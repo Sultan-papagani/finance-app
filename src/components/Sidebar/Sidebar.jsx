@@ -1,11 +1,5 @@
 import React from "react";
-
-/*
-Sidebar.jsx
-Ana sidebar komponenti 
-
-ileride bu sistem değişebilir şimdilik sorun göremiyorum
-*/
+import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
@@ -15,14 +9,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         transition-transform duration-300 ease-in-out z-50 shadow-lg`}
     >
       <div className="p-4 font-bold text-xl border-b border-gray-700 flex justify-between items-center">
-        Finance App
+        Finans Uygulaması
         <button onClick={toggleSidebar} className="text-white text-xl">×</button>
       </div>
       <ul className="mt-4 space-y-2">
-        <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">Ana Sayfa</li>
-        <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">Profilim</li>
-        <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">Ayarlar</li>
-        <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">Çıkış yap</li>
+        <li className="hover:bg-gray-700 cursor-pointer">
+          <Link to="/" className="block px-4 py-2" onClick={toggleSidebar}>
+            Ana Sayfa
+          </Link>
+        </li>
+        <li className="hover:bg-gray-700 cursor-pointer">
+          <Link to="/profile" className="block px-4 py-2" onClick={toggleSidebar}>
+            Profilim
+          </Link>
+        </li>
+        <li className="hover:bg-gray-700 cursor-pointer">
+          <Link to="/settings" className="block px-4 py-2" onClick={toggleSidebar}>
+            Ayarlar
+          </Link>
+        </li>
+        <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer" onClick={() => alert("Çıkış yapıldı")}>
+          Çıkış yap
+        </li>
       </ul>
     </div>
   );

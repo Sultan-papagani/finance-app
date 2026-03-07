@@ -1,5 +1,9 @@
 import React from "react";
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import AppLayout from "./components/AppLayout/AppLayout";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import "./app.css"
 
 /*
@@ -9,16 +13,17 @@ AppLayout'un içini kullanın.
 */
 
 function App() {
+  {/* Tüm Site */}
   return (
-    <AppLayout>
-    {/* Tüm Site */}
-    <div className="flex justify-center min-h-screen pt-8">
-      <div className="max-w-6xl w-full px-4">
-        <h1 className="text-3xl font-bold">Sayfa İçeriği</h1>
-        <p className="mt-4">Bu div tüm sitenin gösterileceği kısım.</p>
-      </div>
-    </div>
-    </AppLayout>
+    <BrowserRouter>
+      <AppLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </AppLayout>
+    </BrowserRouter>
   );
 }
 
