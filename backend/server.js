@@ -1,37 +1,37 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Test route
 app.get("/", (req, res) => {
-  res.send("Express server is running 🚀");
+  res.send("Sunucu baba çalışıyor");
 });
 
-// Example API route
+// Örnek kullanıcı getir
 app.get("/api/users", (req, res) => {
   const users = [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
+    { id: 1, name: "Alirıza Baba" },
+    { id: 2, name: "Mahmut Hakul Hakulefendi" },
   ];
 
   res.json(users);
 });
 
-// POST example
+// post request örneği
 app.post("/api/users", (req, res) => {
   const newUser = req.body;
 
   res.json({
-    message: "User created",
+    message: "Kullanıcı oluşturuldu umarım",
     user: newUser,
   });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Sunucu http://localhost:${PORT}'de çalışıyo olmalı.`);
 });
