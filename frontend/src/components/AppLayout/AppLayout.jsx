@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../Sidebar/Sidebar";
-import SidebarToggleButton from "../Sidebar/SidebarToggleButton";
 import BottomNav from "../BottomNav/BottomNav";
 
-/* 
-AppLayout.jsx
-Sitenin ana komponenti. Sidebar'ı konumlandırır ve 
-içine pass edilen {children}'ı siderbar'a göre konumlandırır.
+/* AppLayout.jsx
+Sitenin ana iskeleti. Mobil/Masaüstü ayrımını yapar.
+Yeni tasarımda SidebarToggleButton kaldırıldı, tuş Sidebar'ın içine taşındı.
 */
 
 const AppLayout = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    // Masaüstünde menü varsayılan olarak açık gelsin
+    const [isOpen, setIsOpen] = useState(true); 
     const toggleSidebar = () => setIsOpen(!isOpen);
+    
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-    // ekran küçüldüğünde navbarları değiştir
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
@@ -25,17 +24,20 @@ const AppLayout = ({ children }) => {
     }, []);
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-gray-50">
             {isMobile ? (
-                    <BottomNav />
+                <BottomNav />
             ) : (
-                <>
-                    <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-                    <SidebarToggleButton toggleSidebar={toggleSidebar} isOpen={isOpen} />
-                </>
+                <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
             )}
 
-            <main className={`flex-1 transition-all duration-300 ${isOpen ? "ml-64" : "ml-0"}`}>
+            {/* İşin sırrı burada: 
+              Mobildeyken alt menü içeriği kapatmasın diye pb-20 (padding-bottom) verdik ve ml-0 yaptık.
+              Masaüstünde ise menü açıksa 256px (ml-64), kapalıysa o ince mavi şerit kadar 64px (ml-16) soldan boşluk bırakıyoruz.
+            */}
+            <main className={`flex-1 transition-all duration-300 
+                ${isMobile ? "ml-0 pb-20" : (isOpen ? "ml-64" : "ml-16")}`}
+            >
                 {children}
             </main>
         </div>
