@@ -3,11 +3,15 @@ import { Link, useLocation } from "react-router-dom";
 // Assets klasöründen logonu çekiyoruz
 import Logo from "../../assets/logo.png"; 
 // History (Saat) ikonunu Lucide'den ekledik
-import { Home, Search, BarChart2, User, ChevronRight, History } from "lucide-react";
+import { Home, Search, BarChart2, User, ChevronRight, History, LogOut } from "lucide-react";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Token'ı sil
+    window.location.href = "/"; // Karşılama veya Login sayfasına fırlat
+  };
 
   return (
     <div
@@ -47,6 +51,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           
           <NavItem to="/finance" icon={<BarChart2 size={22} />} label="Finance" isOpen={isOpen} isActive={isActive('/finance')} />
           <NavItem to="/profile" icon={<User size={22} />} label="Profile" isOpen={isOpen} isActive={isActive('/profile')} />
+          
+          {/* --- ÇIKIŞ YAP BUTONU --- */}
+          <li className="relative group pt-4 mt-4 border-t border-white/10">
+            <button
+              onClick={handleLogout}
+              className={`w-full flex items-center h-12 rounded-xl transition-all duration-200 px-3 text-red-400 hover:bg-red-500/20 hover:text-red-300`}
+            >
+              <div className="min-w-[32px] flex justify-center"><LogOut size={22} /></div>
+              <span className={`ml-3 transition-all duration-300 overflow-hidden whitespace-nowrap ${isOpen ? "opacity-100 w-auto" : "opacity-0 w-0"}`}>
+                Çıkış Yap
+              </span>
+              {!isOpen && (
+                <div className="absolute left-16 bg-white text-red-600 px-3 py-2 rounded-lg hidden group-hover:block text-xs font-bold shadow-xl z-50 whitespace-nowrap">
+                  Çıkış Yap
+                </div>
+              )}
+            </button>
+          </li>
         </ul>
       </nav>
 

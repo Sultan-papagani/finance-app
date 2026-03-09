@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import AppLayout from "./components/AppLayout/AppLayout";
 
 // Sayfaları içe aktarıyoruz
@@ -14,23 +15,55 @@ import History from "./pages/History";
 import MyGoal from "./components/MyGoal/MyGoal";
 import MyGoalDetail from "./components/MyGoal/MyGoalDetail";
 import AddPayment from "./pages/AddPayment";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 function App() {
+  const hasToken = localStorage.getItem("token");
+
+
   return (
     <Router>
-      <AppLayout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/finance" element={<Finance />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/add-transaction" element={<AddTransaction />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/my-goal" element={<MyGoal />} />
-          <Route path="/my-goal/:id" element={<MyGoalDetail />} />
-          <Route path="/add-payment" element={<AddPayment />} />
-        </Routes>
-      </AppLayout>
+      <Routes>
+        {/* --- ANA YÖNLENDİRME --- */}
+        {/* Siteye ilk girildiğinde: Token varsa doğrudan içeri (home), yoksa karşılama sayfasına (Index) */}
+        <Route 
+          path="/" 
+          element={hasToken ? <Navigate to="/home" replace /> : <Index />} 
+        />
+        
+        {/* Sadece Giriş Sayfası */}
+        <Route path="/login" element={<Login />} />
+
+
+        {/* --- KORUMALI ROTALAR --- */}
+        <Route 
+          path="/*" 
+          element={
+            <ProtectedRoute>
+              {/* AppLayout sadece giriş yapmış kişilere render edilecek */}
+              <AppLayout>
+                <Routes>
+                  {/* Dikkat: Home rotasını "/" yerine "/home" yaptık ki Index ile karışmasın */}
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/finance" element={<Finance />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/add-transaction" element={<AddTransaction />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/my-goal" element={<MyGoal />} />
+                  <Route path="/my-goal/:id" element={<MyGoalDetail />} />
+                  <Route path="/add-payment" element={<AddPayment />} />
+                  
+                  {/* Bilinmeyen saçma sapan bir URL girilirse anında Home'a geri şutla */}
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Routes>
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
     </Router>
   );
 }
