@@ -8,27 +8,13 @@ const HomeHeader = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=TRY,USD,GBP,CHF,JPY,AUD,CAD");
+
+        const response = await fetch("http://localhost:3000/api/rates");
         const data = await response.json();
 
-        if (data && data.rates) {
-          const eurTry = data.rates.TRY;
-          const usdTry = data.rates.TRY / data.rates.USD;
-          const gbpTry = data.rates.TRY / data.rates.GBP;
-          const chfTry = data.rates.TRY / data.rates.CHF;
-          const jpyTry = data.rates.TRY / data.rates.JPY; 
-          const audTry = data.rates.TRY / data.rates.AUD;
-          const cadTry = data.rates.TRY / data.rates.CAD;
-
-          setRates({
-            EUR: eurTry.toFixed(2),
-            USD: usdTry.toFixed(2),
-            GBP: gbpTry.toFixed(2),
-            CHF: chfTry.toFixed(2),
-            JPY: jpyTry.toFixed(2), 
-            AUD: audTry.toFixed(2),
-            CAD: cadTry.toFixed(2)
-          });
+        // Backend zaten hesaplayıp gönderdiği için direkt state'e atıyoruz
+        if (data && !data.error) {
+          setRates(data);
         }
       } catch (error) {
         console.error("Kur verileri çekilemedi:", error);
@@ -61,17 +47,16 @@ const HomeHeader = () => {
         `}
       </style>
 
-
-      <header className="w-full bg-white border-b border-gray-100 shadow-sm px-10 py-4 hidden md:flex justify-between items-center sticky top-0 z-10">
+      <header className="w-full bg-white border-b border-gray-100 shadow-sm px-6 md:px-10 py-4 hidden md:flex justify-between items-center sticky top-0 z-10">
         
         {/* SOL TARAF BOŞLUK */}
         <div className="flex-1"></div>
 
-        {/* SAĞ ÜST GRUP: Borsa verileri ve Logo */}
-        <div className="flex items-center gap-6 opacity-40 hover:opacity-100 transition-opacity duration-300 cursor-pointer shrink-0">
+        {/* SAĞ ÜST GRUP */}
+        <div className="flex items-center gap-4 md:gap-6 opacity-40 hover:opacity-100 transition-opacity duration-300 cursor-pointer shrink-0">
           
           {/*  BORSA LİSTESİ */}
-          <div className="relative overflow-hidden h-6 border-r border-gray-100 pr-6 w-[400px] lg:w-[500px]">
+          <div className="relative overflow-hidden h-6 border-r border-gray-100 pr-4 md:pr-6 w-[250px] md:w-[400px] lg:w-[500px]">
             {loading ? (
               <span className="text-[10px] font-bold text-gray-400 animate-pulse uppercase tracking-widest absolute left-0 flex items-center h-full">
                 Veriler Yükleniyor...

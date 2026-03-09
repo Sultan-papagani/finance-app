@@ -241,3 +241,34 @@ app.delete('/api/user/images/:imageId', requireAuth, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Finans sunucusu http://localhost:${PORT}'da çalışıyor`);
 });
+
+//------------------------------------------------------- */
+// --- CANLI BORSA API ROUTE'U dövizzzz---
+app.get('/api/rates', async (req, res) => {
+  try {
+    // Backend'imiz Frankfurter'e gidip ham veriyi çeker
+    const response = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=TRY,USD,GBP,CHF,JPY,AUD,CAD");
+    const data = await response.json();
+
+    if (data && data.rates) {
+      // matematiği Frontend yerine burada, sunucuda yapıyoruz
+      const rates = {
+        EUR: data.rates.TRY.toFixed(2),
+        USD: (data.rates.TRY / data.rates.USD).toFixed(2),
+        GBP: (data.rates.TRY / data.rates.GBP).toFixed(2),
+        CHF: (data.rates.TRY / data.rates.CHF).toFixed(2),
+        JPY: (data.rates.TRY / data.rates.JPY).toFixed(2),
+        AUD: (data.rates.TRY / data.rates.AUD).toFixed(2),
+        CAD: (data.rates.TRY / data.rates.CAD).toFixed(2)
+      };
+
+      //  hesaplanmış veriyi yolluyoruz
+      res.json(rates);
+    } else {
+      res.status(400).json({ error: "API'den beklenen veri gelmedi." });
+    }
+  } catch (error) {
+    console.error("Kurlar çekilirken hata:", error);
+    res.status(500).json({ error: "Sunucu hatası, kurlar alınamadı." });
+  }
+});
