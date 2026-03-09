@@ -1,6 +1,6 @@
 import React from "react";
 import MyGoalsWidget from "../components/MyGoal/MyGoalWidget";
-
+import UpcomingPayments from "../components/UpcomingPayments/UpcomingPayments";
 const Home = () => {
   const handleFetch = async () => {
     try {
@@ -32,6 +32,8 @@ const Home = () => {
 
         {/* Hedef özet widget'ını alt kısma yerleştirdik */}
         <MyGoalsWidget />
+        {/* Yaklaşan Ödemeler Alanı */}
+        <UpcomingPayments />
       </div>
     </div>
   );
