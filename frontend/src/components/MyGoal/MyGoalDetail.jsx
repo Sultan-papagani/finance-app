@@ -207,15 +207,16 @@ const MyGoalDetail = () => {
 
   return (
     <div className="max-w-5xl mx-auto w-full pb-24 md:pb-10 pt-6 px-4 md:px-8 relative">
-      {/* Konfeti Yağmuru */}
       {showConfetti && (
-        <Confetti
-          width={window.innerWidth}
-          height={window.innerHeight}
-          recycle={false}
-          numberOfPieces={600}
-          gravity={0.15}
-        />
+        <div className="fixed inset-0 z-[999] pointer-events-none">
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            recycle={false}
+            numberOfPieces={600}
+            gravity={0.15}
+          />
+        </div>
       )}
 
       {/* Header */}
