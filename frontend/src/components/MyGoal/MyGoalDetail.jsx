@@ -38,7 +38,7 @@ const MyGoalDetail = () => {
     getSingleGoal();
   }, [id]);
 
-  // Dinamik Para Ekleme İşlemi (Tüm UI'ı günceller)
+  // Dinamik Para Ekleme İşlemi
   const handleAddMoney = (e) => {
     e.preventDefault();
 
@@ -124,22 +124,32 @@ const MyGoalDetail = () => {
   ).toFixed(1);
 
   return (
-    <div className="max-w-4xl mx-auto w-full pb-24 md:pb-10 relative">
-      {/* Üst Kısım (Hero) */}
-      <div className="relative h-64 md:h-80 w-full rounded-b-[40px] overflow-hidden shadow-lg">
+    // Dış kapsayıcıya padding (boşluk) verdik ki sayfa kenarlara ve üste yapışmasın
+    <div className="max-w-5xl mx-auto w-full pb-24 md:pb-10 pt-6 px-4 md:px-8 relative">
+      {/* --- YENİ EKLENEN HEADER KISMI --- */}
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={() => navigate("/my-goal")}
+          className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors shadow-sm"
+        >
+          <ArrowLeft size={24} />
+        </button>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Hedef Detayı</h1>
+          <p className="text-sm text-gray-500">
+            Ortak hedefine ait ilerleme ve geçmiş
+          </p>
+        </div>
+      </div>
+
+      {/* Üst Kısım (Hero) - Artık yapışık değil, köşeleri tam yuvarlatılmış ayrı bir kart */}
+      <div className="relative h-64 md:h-80 w-full rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
         <img
           src={goal.image}
           alt={goal.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-
-        <button
-          onClick={() => navigate("/my-goal")}
-          className="absolute top-6 left-6 bg-white/20 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white/40 transition-colors z-10"
-        >
-          <ArrowLeft size={24} />
-        </button>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
 
         <div className="absolute bottom-8 left-6 right-6 text-white z-10">
           <div className="bg-blue-500 text-xs font-bold px-3 py-1 rounded-full inline-block mb-3 shadow-md">
@@ -159,7 +169,7 @@ const MyGoalDetail = () => {
         </div>
       </div>
 
-      <div className="px-6 mt-8 space-y-8">
+      <div className="mt-8 space-y-8">
         {/* Büyük İlerleme Çubuğu ve Aksiyon */}
         <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-1 w-full">
