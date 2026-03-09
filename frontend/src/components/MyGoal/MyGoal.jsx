@@ -74,6 +74,13 @@ const MyGoal = () => {
                   alt={goal.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                 />
+                {/* YÖNLENDİRME İKONU */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
+                  <ChevronRight
+                    size={18}
+                    className="text-[#007AFF] group-hover:translate-x-1 transition-transform"
+                  />
+                </div>
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[#007AFF] shadow-sm">
                   %{progressPercentage} Tamamlandı
                 </div>
