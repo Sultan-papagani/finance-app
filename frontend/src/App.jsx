@@ -2,8 +2,6 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout/AppLayout";
-import MyGoal from "./components/MyGoal/MyGoal";
-import MyGoalDetail from "./components/MyGoal/MyGoalDetail";
 
 // Sayfaları içe aktarıyoruz
 import Home from "./pages/Home";
@@ -13,6 +11,8 @@ import Search from "./pages/Search";
 import Finance from "./pages/Finance";
 import AddTransaction from "./pages/AddTransaction";
 import History from "./pages/History";
+import MyGoal from "./components/MyGoal/MyGoal";
+import MyGoalDetail from "./components/MyGoal/MyGoalDetail";
 
 function App() {
   return (
