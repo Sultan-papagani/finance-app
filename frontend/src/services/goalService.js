@@ -7,6 +7,7 @@ const MOCK_GOALS_DB = [
         image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1000",
         targetAmount: 75000,
         currentAmount: 30000,
+        targetDate: "2026-12-31", // YENİ: Bitiş Tarihi
         contributors: [
             { name: "Ayberk", amount: 20000, avatarColor: "bg-blue-100 text-blue-600" },
             { name: "Ali", amount: 10000, avatarColor: "bg-green-100 text-green-600" },
@@ -23,6 +24,7 @@ const MOCK_GOALS_DB = [
         image: "https://images.unsplash.com/photo-1555885234-a169fa138e6e?auto=format&fit=crop&q=80&w=1000",
         targetAmount: 25000,
         currentAmount: 5000,
+        targetDate: "2026-08-15", // YENİ: Bitiş Tarihi
         contributors: [
             { name: "Ayberk", amount: 5000, avatarColor: "bg-blue-100 text-blue-600" },
         ],
@@ -34,9 +36,7 @@ const MOCK_GOALS_DB = [
 
 export const fetchGoals = () => {
     return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(MOCK_GOALS_DB);
-        }, 800);
+        setTimeout(() => resolve(MOCK_GOALS_DB), 800);
     });
 };
 

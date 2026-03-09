@@ -255,7 +255,21 @@ const MyGoal = () => {
                   </span>
                 </div>
               </div>
-
+              {/* Hedef Tarihi Eklemesi */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Hedef Bitiş Tarihi
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={newGoal.targetDate || ""}
+                  onChange={(e) =>
+                    setNewGoal({ ...newGoal, targetDate: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-gray-700"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Görsel Linki (İsteğe Bağlı)
