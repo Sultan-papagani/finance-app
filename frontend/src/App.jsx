@@ -13,7 +13,7 @@ import AddTransaction from "./pages/AddTransaction";
 import History from "./pages/History";
 import MyGoal from "./components/MyGoal/MyGoal";
 import MyGoalDetail from "./components/MyGoal/MyGoalDetail";
-
+import AddPayment from "./pages/AddPayment";
 function App() {
   return (
     <Router>
@@ -28,6 +28,7 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/my-goal" element={<MyGoal />} />
           <Route path="/my-goal/:id" element={<MyGoalDetail />} />
+          <Route path="/add-payment" element={<AddPayment />} />
         </Routes>
       </AppLayout>
     </Router>
