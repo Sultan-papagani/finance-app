@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Clock, Users, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  Clock,
+  Users,
+  Loader2,
+  X,
+  Wallet,
+} from "lucide-react";
 import { fetchGoalById } from "../../services/goalService";
 
 const MyGoalDetail = () => {
@@ -9,6 +17,11 @@ const MyGoalDetail = () => {
   const [goal, setGoal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Modal State'leri
+  const [isAddMoneyOpen, setIsAddMoneyOpen] = useState(false);
+  const [addedAmount, setAddedAmount] = useState("");
+  const [actionNote, setActionNote] = useState("");
 
   useEffect(() => {
     const getSingleGoal = async () => {
@@ -24,6 +37,62 @@ const MyGoalDetail = () => {
 
     getSingleGoal();
   }, [id]);
+
+  // Dinamik Para Ekleme İşlemi (Tüm UI'ı günceller)
+  const handleAddMoney = (e) => {
+    e.preventDefault();
+
+    const amountToAdd = parseFloat(addedAmount);
+    if (isNaN(amountToAdd) || amountToAdd <= 0) return;
+
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const formattedTime = now.toLocaleTimeString("tr-TR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const newHistoryItem = {
+      id: Date.now(),
+      user: "Ayberk",
+      action: actionNote ? `Para Eklendi (${actionNote})` : "Para Eklendi",
+      amount: amountToAdd,
+      date: formattedDate,
+      time: formattedTime,
+    };
+
+    setGoal((prevGoal) => {
+      const updatedContributors = [...prevGoal.contributors];
+      const userIndex = updatedContributors.findIndex(
+        (c) => c.name === "Ayberk",
+      );
+
+      if (userIndex !== -1) {
+        updatedContributors[userIndex].amount += amountToAdd;
+      } else {
+        updatedContributors.push({
+          name: "Ayberk",
+          amount: amountToAdd,
+          avatarColor: "bg-blue-100 text-blue-600",
+        });
+      }
+
+      return {
+        ...prevGoal,
+        currentAmount: prevGoal.currentAmount + amountToAdd,
+        contributors: updatedContributors,
+        history: [newHistoryItem, ...prevGoal.history],
+      };
+    });
+
+    setAddedAmount("");
+    setActionNote("");
+    setIsAddMoneyOpen(false);
+  };
 
   if (loading) {
     return (
@@ -55,7 +124,7 @@ const MyGoalDetail = () => {
   ).toFixed(1);
 
   return (
-    <div className="max-w-4xl mx-auto w-full pb-24 md:pb-10">
+    <div className="max-w-4xl mx-auto w-full pb-24 md:pb-10 relative">
       {/* Üst Kısım (Hero) */}
       <div className="relative h-64 md:h-80 w-full rounded-b-[40px] overflow-hidden shadow-lg">
         <img
@@ -67,12 +136,12 @@ const MyGoalDetail = () => {
 
         <button
           onClick={() => navigate("/my-goal")}
-          className="absolute top-6 left-6 bg-white/20 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white/40 transition-colors"
+          className="absolute top-6 left-6 bg-white/20 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white/40 transition-colors z-10"
         >
           <ArrowLeft size={24} />
         </button>
 
-        <div className="absolute bottom-8 left-6 right-6 text-white">
+        <div className="absolute bottom-8 left-6 right-6 text-white z-10">
           <div className="bg-blue-500 text-xs font-bold px-3 py-1 rounded-full inline-block mb-3 shadow-md">
             Ortak Hedef
           </div>
@@ -112,7 +181,10 @@ const MyGoalDetail = () => {
             </div>
           </div>
 
-          <button className="w-full md:w-auto bg-[#007AFF] text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 hover:scale-105 transition-all shadow-[0_4px_20px_rgba(0,122,255,0.3)] shrink-0">
+          <button
+            onClick={() => setIsAddMoneyOpen(true)}
+            className="w-full md:w-auto bg-[#007AFF] text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 hover:scale-105 transition-all shadow-[0_4px_20px_rgba(0,122,255,0.3)] shrink-0"
+          >
             <Plus size={20} strokeWidth={3} />
             Para Ekle
           </button>
@@ -130,7 +202,6 @@ const MyGoalDetail = () => {
                 (user.amount / goal.targetAmount) *
                 100
               ).toFixed(1);
-
               return (
                 <div
                   key={index}
@@ -156,6 +227,24 @@ const MyGoalDetail = () => {
                 </div>
               );
             })}
+
+            {/* Büyük Arkadaş Ekle Kartı */}
+            <button
+              onClick={() =>
+                alert("Davet linki kopyalandı! Arkadaşına gönderebilirsin.")
+              }
+              className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center gap-4 hover:border-[#007AFF] hover:bg-blue-50/50 transition-all group text-left"
+            >
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white border border-gray-200 group-hover:border-[#007AFF] group-hover:text-[#007AFF] text-gray-400 transition-colors shadow-sm">
+                <Plus size={24} strokeWidth={2.5} />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-600 group-hover:text-[#007AFF] transition-colors">
+                  Arkadaş Ekle
+                </h4>
+                <p className="text-sm text-gray-400">Ortak hedefe davet et</p>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -191,6 +280,71 @@ const MyGoalDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* --- PARA EKLEME MODALI (POP-UP) --- */}
+      {isAddMoneyOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Wallet className="text-[#007AFF]" size={24} />
+                Para Ekle
+              </h2>
+              <button
+                onClick={() => setIsAddMoneyOpen(false)}
+                className="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 p-2 rounded-full shadow-sm transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddMoney} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Eklenecek Tutar (₺)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Örn: 1500"
+                    required
+                    min="1"
+                    value={addedAmount}
+                    onChange={(e) => setAddedAmount(e.target.value)}
+                    className="w-full pl-4 pr-10 py-3 text-lg font-bold text-[#007AFF] rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">
+                    ₺
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Kısa Not (İsteğe Bağlı)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Maaş yattı, harçlık..."
+                  value={actionNote}
+                  onChange={(e) => setActionNote(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <Plus size={20} strokeWidth={3} />
+                  Hedefe Aktar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
