@@ -1,6 +1,6 @@
 import React from 'react';
 import MarketAnalysis from '../components/Finance/MarketAnalysis/MarketAnalysis';
-
+import StockTerminal from '../components/Finance/StockTerminal/StockTerminal';
 const Finance = () => {
   return (
     // Sayfanın iskeleti: max-w-7xl, ortalanmış, boşluklu
@@ -8,7 +8,8 @@ const Finance = () => {
       
       {/* 1. Modül: Piyasa Analizi Component'ini Çağırıyoruz */}
       <MarketAnalysis />
-
+      {/* 2. Modül: Hisse Senedi Terminali Component'ini Çağırıyoruz */}
+      <StockTerminal />
 
 
     </div>

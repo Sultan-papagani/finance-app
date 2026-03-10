@@ -311,3 +311,119 @@ app.get('/api/historical-rates', async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası." });
   }
 });
+
+// =======================================================
+//  TWELVE DATA - HİSSE SENEDİ API MOTORU (REAL-TIME VERİ + GRAFİK VERİSİ + MOMENTUM VERİSİ)
+// =======================================================
+
+const TWELVE_DATA_API_KEY = 'cc04ac6874cb4301963a1977687aa9b9'; 
+const stockCache = {}; 
+
+app.get('/api/stock/:symbol', async (req, res) => {
+  const symbol = req.params.symbol.toUpperCase();
+
+  // 1. ZEKİ YAKLAŞIM (CACHE KONTROLÜ)
+  if (stockCache[symbol] && (Date.now() - stockCache[symbol].timestamp < 60000)) {
+    console.log(`[ CACHE HIZI] Hafızadan getirildi: ${symbol}`);
+    return res.json(stockCache[symbol].data);
+  }
+
+  try {
+    console.log(`[ API İSTEĞİ] Twelve Data'ya gidiliyor: ${symbol}`);
+    
+    // 2. Ham Verileri Çek
+    const quoteUrl = `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${TWELVE_DATA_API_KEY}`;
+    const quoteRes = await fetch(quoteUrl);
+    const quoteData = await quoteRes.json();
+
+    const historyUrl = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=30&apikey=${TWELVE_DATA_API_KEY}`;
+    const historyRes = await fetch(historyUrl);
+    const historyData = await historyRes.json();
+
+    if (quoteData.status === 'error' || quoteData.code === 400) {
+      return res.status(404).json({ error: `${symbol} adında bir hisse bulunamadı.` });
+    }
+    if (quoteData.code === 429 || historyData.code === 429) {
+      return res.status(429).json({ error: "Dakikada 8 istek limitine takıldık! 1 dakika bekle kingo." });
+    }
+
+
+    const rawHistory = historyData.values ? historyData.values.reverse() : [];
+    let greenDays = 0;
+    let redDays = 0;
+
+    // Frontend yorulmasın diye grafiğin datası Backend'de hazırlanıyor
+    const formattedChartData = rawHistory.map(item => {
+      const closePrice = parseFloat(item.close);
+      const openPrice = parseFloat(item.open);
+      const isPositive = closePrice >= openPrice;
+      
+      if (isPositive) greenDays++; else redDays++;
+
+      return {
+        date: item.datetime.split('-').slice(1).join('/'), // 2026-03-10 -> 03/10 yapar
+        price: closePrice,
+        open: openPrice,
+        volume: parseInt(item.volume) / 1000000, // Direkt Milyon'a çevirip yollar
+        isPositive: isPositive
+      };
+    });
+
+    // Momentum pastasının verisi de Backend'den hazır gidiyor
+    const momentumData = [
+      { name: 'Alıcılı (Yeşil)', value: greenDays, color: '#10B981' },
+      { name: 'Satıcılı (Kırmızı)', value: redDays, color: '#EF4444' }
+    ];
+
+    // Sonuç
+    const result = {
+      info: quoteData,
+      chartData: formattedChartData,
+      momentumData: momentumData
+    };
+
+    // 5. Cache'e kaydet ve yolla
+    stockCache[symbol] = { timestamp: Date.now(), data: result };
+    res.json(result);
+
+  } catch (error) {
+    console.error(`[❌ HATA] ${symbol} çekilirken backend patladı:`, error);
+    res.status(500).json({ error: "Sunucu hatası, hisse verisi alınamadı." });
+  }
+});
+
+// =======================================================
+//  HİSSE ARAMA MOTORU (LİMİTSİZ YAHOO FINANCE ALTYAPISI)
+// =======================================================
+app.get('/api/search/:query', async (req, res) => {
+  const query = req.params.query;
+  try {
+    //  Yahoo bizi bot sanmasın diye kendimizi gerçek bir tarayıcı (Chrome) gibi gösteriyoruz!
+    const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=6&newsCount=0`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+
+    if (data && data.quotes) {
+      // Sadece hisse senetlerini (EQUITY) ve ETF'leri filtrele
+      const results = data.quotes
+        .filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF')
+        .map(q => ({
+          symbol: q.symbol,
+          name: q.shortname || q.longname || 'Bilinmeyen Şirket',
+          exchange: q.exchDisp || q.exchange || 'Borsa'
+        }));
+      
+      res.json(results);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error(`[Arama Hatası] ${query} aranırken patladı:`, error);
+    res.status(500).json({ error: "Arama motoru yanıt vermiyor." });
+  }
+});
