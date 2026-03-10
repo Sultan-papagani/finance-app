@@ -18,6 +18,7 @@ import AddPayment from "./pages/AddPayment";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import CurrencyDetail from './pages/CurrencyDetail';
 function App() {
   const hasToken = localStorage.getItem("token");
 
@@ -55,7 +56,7 @@ function App() {
                   <Route path="/my-goal" element={<MyGoal />} />
                   <Route path="/my-goal/:id" element={<MyGoalDetail />} />
                   <Route path="/add-payment" element={<AddPayment />} />
-                  
+                  <Route path="/detail" element={<CurrencyDetail />} />
                   {/* Bilinmeyen saçma sapan bir URL girilirse anında Home'a geri şutla */}
                   <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>

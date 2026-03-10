@@ -272,3 +272,42 @@ app.get('/api/rates', async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası, kurlar alınamadı." });
   }
 });
+
+
+// --- GEÇMİŞ VERİLER (GRAFİK İÇİN) ---
+app.get('/api/historical-rates', async (req, res) => {
+  try {
+    // Frontend'den gelen istekleri alıyoruz (Örn: base=EUR, symbol=TRY, days=30)
+    const base = req.query.base || 'EUR';
+    const symbol = req.query.symbol || 'TRY';
+    const days = parseInt(req.query.days) || 30; // Varsayılan 30 gün (1 Ay)
+
+    // Tarihleri hesaplıyoruz (Bugün ve X gün öncesi)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days);
+
+    const startStr = startDate.toISOString().split('T')[0]; // Örn: 2024-02-10
+    const endStr = endDate.toISOString().split('T')[0];     // Örn: 2024-03-10
+
+    // Frankfurter'in geçmiş veri URL'si
+    const url = `https://api.frankfurter.dev/v1/${startStr}..${endStr}?base=${base}&symbols=${symbol}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data && data.rates) {
+      // Recharts kütüphanesinin anlayacağı formata çeviriyoruz [{ date: '...', rate: ... }]
+      const chartData = Object.entries(data.rates).map(([date, ratesObj]) => ({
+        date: date,
+        rate: ratesObj[symbol]
+      }));
+
+      res.json(chartData);
+    } else {
+      res.status(400).json({ error: "Geçmiş veri bulunamadı." });
+    }
+  } catch (error) {
+    console.error("Geçmiş veri çekilirken hata:", error);
+    res.status(500).json({ error: "Sunucu hatası." });
+  }
+});
