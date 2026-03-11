@@ -313,81 +313,121 @@ app.get('/api/historical-rates', async (req, res) => {
 });
 
 // =======================================================
-//  TWELVE DATA - HİSSE SENEDİ API MOTORU (REAL-TIME VERİ + GRAFİK VERİSİ + MOMENTUM VERİSİ)
+// DÜNYANIN EN BÜYÜK 10 BORSASI İÇİN HİBRİT MOTOR
 // =======================================================
 
 const TWELVE_DATA_API_KEY = 'cc04ac6874cb4301963a1977687aa9b9'; 
 const stockCache = {}; 
 
-app.get('/api/stock/:symbol', async (req, res) => {
-  const symbol = req.params.symbol.toUpperCase();
+// Yahoo'nun kullandığı borsa uzantıları sözlüğü
+const GLOBAL_MARKETS = {
+  '.IS': { name: 'Borsa İstanbul', exchange: 'BIST' },
+  '.L':  { name: 'Londra Borsası', exchange: 'LSE' },
+  '.DE': { name: 'Almanya (XETRA)', exchange: 'XETRA' },
+  '.PA': { name: 'Paris Borsası', exchange: 'EPA' },
+  '.T':  { name: 'Tokyo Borsası', exchange: 'TSE' },
+  '.HK': { name: 'Hong Kong Borsası', exchange: 'HKG' },
+  '.TO': { name: 'Toronto Borsası', exchange: 'TSX' },
+  '.AX': { name: 'Avustralya Borsası', exchange: 'ASX' },
+  '.NS': { name: 'Hindistan Borsası', exchange: 'NSE' }
+};
 
-  // 1. ZEKİ YAKLAŞIM (CACHE KONTROLÜ)
-  if (stockCache[symbol] && (Date.now() - stockCache[symbol].timestamp < 60000)) {
-    console.log(`[ CACHE HIZI] Hafızadan getirildi: ${symbol}`);
-    return res.json(stockCache[symbol].data);
+app.get('/api/stock/:symbol', async (req, res) => {
+  const rawSymbol = req.params.symbol.toUpperCase();
+
+  // 1. (CACHE KONTROLÜ)
+  if (stockCache[rawSymbol] && (Date.now() - stockCache[rawSymbol].timestamp < 60000)) {
+    console.log(`[⚡ CACHE HIZI] Hafızadan getirildi: ${rawSymbol}`);
+    return res.json(stockCache[rawSymbol].data);
   }
 
   try {
-    console.log(`[ API İSTEĞİ] Twelve Data'ya gidiliyor: ${symbol}`);
-    
-    // 2. Ham Verileri Çek
-    const quoteUrl = `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${TWELVE_DATA_API_KEY}`;
-    const quoteRes = await fetch(quoteUrl);
-    const quoteData = await quoteRes.json();
+    let quoteData;
+    let historyData;
 
-    const historyUrl = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=30&apikey=${TWELVE_DATA_API_KEY}`;
-    const historyRes = await fetch(historyUrl);
-    const historyData = await historyRes.json();
+    //  DİNAMİK KONTROL: Gelen hisse GLOBAL_MARKETS sözlüğündeki bir uzantıya sahip mi?
+    const marketSuffix = Object.keys(GLOBAL_MARKETS).find(suffix => rawSymbol.endsWith(suffix));
 
-    if (quoteData.status === 'error' || quoteData.code === 400) {
-      return res.status(404).json({ error: `${symbol} adında bir hisse bulunamadı.` });
+    if (marketSuffix) {
+      const marketInfo = GLOBAL_MARKETS[marketSuffix];
+      console.log(`[🌍 YEDEK MOTOR] Global Hisse algılandı (${marketInfo.name}), Yahoo'ya gidiliyor: ${rawSymbol}`);
+      
+      const yahooUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${rawSymbol}?interval=1d&range=2mo`;
+      const response = await fetch(yahooUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const data = await response.json();
+
+      if (!data.chart.result) return res.status(404).json({ error: `${rawSymbol} adında bir hisse bulunamadı.` });
+
+      const resultObj = data.chart.result[0];
+      const meta = resultObj.meta;
+      const timestamps = resultObj.timestamp || [];
+      const quotes = resultObj.indicators.quote[0];
+
+      quoteData = {
+        symbol: rawSymbol,
+        name: rawSymbol.replace(marketSuffix, '') + ` (${marketInfo.name})`, 
+        exchange: marketInfo.exchange,
+        close: meta.regularMarketPrice,
+        change: (meta.regularMarketPrice - meta.chartPreviousClose),
+        percent_change: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100
+      };
+
+      const values = [];
+      for(let i = timestamps.length - 1; i >= 0; i--) {
+        if (quotes.close[i] !== null && quotes.close[i] !== undefined) {
+          values.push({
+            datetime: new Date(timestamps[i] * 1000).toISOString().split('T')[0],
+            open: quotes.open[i] || quotes.close[i],
+            close: quotes.close[i],
+            volume: quotes.volume[i] || 0
+          });
+        }
+        if (values.length === 30) break;
+      }
+      historyData = { values: values };
+
+    } 
+    // Uzantı yoksa demek ki Amerikan Hissesi (Wall Street)!
+    else {
+      console.log(`[🌍 API İSTEĞİ] Twelve Data'ya gidiliyor: ${rawSymbol}`);
+      const quoteUrl = `https://api.twelvedata.com/quote?symbol=${rawSymbol}&apikey=${TWELVE_DATA_API_KEY}`;
+      const quoteRes = await fetch(quoteUrl);
+      quoteData = await quoteRes.json();
+
+      const historyUrl = `https://api.twelvedata.com/time_series?symbol=${rawSymbol}&interval=1day&outputsize=30&apikey=${TWELVE_DATA_API_KEY}`;
+      const historyRes = await fetch(historyUrl);
+      historyData = await historyRes.json();
+
+      if (quoteData.status === 'error' || quoteData.code === 400) return res.status(404).json({ error: `${rawSymbol} adında hisse bulunamadı.` });
+      if (quoteData.code === 429 || historyData.code === 429) return res.status(429).json({ error: "API Limiti! 1 dakika bekle." });
     }
-    if (quoteData.code === 429 || historyData.code === 429) {
-      return res.status(429).json({ error: "Dakikada 8 istek limitine takıldık! 1 dakika bekle kingo." });
-    }
 
-
+    // ORTAK VERİ İŞLEME MERKEZİ
     const rawHistory = historyData.values ? historyData.values.reverse() : [];
-    let greenDays = 0;
-    let redDays = 0;
+    let greenDays = 0, redDays = 0;
 
-    // Frontend yorulmasın diye grafiğin datası Backend'de hazırlanıyor
     const formattedChartData = rawHistory.map(item => {
       const closePrice = parseFloat(item.close);
       const openPrice = parseFloat(item.open);
       const isPositive = closePrice >= openPrice;
-      
       if (isPositive) greenDays++; else redDays++;
-
       return {
-        date: item.datetime.split('-').slice(1).join('/'), // 2026-03-10 -> 03/10 yapar
-        price: closePrice,
-        open: openPrice,
-        volume: parseInt(item.volume) / 1000000, // Direkt Milyon'a çevirip yollar
-        isPositive: isPositive
+        date: item.datetime.split('-').slice(1).join('/'), 
+        price: closePrice, open: openPrice, volume: parseInt(item.volume) / 1000000, isPositive
       };
     });
 
-    // Momentum pastasının verisi de Backend'den hazır gidiyor
-    const momentumData = [
-      { name: 'Alıcılı (Yeşil)', value: greenDays, color: '#10B981' },
-      { name: 'Satıcılı (Kırmızı)', value: redDays, color: '#EF4444' }
-    ];
-
-    // Sonuç
     const result = {
       info: quoteData,
       chartData: formattedChartData,
-      momentumData: momentumData
+      momentumData: [{ name: 'Alıcılı (Yeşil)', value: greenDays, color: '#10B981' }, { name: 'Satıcılı (Kırmızı)', value: redDays, color: '#EF4444' }]
     };
 
-    // 5. Cache'e kaydet ve yolla
-    stockCache[symbol] = { timestamp: Date.now(), data: result };
+    stockCache[rawSymbol] = { timestamp: Date.now(), data: result };
     res.json(result);
 
   } catch (error) {
-    console.error(`[❌ HATA] ${symbol} çekilirken backend patladı:`, error);
+    console.error(`[❌ HATA] ${rawSymbol} çekilirken backend patladı:`, error);
     res.status(500).json({ error: "Sunucu hatası, hisse verisi alınamadı." });
   }
 });
@@ -396,34 +436,15 @@ app.get('/api/stock/:symbol', async (req, res) => {
 //  HİSSE ARAMA MOTORU (LİMİTSİZ YAHOO FINANCE ALTYAPISI)
 // =======================================================
 app.get('/api/search/:query', async (req, res) => {
-  const query = req.params.query;
   try {
-    //  Yahoo bizi bot sanmasın diye kendimizi gerçek bir tarayıcı (Chrome) gibi gösteriyoruz!
-    const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=6&newsCount=0`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json'
-      }
+    const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${req.params.query}&quotesCount=6&newsCount=0`, {
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
     });
-    
     const data = await response.json();
-
     if (data && data.quotes) {
-      // Sadece hisse senetlerini (EQUITY) ve ETF'leri filtrele
-      const results = data.quotes
-        .filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF')
-        .map(q => ({
-          symbol: q.symbol,
-          name: q.shortname || q.longname || 'Bilinmeyen Şirket',
-          exchange: q.exchDisp || q.exchange || 'Borsa'
-        }));
-      
-      res.json(results);
+      res.json(data.quotes.filter(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF').map(q => ({ symbol: q.symbol, name: q.shortname || q.longname, exchange: q.exchDisp || q.exchange })));
     } else {
       res.json([]);
     }
-  } catch (error) {
-    console.error(`[Arama Hatası] ${query} aranırken patladı:`, error);
-    res.status(500).json({ error: "Arama motoru yanıt vermiyor." });
-  }
+  } catch (error) { res.status(500).json({ error: "Arama motoru yanıt vermiyor." }); }
 });
