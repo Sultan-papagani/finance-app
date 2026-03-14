@@ -13,29 +13,34 @@ import {
   Heart,
   Calendar,
 } from "lucide-react";
-import { fetchGoalById } from "../../services/goalService";
+import { fetchGoals, saveGoals } from "../../services/goalService";
+import { apiGet } from "../../services/api";
 
 const MyGoalDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [goal, setGoal] = useState(null);
+  const [allGoals, setAllGoals] = useState([]);
+  const [username, setUsername] = useState("Kullanıcı");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Modal State'leri
   const [isAddMoneyOpen, setIsAddMoneyOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [actionAmount, setActionAmount] = useState("");
   const [actionNote, setActionNote] = useState("");
 
   useEffect(() => {
-    const getSingleGoal = async () => {
+    const load = async () => {
       try {
-        const data = await fetchGoalById(id);
-        setGoal(data);
-        // Sayfa açıldığında hedef %100 ise konfetiyi patlat
-        if (data.currentAmount >= data.targetAmount) {
+        const [goals, profile] = await Promise.all([fetchGoals(), apiGet('/api/user/profile')]);
+        setAllGoals(goals);
+        setUsername(profile.username);
+        const found = goals.find(g => g.id === parseInt(id));
+        if (!found) throw new Error("Hedef bulunamadı");
+        setGoal(found);
+        if (found.currentAmount >= found.targetAmount) {
           setShowConfetti(true);
         }
       } catch (err) {
@@ -44,9 +49,15 @@ const MyGoalDetail = () => {
         setLoading(false);
       }
     };
-
-    getSingleGoal();
+    load();
   }, [id]);
+
+  // Güncellenen hedefi tüm goals dizisiyle birlikte backend'e kaydet
+  const persistGoal = (updatedGoal) => {
+    const updatedAllGoals = allGoals.map(g => g.id === updatedGoal.id ? updatedGoal : g);
+    setAllGoals(updatedAllGoals);
+    saveGoals(updatedAllGoals).catch(err => console.error("Kaydetme hatası:", err));
+  };
 
   // --- AKILLI MATEMATİK HESAPLAMALARI ---
   const calculateInsights = () => {
@@ -102,32 +113,22 @@ const MyGoalDetail = () => {
     const amount = parseFloat(actionAmount);
     if (isNaN(amount) || amount <= 0) return;
 
-    // Eğer para çekilecekse ve bakiye yetersizse uyar
     if (type === "withdraw" && amount > goal.currentAmount) {
       alert("Biriken tutardan fazlasını çekemezsin!");
       return;
     }
 
     const now = new Date();
-    const formattedDate = now.toLocaleDateString("tr-TR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-    const formattedTime = now.toLocaleTimeString("tr-TR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const formattedDate = now.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+    const formattedTime = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
     const actionText = type === "add" ? "Para Eklendi" : "Para Çekildi";
-    const finalActionNote = actionNote
-      ? `${actionText} (${actionNote})`
-      : actionText;
+    const finalActionNote = actionNote ? `${actionText} (${actionNote})` : actionText;
     const transactionAmount = type === "add" ? amount : -amount;
 
     const newHistoryItem = {
       id: Date.now(),
-      user: "Ayberk",
+      user: username,
       action: finalActionNote,
       amount: transactionAmount,
       date: formattedDate,
@@ -136,38 +137,39 @@ const MyGoalDetail = () => {
       isLiked: false,
     };
 
-    setGoal((prevGoal) => {
-      const updatedContributors = [...prevGoal.contributors];
-      const userIndex = updatedContributors.findIndex(
-        (c) => c.name === "Ayberk",
-      );
+    const updatedContributors = [...goal.contributors];
+    const userIndex = updatedContributors.findIndex(c => c.name === username);
 
-      if (userIndex !== -1) {
-        updatedContributors[userIndex].amount += transactionAmount;
-      } else if (type === "add") {
-        updatedContributors.push({
-          name: "Ayberk",
-          amount: amount,
-          avatarColor: "bg-blue-100 text-blue-600",
-        });
-      }
-
-      const newCurrentAmount = prevGoal.currentAmount + transactionAmount;
-
-      // İşlem sonrası %100 olduysa konfeti patlat
-      if (newCurrentAmount >= prevGoal.targetAmount && type === "add") {
-        setShowConfetti(true);
-      } else {
-        setShowConfetti(false); // Geri düştüyse konfetiyi durdur
-      }
-
-      return {
-        ...prevGoal,
-        currentAmount: newCurrentAmount,
-        contributors: updatedContributors,
-        history: [newHistoryItem, ...prevGoal.history],
+    if (userIndex !== -1) {
+      updatedContributors[userIndex] = {
+        ...updatedContributors[userIndex],
+        amount: updatedContributors[userIndex].amount + transactionAmount,
       };
-    });
+    } else if (type === "add") {
+      updatedContributors.push({
+        name: username,
+        amount: amount,
+        avatarColor: "bg-blue-100 text-blue-600",
+      });
+    }
+
+    const newCurrentAmount = goal.currentAmount + transactionAmount;
+
+    if (newCurrentAmount >= goal.targetAmount && type === "add") {
+      setShowConfetti(true);
+    } else {
+      setShowConfetti(false);
+    }
+
+    const updatedGoal = {
+      ...goal,
+      currentAmount: newCurrentAmount,
+      contributors: updatedContributors,
+      history: [newHistoryItem, ...goal.history],
+    };
+
+    setGoal(updatedGoal);
+    persistGoal(updatedGoal);
 
     setActionAmount("");
     setActionNote("");

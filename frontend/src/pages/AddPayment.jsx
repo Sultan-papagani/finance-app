@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as LucideIcons from "lucide-react";
+import { fetchPayments, savePayments } from "../services/goalService";
 
 const AddPayment = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const AddPayment = () => {
   
   const [payments, setPayments] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // --- FİLTRELEME & ANALİTİK STATE'LERİ ---
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -47,12 +49,12 @@ const AddPayment = () => {
     .slice(0, 36);
 
   useEffect(() => {
-    const saved = localStorage.getItem("upcomingPayments");
-    if (saved) {
-      const parsedData = JSON.parse(saved);
-      parsedData.sort((a, b) => new Date(a.date) - new Date(b.date));
-      setPayments(parsedData);
-    }
+    fetchPayments()
+      .then(data => {
+        data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        setPayments(data);
+      })
+      .catch(err => console.error("Ödemeler yüklenemedi:", err));
   }, []);
 
   // --- YARDIMCI FONKSİYONLAR ---
@@ -113,9 +115,9 @@ const AddPayment = () => {
     : filteredPayments.filter(p => p.transactionType === "income").reduce((sum, p) => sum + Number(p.amount), 0);
 
   // --- AKSİYONLAR ---
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (!title || !amount || !date) { alert("Lütfen gerekli alanları doldur kingo!"); return; }
+    if (!title || !amount || !date) { alert("Lütfen gerekli alanları doldur!"); return; }
     const newPayment = {
       id: Date.now(), title, amount: Number(amount), date, note,
       iconName: selectedIcon, color: selectedColor, isRecurring, transactionType,
@@ -123,23 +125,31 @@ const AddPayment = () => {
     };
     const updatedPayments = [...payments, newPayment].sort((a, b) => new Date(a.date) - new Date(b.date));
     setPayments(updatedPayments);
-    localStorage.setItem("upcomingPayments", JSON.stringify(updatedPayments));
+    setIsSaving(true);
+    try {
+      await savePayments(updatedPayments);
+    } catch (err) {
+      console.error("Kaydetme hatası:", err);
+      alert("Kaydetme sırasında bir hata oluştu.");
+    } finally {
+      setIsSaving(false);
+    }
     setTitle(""); setAmount(""); setDate(""); setNote(""); setIconSearch(""); setIsRecurring(false);
   };
 
-  const handleComplete = (e, id) => {
+  const handleComplete = async (e, id) => {
     e.stopPropagation();
     const updatedPayments = payments.map(p => p.id === id ? { ...p, isCompleted: !p.isCompleted } : p);
     setPayments(updatedPayments);
-    localStorage.setItem("upcomingPayments", JSON.stringify(updatedPayments));
+    savePayments(updatedPayments).catch(err => console.error("Güncelleme hatası:", err));
   };
 
-  const handleDelete = (e, id) => {
+  const handleDelete = async (e, id) => {
     e.stopPropagation();
     if (window.confirm("Kaydı silmek istediğine emin misin?")) {
       const updatedPayments = payments.filter(p => p.id !== id);
       setPayments(updatedPayments);
-      localStorage.setItem("upcomingPayments", JSON.stringify(updatedPayments));
+      savePayments(updatedPayments).catch(err => console.error("Silme hatası:", err));
     }
   };
 
@@ -221,8 +231,9 @@ const AddPayment = () => {
                 </div>
               </div>
 
-              <button type="submit" className={`w-full text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:-translate-y-1 active:scale-95 transition-all flex justify-center items-center gap-2 ${transactionType === "income" ? "bg-green-500 hover:shadow-green-500/40" : "bg-[#007AFF] hover:shadow-blue-500/40"}`}>
-                <LucideIcons.Save size={24} /> Kaydet
+              <button type="submit" disabled={isSaving} className={`w-full text-white font-bold text-lg py-4 rounded-2xl shadow-lg hover:-translate-y-1 active:scale-95 transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed ${transactionType === "income" ? "bg-green-500 hover:shadow-green-500/40" : "bg-[#007AFF] hover:shadow-blue-500/40"}`}>
+                {isSaving ? <LucideIcons.Loader2 size={24} className="animate-spin" /> : <LucideIcons.Save size={24} />}
+                {isSaving ? "Kaydediliyor..." : "Kaydet"}
               </button>
             </form>
           </div>

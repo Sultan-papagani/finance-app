@@ -8,40 +8,41 @@ import {
   X,
   Image as ImageIcon,
 } from "lucide-react";
-import { fetchGoals } from "../../services/goalService";
+import { fetchGoals, saveGoals } from "../../services/goalService";
+import { apiGet } from "../../services/api";
 
 const MyGoal = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("Kullanıcı");
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
 
-  // Modal (Pop-up) açık/kapalı durumunu kontrol eden state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Yeni eklenecek hedefin verilerini tutan state
   const [newGoal, setNewGoal] = useState({
     title: "",
     targetAmount: "",
+    targetDate: "",
     image: "",
-    friends: [], // Arkadaş listesi
+    friends: [],
   });
 
-  // Arkadaş ekleme inputu için geçici state
   const [friendInput, setFriendInput] = useState("");
 
   useEffect(() => {
-    const getGoalsData = async () => {
+    const load = async () => {
       try {
-        const data = await fetchGoals();
+        const [data, profile] = await Promise.all([fetchGoals(), apiGet('/api/user/profile')]);
         setGoals(data);
+        setUsername(profile.username);
       } catch (error) {
         console.error("Veriler çekilirken hata oluştu", error);
       } finally {
         setLoading(false);
       }
     };
-
-    getGoalsData();
+    load();
   }, []);
 
   // Arkadaş Ekleme Fonksiyonu
@@ -64,23 +65,50 @@ const MyGoal = () => {
     setNewGoal({ ...newGoal, friends: updatedFriends });
   };
 
-  // Formu gönderme (Kaydetme) işlemi
-  const handleCreateGoal = (e) => {
+  const handleCreateGoal = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
 
-    const friendMessage =
-      newGoal.friends.length > 0
-        ? ` ve ${newGoal.friends.length} arkadaşına davet gönderildi!`
-        : "!";
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+    const formattedTime = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
-    alert(
-      `Harika! "${newGoal.title}" hedefi ${newGoal.targetAmount} ₺ tutarıyla oluşturuldu${friendMessage}`,
-    );
+    const newGoalObject = {
+      id: Date.now(),
+      title: newGoal.title,
+      image: newGoal.image || "https://images.unsplash.com/photo-1579621970795-87facc2f976d?auto=format&fit=crop&q=80&w=1000",
+      targetAmount: Number(newGoal.targetAmount),
+      currentAmount: 0,
+      targetDate: newGoal.targetDate || "",
+      contributors: [],
+      friends: newGoal.friends,
+      history: [
+        {
+          id: Date.now() + 1,
+          user: username,
+          action: "Hedef Oluşturuldu",
+          amount: 0,
+          date: formattedDate,
+          time: formattedTime,
+          likes: 0,
+          isLiked: false,
+        },
+      ],
+    };
 
-    // Formu temizle ve modalı kapat
-    setNewGoal({ title: "", targetAmount: "", image: "", friends: [] });
-    setFriendInput("");
-    setIsModalOpen(false);
+    try {
+      const updatedGoals = [...goals, newGoalObject];
+      await saveGoals(updatedGoals);
+      setGoals(updatedGoals);
+      setNewGoal({ title: "", targetAmount: "", targetDate: "", image: "", friends: [] });
+      setFriendInput("");
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Hedef oluşturulamadı:", err);
+      alert("Hedef oluşturulurken bir hata oluştu. Lütfen tekrar dene.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -354,9 +382,12 @@ const MyGoal = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all"
+                  disabled={isSaving}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Oluştur
+                  {isSaving ? (
+                    <><Loader2 size={18} className="animate-spin" /> Kaydediliyor...</>
+                  ) : "Oluştur"}
                 </button>
               </div>
             </form>

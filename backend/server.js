@@ -15,7 +15,48 @@ const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI'; 
+const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI';
+
+// Yeni kullanıcılar veya boş finans verisi olan admin için başlangıç verileri
+const INITIAL_FINANCES = {
+    goals: [
+        {
+            id: 1,
+            title: "MacBook Pro M3",
+            image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1000",
+            targetAmount: 75000,
+            currentAmount: 30000,
+            targetDate: "2026-12-31",
+            contributors: [
+                { name: "Yönetici", amount: 20000, avatarColor: "bg-blue-100 text-blue-600" },
+                { name: "Ali", amount: 10000, avatarColor: "bg-green-100 text-green-600" }
+            ],
+            history: [
+                { id: 101, user: "Yönetici", action: "Para Eklendi", amount: 1500, date: "10 Mart 2026", time: "14:30", likes: 0, isLiked: false },
+                { id: 102, user: "Ali", action: "Para Eklendi", amount: 5000, date: "05 Mart 2026", time: "09:15", likes: 0, isLiked: false },
+                { id: 103, user: "Yönetici", action: "Hedef Oluşturuldu", amount: 18500, date: "01 Mart 2026", time: "20:00", likes: 0, isLiked: false }
+            ]
+        },
+        {
+            id: 2,
+            title: "Karadağ Yaz Tatili",
+            image: "https://images.unsplash.com/photo-1555885234-a169fa138e6e?auto=format&fit=crop&q=80&w=1000",
+            targetAmount: 25000,
+            currentAmount: 5000,
+            targetDate: "2026-08-15",
+            contributors: [
+                { name: "Yönetici", amount: 5000, avatarColor: "bg-blue-100 text-blue-600" }
+            ],
+            history: [
+                { id: 201, user: "Yönetici", action: "Para Eklendi", amount: 5000, date: "08 Mart 2026", time: "11:20", likes: 0, isLiked: false }
+            ]
+        }
+    ],
+    payments: [
+        { id: 1, title: "Ev Kirası", amount: 15000, date: "2026-03-15", iconName: "Home", color: "text-blue-500", isRecurring: true, transactionType: "expense", isCompleted: false, note: "" },
+        { id: 2, title: "Maaş Ödemesi", amount: 45000, date: "2026-04-01", iconName: "Banknote", color: "text-green-500", isRecurring: true, transactionType: "income", isCompleted: false, note: "" }
+    ]
+};
 
 // --- MIDDLEWARE ---
 app.use(helmet());
@@ -52,13 +93,21 @@ let db;
     const adminExists = await db.get("SELECT * FROM users WHERE email = 'admin'");
     if (!adminExists) {
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('admin', salt); // Şifre: admin
+        const hashedPassword = await bcrypt.hash('admin', salt);
         
         await db.run(
-            "INSERT INTO users (username, email, password_hash) VALUES ('Yönetici', 'admin', ?)",
-            [hashedPassword]
+            "INSERT INTO users (username, email, password_hash, finances) VALUES ('Yönetici', 'admin', ?, ?)",
+            [hashedPassword, JSON.stringify(INITIAL_FINANCES)]
         );
-        console.log("👑 Varsayılan admin kullanıcısı oluşturuldu! (Kullanıcı adı/Email: admin, Şifre: admin)");
+        console.log("👑 Varsayılan admin kullanıcısı oluşturuldu ve örnek veriler yüklendi!");
+    } else {
+        // Mevcut admin kullanıcısının finans verisi boşsa örnek verileri yükle
+        const adminUser = await db.get("SELECT id, finances FROM users WHERE email = 'admin'");
+        const currentFinances = JSON.parse(adminUser.finances || '{}');
+        if (!currentFinances.goals) {
+            await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(INITIAL_FINANCES), adminUser.id]);
+            console.log("✅ Admin kullanıcısına başlangıç finans verileri yüklendi!");
+        }
     }
     
     console.log('SQLite veritabanı hazır!');
@@ -154,6 +203,16 @@ app.get('/api/user/profile', requireAuth, (req, res) => {
     res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
+// Finans Verisini Getir
+app.get('/api/user/finances', requireAuth, async (req, res) => {
+    try {
+        const user = await db.get('SELECT finances FROM users WHERE id = ?', [req.user.id]);
+        res.json(JSON.parse(user.finances || '{}'));
+    } catch (error) {
+        res.status(500).json({ error: "Finans verisi getirilemedi." });
+    }
+});
+
 // Finans Verisini Düzenle
 app.patch('/api/user/finances', requireAuth, async (req, res) => {
     try {
@@ -165,9 +224,9 @@ app.patch('/api/user/finances', requireAuth, async (req, res) => {
         const updatedFinances = { ...currentFinances, ...newFinanceData };
 
         await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(updatedFinances), userId]);
-        res.json({ message: "Kullanıcı json verisi düzenlendi!", finances: updatedFinances });
+        res.json({ message: "Finans verisi güncellendi!", finances: updatedFinances });
     } catch (error) {
-        res.status(500).json({ error: "Kulanıcı json verisi düzenlenemedi" });
+        res.status(500).json({ error: "Finans verisi güncellenemedi." });
     }
 });
 
