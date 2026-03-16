@@ -20,6 +20,8 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import CurrencyDetail from './pages/CurrencyDetail';
 import StockTerminalPage from './pages/StockTerminalPage';
+
+import CryptoTerminalPage from "./pages/CryptoTerminalPage";
 function App() {
   const hasToken = localStorage.getItem("token");
 
@@ -58,7 +60,7 @@ function App() {
                   <Route path="/my-goal/:id" element={<MyGoalDetail />} />
                   <Route path="/add-payment" element={<AddPayment />} />
                   <Route path="/detail" element={<CurrencyDetail />} />
-
+                  <Route path="/crypto-terminal" element={<CryptoTerminalPage />} />
                   <Route path="/stock-terminal" element={<StockTerminalPage />} />
                  
                   {/* Bilinmeyen saçma sapan bir URL girilirse anında Home'a geri şutla */}

@@ -507,3 +507,95 @@ app.get('/api/search/:query', async (req, res) => {
     }
   } catch (error) { res.status(500).json({ error: "Arama motoru yanıt vermiyor." }); }
 });
+
+// =======================================================
+//  KRİPTO ARAMA MOTORU (COINGECKO & CACHE ZIRHI)
+// =======================================================
+const cryptoSearchCache = {};
+
+app.get('/api/crypto/search/:query', async (req, res) => {
+  const query = req.params.query.toLowerCase();
+
+  // 1. HAFIZA KONTROLÜ: Eğer son 2 dakika içinde aynı kelime arandıysa CoinGecko'yu yorma!
+  if (cryptoSearchCache[query] && (Date.now() - cryptoSearchCache[query].timestamp < 120000)) {
+    console.log(`[⚡ CACHE HIZI] Kripto hafızadan getirildi: ${query}`);
+    return res.json(cryptoSearchCache[query].data);
+  }
+
+  try {
+    console.log(`[🌍 API İSTEĞİ] CoinGecko'da aranıyor: ${query}`);
+    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`);
+    const data = await response.json();
+
+    if (data && data.coins) {
+      const results = data.coins.slice(0, 6); // Sadece ilk 6 sonucu al
+      
+      // Sonucu hafızaya (Cache) kaydet
+      cryptoSearchCache[query] = { timestamp: Date.now(), data: results };
+      res.json(results);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error("Kripto arama hatası:", error);
+    res.status(500).json({ error: "Kripto arama motoru yanıt vermiyor." });
+  }
+});
+
+// =======================================================
+// COINGECKO ZIRHLI PROXY (CACHE SİSTEMİ)
+// =======================================================
+
+// 1. Ana Sayfa Widget Hafızası (60 saniye tutar)
+let widgetCache = { data: null, timestamp: 0 };
+app.get('/api/crypto/widget', async (req, res) => {
+  if (widgetCache.data && (Date.now() - widgetCache.timestamp < 60000)) {
+    console.log("⚡ Widget hafızadan (cache) yüklendi!");
+    return res.json(widgetCache.data);
+  }
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=4&page=1&sparkline=true&price_change_percentage=24h');
+    const data = await response.json();
+    widgetCache = { data, timestamp: Date.now() };
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Widget verisi çekilemedi" });
+  }
+});
+
+// 2. Terminal Detay Hafızası (2 Dakika tutar)
+const detailsCache = {};
+app.get('/api/crypto/details/:id', async (req, res) => {
+  const id = req.params.id;
+  if (detailsCache[id] && (Date.now() - detailsCache[id].timestamp < 120000)) {
+    return res.json(detailsCache[id].data);
+  }
+  try {
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false`);
+    const data = await response.json();
+    detailsCache[id] = { data, timestamp: Date.now() };
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Detay çekilemedi" });
+  }
+});
+
+// 3. Terminal Grafik Hafızası (2 Dakika tutar)
+const chartCache = {};
+app.get('/api/crypto/chart/:id', async (req, res) => {
+  const { id } = req.params;
+  const days = req.query.days || '1';
+  const cacheKey = `${id}-${days}`;
+  
+  if (chartCache[cacheKey] && (Date.now() - chartCache[cacheKey].timestamp < 120000)) {
+    return res.json(chartCache[cacheKey].data);
+  }
+  try {
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}`);
+    const data = await response.json();
+    chartCache[cacheKey] = { data, timestamp: Date.now() };
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Grafik çekilemedi" });
+  }
+});

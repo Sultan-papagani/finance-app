@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Loader2, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const CryptoWidget = () => {
   const [cryptos, setCryptos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTopCryptos = async () => {
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=4&page=1&sparkline=true&price_change_percentage=24h');
+        //  ARTIK KENDİ ZIRHLI BACKEND'İMİZE (CACHE) GİDİYORUZ!
+        const res = await fetch('http://localhost:3000/api/crypto/widget');
         if (!res.ok) throw new Error('Veri çekilemedi');
         
         const data = await res.json();
         setCryptos(data);
       } catch (err) {
-        console.error("CoinGecko Hatası:", err);
+        console.error("Backend Hatası:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -45,7 +48,7 @@ const CryptoWidget = () => {
   return (
     <div className="w-full space-y-8">
  
-      <div className="flex items-end justify-between px-4">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between px-4 gap-4">
         <div>
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">
             Trend Kriptolar
@@ -53,12 +56,22 @@ const CryptoWidget = () => {
           <p className="text-gray-400 font-semibold mt-1">Piyasa değerine göre en büyük 4 varlık.</p>
         </div>
         
-        <div className="hidden md:flex items-center gap-2 bg-green-50/80 border border-green-100 px-4 py-2 rounded-2xl shadow-sm">
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-          </span>
-          <span className="text-xs font-black text-green-700 tracking-widest uppercase">Canlı</span>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="hidden md:flex items-center gap-2 bg-green-50/80 border border-green-100 px-4 py-2.5 rounded-2xl shadow-sm">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            <span className="text-xs font-black text-green-700 tracking-widest uppercase">Canlı</span>
+          </div>
+
+          <button 
+            onClick={() => navigate('/crypto-terminal')} 
+            className="w-full md:w-auto bg-gray-900 hover:bg-[#04009A] text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2 group"
+          >
+            Terminali Keşfet
+            <ChevronRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
+          </button>
         </div>
       </div>
 
@@ -71,24 +84,17 @@ const CryptoWidget = () => {
           return (
             <div 
               key={coin.id} 
-              // Kartı çok daha uzun (h-[380px]), oval (rounded-[3rem]) ve minimalist yaptık
               className="relative bg-white rounded-[3rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] border border-gray-100 hover:border-gray-200 transition-all duration-700 hover:-translate-y-4 group overflow-hidden flex flex-col h-[380px]"
             >
-              
-              {/*  HAYALET LOGO EFEKTİ (Arka planda devasa, yarı şeffaf dönen logo) */}
               <img 
                 src={coin.image} 
                 alt="bg-logo" 
                 className="absolute -top-10 -right-10 w-64 h-64 opacity-[0.02] group-hover:opacity-[0.06] group-hover:scale-110 group-hover:rotate-12 transition-all duration-1000 pointer-events-none grayscale group-hover:grayscale-0" 
               />
 
-              {/* ÜST KISIM: DEV LOGO VE YÜZDE */}
               <div className="flex justify-between items-start z-10 relative">
                 <div className="relative">
-                  {/* Logonun arkasındaki neon parlama */}
                   <div className={`absolute inset-0 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-700 rounded-full ${isPositive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  
-                  {/* Logonun kendisi artık kocaman (w-20 h-20) ve hover olunca zıplıyor */}
                   <img 
                     src={coin.image} 
                     alt={coin.name} 
@@ -96,26 +102,22 @@ const CryptoWidget = () => {
                   />
                 </div>
                 
-                {/* Şık ve kalın yüzde kapsülü */}
                 <div className={`px-4 py-2 rounded-2xl font-black text-sm flex items-center gap-1.5 shadow-sm transition-transform duration-500 group-hover:scale-105 ${isPositive ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
                   {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                   {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                 </div>
               </div>
 
-              {/* ORTA KISIM: MİNİMALİST TİPOGRAFİ */}
               <div className="mt-auto mb-10 z-10 relative">
                 <h3 className="text-gray-400 font-bold tracking-widest uppercase text-sm mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
                   {coin.name} ({coin.symbol})
                 </h3>
                 
-                {/* Fiyat artık devasa boyutta ve ekranı kaplıyor */}
                 <div className="text-5xl font-black text-gray-900 tracking-tighter group-hover:text-[#04009A] transition-colors duration-500">
                   ${coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                 </div>
               </div>
 
-              {/* ALT KISIM: ANİMASYONLU GRAFİK (Kartın yarısını kaplar) */}
               <div className="absolute bottom-0 left-0 w-full h-[55%] opacity-40 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none z-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={sparklineData}>
@@ -132,7 +134,6 @@ const CryptoWidget = () => {
                       stroke={isPositive ? '#10B981' : '#EF4444'} 
                       strokeWidth={4} 
                       fill={`url(#${gradientId})`} 
-                      // Çizim Animasyonu! Sayfa açıldığında soldan sağa doğru çizilir.
                       isAnimationActive={true} 
                       animationDuration={2000} 
                       animationEasing="ease-out"

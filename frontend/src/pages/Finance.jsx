@@ -13,7 +13,7 @@ const Finance = () => {
       <StockTerminal />
       {/* 3. Modül: Kripto Para Widget'ı Component'ini Çağırıyoruz */}
       <CryptoWidget />
-
+      
 
     </div>
   );
