@@ -12,10 +12,14 @@ const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI';
+
+// --- oluşturulan ark kodları
+const activeGoalCodes = new Map();
 
 // Yeni kullanıcılar veya boş finans verisi olan admin için başlangıç verileri
 const INITIAL_FINANCES = {
@@ -89,6 +93,17 @@ let db;
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
     `);
+
+  await db.exec(`
+      CREATE TABLE IF NOT EXISTS shared_goals (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,      -- Kodu giren (Veriyi görecek olan)
+          friend_id INTEGER NOT NULL,    -- Kodu paylaşan (Hedefin asıl sahibi)
+          goal_id TEXT NOT NULL,         -- Paylaşılan hedefin ID'si (1, 2 veya timestamp olabilir)
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+          FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+  `);
 
   const adminExists = await db.get("SELECT * FROM users WHERE email = 'admin'");
   if (!adminExists) {
@@ -597,5 +612,202 @@ app.get('/api/crypto/chart/:id', async (req, res) => {
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: "Grafik çekilemedi" });
+  }
+});
+
+
+
+// =======================================================
+// --- ORTAK HEDEF (SADECE BELİRLİ GOAL) SİSTEMİ ---
+// =======================================================
+
+// 1. Hedef İçin Kod Üret (Hedef sahibi tetikler)
+app.post('/api/friends/generate-code', requireAuth, (req, res) => {
+  try {
+    const { goalId } = req.body; // Frontend'den paylaşılan hedefin ID'si gelmeli
+    if (!goalId) return res.status(400).json({ error: "Lütfen paylaşılacak hedefin ID'sini gönderin." });
+
+    // 6 haneli rastgele kod üret
+    const code = crypto.randomBytes(3).toString('hex').toUpperCase();
+    
+    // 1 saat (60 * 60 * 1000 ms) geçerlilik süresi
+    const expiresAt = Date.now() + 3600000;
+
+    // Kodu RAM'e kaydet
+    activeGoalCodes.set(code, {
+      userId: req.user.id,
+      goalId: goalId.toString(), // Garanti olsun diye string yapıyoruz
+      expiresAt: expiresAt
+    });
+
+    // 1 Saat sonra RAM'den otomatik silinmesi için zamanlayıcı kur
+    setTimeout(() => {
+      activeGoalCodes.delete(code);
+    }, 3600000);
+
+    res.status(201).json({ 
+      message: "Hedef paylaşım kodu oluşturuldu!", 
+      code, 
+      expiresIn: "1 Saat" 
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Kod oluşturulamadı." });
+  }
+});
+
+// 2. Kodu Girerek Hedefe Katıl (Davetli tetikler)
+app.post('/api/friends/join', requireAuth, async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: "Lütfen bir kod girin." });
+
+    // Kodu RAM'de ara
+    const codeData = activeGoalCodes.get(code.toUpperCase());
+
+    if (!codeData || codeData.expiresAt < Date.now()) {
+      return res.status(404).json({ error: "Geçersiz veya süresi dolmuş kod." });
+    }
+
+    if (codeData.userId === req.user.id) {
+      return res.status(400).json({ error: "Kendi hedefinize kendiniz katılamazsınız." });
+    }
+
+    // Zaten bu hedefe katılmış mı kontrol et
+    const existingShare = await db.get(
+      'SELECT * FROM shared_goals WHERE user_id = ? AND friend_id = ? AND goal_id = ?',
+      [req.user.id, codeData.userId, codeData.goalId]
+    );
+
+    if (existingShare) {
+      return res.status(400).json({ error: "Bu hedefe zaten katılmışsınız." });
+    }
+
+    // Davetlinin erişimini veritabanına kaydet
+    await db.run(
+      'INSERT INTO shared_goals (user_id, friend_id, goal_id) VALUES (?, ?, ?)', 
+      [req.user.id, codeData.userId, codeData.goalId]
+    );
+
+    // Kod tek kullanımlıksa hemen RAM'den sil. (Eğer bir kodu birden fazla kişi kullansın dersen bu satırı silebilirsin)
+    activeGoalCodes.delete(code.toUpperCase());
+
+    res.json({ message: "Hedefe başarıyla katıldınız!" });
+  } catch (error) {
+    res.status(500).json({ error: "Hedefe katılırken bir hata oluştu." });
+  }
+});
+
+// 3. Katıldığım Ortak Hedefleri Getir (Tüm finans verisi yerine SADECE paylaşılan hedefler)
+app.get('/api/friends/shared-goals', requireAuth, async (req, res) => {
+  try {
+    // 1. Kullanıcının katıldığı tüm hedef bağlarını bul
+    const shares = await db.all(`
+      SELECT shared_goals.goal_id, users.id as friend_id, users.username as friend_name, users.finances
+      FROM shared_goals
+      JOIN users ON shared_goals.friend_id = users.id
+      WHERE shared_goals.user_id = ?
+    `, [req.user.id]);
+
+    const sharedGoalsList = [];
+
+    // 2. Her bir bağ için, arkadaşın verisini JSON'dan çıkarıp sadece o spesifik hedefi filtrele
+    shares.forEach(share => {
+      const friendFinances = JSON.parse(share.finances || '{}');
+      const friendGoals = friendFinances.goals || [];
+      
+      // Arkadaşın hedefleri arasından sadece ID'si eşleşen(ler)i bul
+      const specificGoal = friendGoals.find(g => g.id.toString() === share.goal_id.toString());
+      
+      if (specificGoal) {
+        // Hedefin içine kimin hedefi olduğunu da ekleyelim ki frontend'de gösterebilesin
+        sharedGoalsList.push({
+          ...specificGoal,
+          ownerId: share.friend_id,
+          ownerName: share.friend_name
+        });
+      }
+    });
+
+    res.json({ sharedGoals: sharedGoalsList });
+  } catch (error) {
+    console.error("Ortak hedefler getirilirken hata:", error);
+    res.status(500).json({ error: "Ortak hedefler getirilemedi." });
+  }
+});
+
+// 4. Ortak Hedefe Para Ekle/Çıkar (Davetlinin İşlemi)
+app.post('/api/friends/shared-goals/:goalId/transaction', requireAuth, async (req, res) => {
+  try {
+    const { goalId } = req.params;
+    const { amount, actionNote, type } = req.body; // type: 'add' veya 'withdraw'
+    
+    // 1. Yetki Kontrolü: Bu kullanıcı bu hedefe ortak mı?
+    const shareRecord = await db.get(
+      'SELECT friend_id FROM shared_goals WHERE user_id = ? AND goal_id = ?',
+      [req.user.id, goalId]
+    );
+
+    if (!shareRecord) return res.status(403).json({ error: "Bu hedefe işlem yapma yetkiniz yok." });
+
+    const ownerId = shareRecord.friend_id;
+
+    // 2. Hedef sahibinin (owner) verisini çek
+    const owner = await db.get('SELECT finances FROM users WHERE id = ?', [ownerId]);
+    const ownerFinances = JSON.parse(owner.finances || '{}');
+    
+    const goalIndex = ownerFinances.goals.findIndex(g => g.id.toString() === goalId.toString());
+    if (goalIndex === -1) return res.status(404).json({ error: "Hedef sahibinin hesabında bulunamadı." });
+
+    const goal = ownerFinances.goals[goalIndex];
+    
+    // 3. İşlemi Uygula
+    const transactionAmount = type === 'add' ? Number(amount) : -Number(amount);
+    
+    // Bakiye kontrolü (Eksiye düşmesini engelle)
+    if (type === 'withdraw' && goal.currentAmount + transactionAmount < 0) {
+        return res.status(400).json({ error: "Yetersiz bakiye." });
+    }
+
+    goal.currentAmount += transactionAmount;
+
+    // Geçmişe Ekle
+    const now = new Date();
+    goal.history.unshift({
+      id: Date.now(),
+      user: req.user.username,
+      action: actionNote,
+      amount: transactionAmount,
+      date: now.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }),
+      time: now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }),
+      likes: 0,
+      isLiked: false
+    });
+
+    // Katkıda Bulunanları (Contributors) Güncelle
+    if (!goal.contributors) goal.contributors = [];
+    const contributorIndex = goal.contributors.findIndex(c => c.name === req.user.username);
+    
+    if (type === 'add') {
+        if (contributorIndex > -1) {
+            goal.contributors[contributorIndex].amount += Number(amount);
+        } else {
+            goal.contributors.push({
+                name: req.user.username,
+                amount: Number(amount),
+                avatarColor: "bg-green-100 text-green-600" // Arkadaşlara özel renk
+            });
+        }
+    } else if (type === 'withdraw' && contributorIndex > -1) {
+        goal.contributors[contributorIndex].amount = Math.max(0, goal.contributors[contributorIndex].amount - Number(amount));
+    }
+
+    // 4. Hedef sahibinin JSON verisini güncelle ve kaydet
+    await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(ownerFinances), ownerId]);
+
+    res.json({ message: "İşlem başarılı", updatedGoal: goal });
+
+  } catch (error) {
+    console.error("Ortak hedefe işlem yaparken hata:", error);
+    res.status(500).json({ error: "İşlem gerçekleştirilemedi." });
   }
 });

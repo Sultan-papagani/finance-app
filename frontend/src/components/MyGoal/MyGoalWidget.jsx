@@ -31,7 +31,7 @@ const MyGoalWidget = () => {
     );
   }
 
-  if (!goals || goals.length === 0) return null;
+  //if (!goals || goals.length === 0) return null;
 
   return (
     <div className="bg-white rounded-[32px] p-5 md:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.03)] border border-gray-50">

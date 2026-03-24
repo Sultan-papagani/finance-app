@@ -7,6 +7,9 @@ import {
   Loader2,
   X,
   Image as ImageIcon,
+  Key,
+  Copy,
+  Check
 } from "lucide-react";
 import { fetchGoals, saveGoals } from "../../services/goalService";
 import { apiGet } from "../../services/api";
@@ -18,53 +21,59 @@ const MyGoal = () => {
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
 
+  // Modallar
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  
+  // State'ler
+  const [joinCode, setJoinCode] = useState("");
+  const [shareCode, setShareCode] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const [newGoal, setNewGoal] = useState({
     title: "",
     targetAmount: "",
     targetDate: "",
     image: "",
-    friends: [],
   });
 
-  const [friendInput, setFriendInput] = useState("");
-
-  useEffect(() => {
-    const load = async () => {
+  const loadData = async () => {
+    try {
+      // Backend'den hem kendi hedeflerini hem profilini çek
+      const [ownGoalsData, profile] = await Promise.all([fetchGoals(), apiGet('/api/user/profile')]);
+      
+      // Ortak hedefleri çek (Yeni Endpoint)
+      let sharedGoalsData = [];
       try {
-        const [data, profile] = await Promise.all([fetchGoals(), apiGet('/api/user/profile')]);
-        setGoals(data);
-        setUsername(profile.username);
-      } catch (error) {
-        console.error("Veriler çekilirken hata oluştu", error);
-      } finally {
-        setLoading(false);
+        const token = localStorage.getItem('token') || localStorage.getItem('jwt');
+        const headers = token ? { 'Authorization': token, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+        
+        const res = await fetch('http://localhost:3000/api/friends/shared-goals', { headers });
+        if(res.ok) {
+          const json = await res.json();
+          // Ortak hedefleri ayırt edebilmek için isShared bayrağı ekliyoruz
+          sharedGoalsData = (json.sharedGoals || []).map(g => ({ ...g, isShared: true }));
+        }
+      } catch (err) {
+        console.error("Ortak hedefler çekilemedi", err);
       }
-    };
-    load();
-  }, []);
 
-  // Arkadaş Ekleme Fonksiyonu
-  const handleAddFriendToNewGoal = (e) => {
-    e.preventDefault();
-    if (friendInput.trim() !== "") {
-      setNewGoal({
-        ...newGoal,
-        friends: [...newGoal.friends, friendInput.trim()],
-      });
-      setFriendInput(""); // Yazdıktan sonra kutuyu temizle
+      // Hepsini birleştir
+      setGoals([...ownGoalsData, ...sharedGoalsData]);
+      setUsername(profile.username);
+    } catch (error) {
+      console.error("Veriler çekilirken hata oluştu", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Eklenen Arkadaşı Silme Fonksiyonu
-  const handleRemoveFriend = (indexToRemove) => {
-    const updatedFriends = newGoal.friends.filter(
-      (_, index) => index !== indexToRemove,
-    );
-    setNewGoal({ ...newGoal, friends: updatedFriends });
-  };
+  useEffect(() => {
+    loadData();
+  }, []);
 
+  // Yeni Hedef Oluşturma
   const handleCreateGoal = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -74,14 +83,13 @@ const MyGoal = () => {
     const formattedTime = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
     const newGoalObject = {
-      id: Date.now(),
+      id: Date.now().toString(),
       title: newGoal.title,
       image: newGoal.image || "https://images.unsplash.com/photo-1579621970795-87facc2f976d?auto=format&fit=crop&q=80&w=1000",
       targetAmount: Number(newGoal.targetAmount),
       currentAmount: 0,
       targetDate: newGoal.targetDate || "",
       contributors: [],
-      friends: newGoal.friends,
       history: [
         {
           id: Date.now() + 1,
@@ -97,18 +105,87 @@ const MyGoal = () => {
     };
 
     try {
-      const updatedGoals = [...goals, newGoalObject];
-      await saveGoals(updatedGoals);
-      setGoals(updatedGoals);
-      setNewGoal({ title: "", targetAmount: "", targetDate: "", image: "", friends: [] });
-      setFriendInput("");
+      // Sadece kendi hedeflerimizi (ortak olmayanları) bul ve kaydet
+      const ownGoals = goals.filter(g => !g.isShared);
+      const sharedGoals = goals.filter(g => g.isShared);
+      
+      const updatedOwnGoals = [...ownGoals, newGoalObject];
+      await saveGoals(updatedOwnGoals); // Backend'e sadece kendi verilerimizi yazıyoruz
+      
+      setGoals([...updatedOwnGoals, ...sharedGoals]);
+      setNewGoal({ title: "", targetAmount: "", targetDate: "", image: "" });
       setIsModalOpen(false);
     } catch (err) {
-      console.error("Hedef oluşturulamadı:", err);
-      alert("Hedef oluşturulurken bir hata oluştu. Lütfen tekrar dene.");
+      alert("Hedef oluşturulurken bir hata oluştu.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Ortak Hedefe Katılma
+  const handleJoinGoal = async (e) => {
+    e.preventDefault();
+    if (!joinCode) return;
+    
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwt');
+      const res = await fetch('http://localhost:3000/api/friends/join', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: joinCode.trim().toUpperCase() })
+      });
+      
+      const data = await res.json();
+      if(res.ok) {
+        alert(data.message || "Hedefe başarıyla katıldın!");
+        setIsJoinModalOpen(false);
+        setJoinCode("");
+        loadData(); // Sayfayı yenileyip yeni katıldığımız hedefi çekiyoruz
+      } else {
+        alert(data.error || "Geçersiz kod.");
+      }
+    } catch(err) {
+      alert("Bağlantı hatası.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Davet Kodu Üretme
+  const handleGenerateCode = async (e, goalId) => {
+    e.stopPropagation(); // Kartın içine tıklanmasını engelle
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwt');
+      const res = await fetch('http://localhost:3000/api/friends/generate-code', {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ goalId })
+      });
+      
+      const data = await res.json();
+      if(res.ok) {
+        setShareCode(data.code);
+        setIsShareModalOpen(true);
+        setCopied(false);
+      } else {
+        alert(data.error || "Kod üretilemedi.");
+      }
+    } catch (err) {
+      alert("Sunucuya ulaşılamadı.");
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
@@ -122,8 +199,8 @@ const MyGoal = () => {
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto w-full relative">
-      {/* Üst Kısım: Başlık ve Ekleme Butonu */}
-      <div className="flex justify-between items-center mb-8">
+      {/* Üst Kısım: Başlık ve Ekleme Butonları */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
             <Target className="text-[#007AFF]" size={32} />
@@ -134,16 +211,26 @@ const MyGoal = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-[#007AFF] hover:bg-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl flex items-center gap-2 font-semibold transition-all shadow-[0_4px_15px_rgba(0,122,255,0.3)] hover:shadow-[0_6px_20px_rgba(0,122,255,0.4)]"
-        >
-          <Plus size={20} strokeWidth={2.5} />
-          <span className="hidden md:inline">Yeni Hedef</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsJoinModalOpen(true)}
+            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 md:px-5 md:py-3 rounded-xl flex items-center gap-2 font-semibold transition-all shadow-sm"
+          >
+            <Key size={18} className="text-[#007AFF]" />
+            <span className="hidden sm:inline">Koda Katıl</span>
+          </button>
+
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-[#007AFF] hover:bg-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl flex items-center gap-2 font-semibold transition-all shadow-[0_4px_15px_rgba(0,122,255,0.3)] hover:shadow-[0_6px_20px_rgba(0,122,255,0.4)]"
+          >
+            <Plus size={20} strokeWidth={2.5} />
+            <span className="hidden md:inline">Yeni Hedef</span>
+          </button>
+        </div>
       </div>
 
-      {/* Hedef Kartları Grid Yapısı */}
+      {/* Hedef Kartları */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {goals.map((goal) => {
           const progressPercentage = Math.min(
@@ -155,8 +242,14 @@ const MyGoal = () => {
             <div
               key={goal.id}
               onClick={() => navigate(`/my-goal/${goal.id}`)}
-              className="bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgba(0,122,255,0.15)] transition-all duration-300 cursor-pointer group flex flex-col border border-gray-100 overflow-hidden"
+              className={`bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgba(0,122,255,0.15)] transition-all duration-300 cursor-pointer group flex flex-col border overflow-hidden relative ${goal.isShared ? 'border-blue-200 bg-blue-50/10' : 'border-gray-100'}`}
             >
+              {goal.isShared && (
+                <div className="absolute top-4 left-4 z-10 bg-blue-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-md">
+                  Ortak Hedef ({goal.ownerName || "Arkadaş"})
+                </div>
+              )}
+
               <div className="w-full h-48 sm:h-52 relative overflow-hidden bg-gray-100">
                 <img
                   src={goal.image}
@@ -170,7 +263,7 @@ const MyGoal = () => {
 
               <div className="p-6 flex-1 flex flex-col">
                 <div className="text-center mb-6">
-                  <h3 className="font-bold text-xl text-gray-900 mb-1">
+                  <h3 className="font-bold text-xl text-gray-900 mb-1 line-clamp-1">
                     {goal.title}
                   </h3>
                   <div className="text-[#007AFF] font-bold text-lg">
@@ -186,41 +279,24 @@ const MyGoal = () => {
                     <div
                       className="bg-[#007AFF] h-full rounded-full transition-all duration-1000 ease-out relative"
                       style={{ width: `${progressPercentage}%` }}
-                    >
-                      <div className="absolute top-0 right-0 bottom-0 w-4 bg-white/30 rounded-full"></div>
-                    </div>
+                    ></div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500">
                       <Users size={16} className="text-gray-400" />
-                      <span>{goal.contributors.length} Katılımcı</span>
+                      <span>{goal.contributors?.length || 0} Katılımcı</span>
                     </div>
 
-                    <div className="flex items-center -space-x-2">
-                      {goal.contributors.slice(0, 3).map((user, index) => (
-                        <div
-                          key={index}
-                          className={`w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold z-10 ${user.avatarColor || "bg-blue-100 text-[#007AFF]"}`}
-                        >
-                          {user.name.charAt(0)}
-                        </div>
-                      ))}
-
-                      {/* Kart İçindeki Küçük Arkadaş Ekle Butonu */}
+                    {!goal.isShared && (
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          alert(
-                            `${goal.title} hedefine arkadaş davet etme modalı açılacak!`,
-                          );
-                        }}
-                        className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center bg-gray-50 text-gray-400 hover:bg-[#007AFF] hover:text-white transition-colors z-20 shadow-sm"
-                        title="Arkadaş Ekle"
+                        onClick={(e) => handleGenerateCode(e, goal.id)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 text-[#007AFF] hover:bg-[#007AFF] hover:text-white transition-colors z-20 border border-blue-100 shadow-sm"
+                        title="Davet Kodu Üret"
                       >
-                        <Plus size={14} strokeWidth={3} />
+                        <Plus size={16} strokeWidth={3} />
                       </button>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -229,168 +305,94 @@ const MyGoal = () => {
         })}
       </div>
 
-      {/* --- YENİ HEDEF EKLEME MODALI (POP-UP) --- */}
+      {/* --- YENİ HEDEF OLUŞTURMA MODALI --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">
-                Yeni Hedef Oluştur
-              </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors"
-              >
+              <h2 className="text-xl font-bold text-gray-900">Yeni Hedef Oluştur</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 p-2 rounded-full">
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleCreateGoal} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Hedef Adı
-                </label>
-                <input
-                  type="text"
-                  placeholder="Örn: PlayStation 5"
-                  required
-                  value={newGoal.title}
-                  onChange={(e) =>
-                    setNewGoal({ ...newGoal, title: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Hedeflenen Tutar (₺)
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="25000"
-                    required
-                    min="1"
-                    value={newGoal.targetAmount}
-                    onChange={(e) =>
-                      setNewGoal({ ...newGoal, targetAmount: e.target.value })
-                    }
-                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">
-                    ₺
-                  </span>
-                </div>
-              </div>
-              {/* Hedef Tarihi Eklemesi */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Hedef Bitiş Tarihi
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={newGoal.targetDate || ""}
-                  onChange={(e) =>
-                    setNewGoal({ ...newGoal, targetDate: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-gray-700"
-                />
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedef Adı</label>
+                <input required value={newGoal.title} onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Görsel Linki (İsteğe Bağlı)
-                </label>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-[#007AFF] shrink-0">
-                    <ImageIcon size={24} />
-                  </div>
-                  <input
-                    type="url"
-                    placeholder="https://... (Resim Linki)"
-                    value={newGoal.image}
-                    onChange={(e) =>
-                      setNewGoal({ ...newGoal, image: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
-                  />
-                </div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedeflenen Tutar (₺)</label>
+                <input type="number" required value={newGoal.targetAmount} onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
               </div>
-
-              {/* Arkadaş Davet Et Alanı */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Arkadaş Davet Et (İsteğe Bağlı)
-                </label>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Users
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={18}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Kullanıcı adı veya e-posta"
-                      value={friendInput}
-                      onChange={(e) => setFriendInput(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" &&
-                        (e.preventDefault(), handleAddFriendToNewGoal(e))
-                      }
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddFriendToNewGoal}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold transition-colors text-sm"
-                  >
-                    Ekle
-                  </button>
-                </div>
-
-                {/* Eklenen Arkadaşların Listesi */}
-                {newGoal.friends.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {newGoal.friends.map((friend, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-1.5 bg-blue-50 text-[#007AFF] px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-100 animate-in fade-in slide-in-from-left-2"
-                      >
-                        {friend}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveFriend(index)}
-                          className="hover:text-blue-700 transition-colors bg-white rounded-full p-0.5"
-                        >
-                          <X size={12} strokeWidth={3} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedef Bitiş Tarihi</label>
+                <input type="date" required value={newGoal.targetDate} onChange={(e) => setNewGoal({ ...newGoal, targetDate: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Görsel Linki (İsteğe Bağlı)</label>
+                <input type="url" value={newGoal.image} onChange={(e) => setNewGoal({ ...newGoal, image: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3.5 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
-                >
-                  İptal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="flex-1 py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isSaving ? (
-                    <><Loader2 size={18} className="animate-spin" /> Kaydediliyor...</>
-                  ) : "Oluştur"}
-                </button>
+              <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded-xl font-medium flex items-start gap-2">
+                <Users size={18} className="shrink-0 mt-0.5" />
+                <p>Hedefi kaydettikten sonra, üzerine tıklayarak davet kodu oluşturabilir ve arkadaşlarınla paylaşabilirsin.</p>
+              </div>
+
+              <button type="submit" disabled={isSaving} className="w-full py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 flex justify-center items-center gap-2">
+                {isSaving ? <Loader2 className="animate-spin" size={20} /> : "Oluştur"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- KODA KATIL MODALI --- */}
+      {isJoinModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-6 text-center animate-in fade-in zoom-in-95">
+            <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#007AFF]">
+              <Key size={28} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Ortak Hedefe Katıl</h2>
+            <p className="text-sm text-gray-500 mb-6">Arkadaşından aldığın 6 haneli davet kodunu aşağıya gir.</p>
+            
+            <form onSubmit={handleJoinGoal}>
+              <input
+                type="text"
+                maxLength={6}
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                placeholder="Örn: X9K2P1"
+                className="w-full text-center text-2xl tracking-[0.3em] font-bold px-4 py-4 rounded-xl border-2 border-gray-200 focus:border-[#007AFF] outline-none mb-6 uppercase"
+              />
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setIsJoinModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200">İptal</button>
+                <button type="submit" disabled={isSaving || joinCode.length < 4} className="flex-1 py-3 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 disabled:opacity-50">Katıl</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- KOD PAYLAŞMA (ÜRETİLDİ) MODALI --- */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center animate-in fade-in zoom-in-95">
+            <button onClick={() => setIsShareModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
+              <X size={20} />
+            </button>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Davet Kodu Üretildi!</h2>
+            <p className="text-sm text-gray-500 mb-6">Bu kodu arkadaşınla paylaşarak hedefi ortak takip edebilirsiniz. Kod 1 saat geçerlidir.</p>
+            
+            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-4 mb-6 relative">
+              <div className="text-4xl font-black tracking-widest text-gray-800">{shareCode}</div>
+            </div>
+
+            <button onClick={copyToClipboard} className="w-full py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              {copied ? <Check size={20} /> : <Copy size={20} />}
+              {copied ? "Kopyalandı!" : "Kodu Kopyala"}
+            </button>
           </div>
         </div>
       )}
