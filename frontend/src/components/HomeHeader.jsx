@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Wallet, DollarSign, Euro, PoundSterling, JapaneseYen, Banknote, Coins } from 'lucide-react';
+import { apiGet } from '../services/api';
 
 const HomeHeader = () => {
   const [rates, setRates] = useState(null);
@@ -8,11 +9,7 @@ const HomeHeader = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-
-        const response = await fetch("http://localhost:3000/api/rates");
-        const data = await response.json();
-
-        // Backend zaten hesaplayıp gönderdiği için direkt state'e atıyoruz
+        const data = await apiGet('/api/rates');
         if (data && !data.error) {
           setRates(data);
         }
