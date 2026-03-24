@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Activity, ArrowLeft, RefreshCw, ChevronRight, BarChart2, Info, TrendingUp, TrendingDown, Globe, Wallet, Gauge, PenTool, LineChart, BookOpen, Save, Maximize, List, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { apiGet, apiPatch } from '../services/api';
 
 const CryptoTerminalPage = () => {
   const navigate = useNavigate();
@@ -41,11 +42,12 @@ const CryptoTerminalPage = () => {
   useEffect(() => {
     fetchCoinDetails('bitcoin', '1');
     
-    fetch('http://localhost:3000/api/rates')
-      .then(res => res.json())
+    // GÜVENLİ: apiGet kullanarak kurları çektik (res.json()'a gerek kalmadı)
+    apiGet('/api/rates')
       .then(data => { if(data && data.USD) setUsdToTryRate(parseFloat(data.USD)); })
       .catch(err => console.error("Döviz kurları çekilemedi:", err));
 
+    // DİKKAT: Bu harici bir API olduğu için dokunmuyoruz, normal fetch olarak kalıyor!
     fetch('https://api.alternative.me/fng/')
       .then(res => res.json())
       .then(data => {
@@ -59,8 +61,8 @@ const CryptoTerminalPage = () => {
       const token = localStorage.getItem('token');
       if (!token) return; 
       try {
-        const res = await fetch('http://localhost:3000/api/user/finances', { headers: { 'Authorization': token } });
-        const data = await res.json();
+        // GÜVENLİ: apiGet kullanarak notları çektik (Headers'a gerek kalmadı, api.js hallediyor)
+        const data = await apiGet('/api/user/finances');
         if (data && data.notes) setUserNotes(data.notes);
       } catch (err) { console.error("Notlar çekilemedi:", err); }
     };
@@ -84,8 +86,7 @@ const CryptoTerminalPage = () => {
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/crypto/search/${searchTerm}`);
-        const data = await res.json();
+        const data = await apiGet(`/api/crypto/search/${searchTerm}`);
         setSearchResults(data || []);
       } catch (err) {
         console.error("Arama hatası:", err);
@@ -106,14 +107,10 @@ const CryptoTerminalPage = () => {
     setSearchTerm(''); 
 
     try {
-      //  ARTIK KENDİ ZIRHLI BACKEND'İMİZE (CACHE) GİDİYORUZ!
-      const [detailRes, chartRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/crypto/details/${coinId}`),
-        fetch(`http://localhost:3000/api/crypto/chart/${coinId}?days=${days}`)
+      const [detailData, chartRawData] = await Promise.all([
+        apiGet(`/api/crypto/details/${coinId}`),
+        apiGet(`/api/crypto/chart/${coinId}?days=${days}`)
       ]);
-
-      const detailData = await detailRes.json();
-      const chartRawData = await chartRes.json();
 
       setCoinData(detailData);
 
@@ -176,14 +173,12 @@ const CryptoTerminalPage = () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const res = await fetch('http://localhost:3000/api/user/finances', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'Authorization': token },
-          body: JSON.stringify({ notes: updatedNotes })
-        });
-        if (res.ok) setSaveMessage('Kaydedildi ✓');
-        else setSaveMessage('Kaydedilemedi ❌');
-      } catch (err) { setSaveMessage('Sunucu hatası ❌'); }
+        // GÜVENLİ: apiPatch kullanıyoruz. Method, Headers ve JSON.stringify ile vedalaşıyoruz!
+        await apiPatch('/api/user/finances', { notes: updatedNotes });
+        setSaveMessage('Kaydedildi ✓');
+      } catch (err) { 
+        setSaveMessage('Sunucu hatası ❌'); 
+      }
     } else {
       setSaveMessage('Geçici kaydedildi ⚠️');
     }

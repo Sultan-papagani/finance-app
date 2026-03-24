@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, TrendingDown, Calendar, Target, RefreshCw, Radar as RadarIcon, Globe, BarChart2, AlertTriangle, Activity } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar } from 'recharts';
+import { apiGet } from '../services/api';
 
 const CurrencyDetail = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,8 +40,7 @@ const CurrencyDetail = () => {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/historical-rates?base=${base}&symbol=${target}&days=${days}`);
-        const data = await res.json();
+        const data = await apiGet(`/api/historical-rates?base=${base}&symbol=${target}&days=${days}`);
         if (data && data.length > 0) setHistoryData(data);
       } catch (err) {
         console.error("Detay verisi çekilemedi:", err);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Loader2, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { apiGet } from '../../../services/api';
 
 const CryptoWidget = () => {
   const [cryptos, setCryptos] = useState([]);
@@ -12,11 +13,7 @@ const CryptoWidget = () => {
   useEffect(() => {
     const fetchTopCryptos = async () => {
       try {
-        //  ARTIK KENDİ ZIRHLI BACKEND'İMİZE (CACHE) GİDİYORUZ!
-        const res = await fetch('http://localhost:3000/api/crypto/widget');
-        if (!res.ok) throw new Error('Veri çekilemedi');
-        
-        const data = await res.json();
+        const data = await apiGet('/api/crypto/widget');
         setCryptos(data);
       } catch (err) {
         console.error("Backend Hatası:", err);
