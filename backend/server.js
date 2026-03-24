@@ -11,7 +11,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const fs = require('fs'); 
+const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
@@ -19,43 +19,43 @@ const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI';
 
 // Yeni kullanıcılar veya boş finans verisi olan admin için başlangıç verileri
 const INITIAL_FINANCES = {
-    goals: [
-        {
-            id: 1,
-            title: "MacBook Pro M3",
-            image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1000",
-            targetAmount: 75000,
-            currentAmount: 30000,
-            targetDate: "2026-12-31",
-            contributors: [
-                { name: "Yönetici", amount: 20000, avatarColor: "bg-blue-100 text-blue-600" },
-                { name: "Ali", amount: 10000, avatarColor: "bg-green-100 text-green-600" }
-            ],
-            history: [
-                { id: 101, user: "Yönetici", action: "Para Eklendi", amount: 1500, date: "10 Mart 2026", time: "14:30", likes: 0, isLiked: false },
-                { id: 102, user: "Ali", action: "Para Eklendi", amount: 5000, date: "05 Mart 2026", time: "09:15", likes: 0, isLiked: false },
-                { id: 103, user: "Yönetici", action: "Hedef Oluşturuldu", amount: 18500, date: "01 Mart 2026", time: "20:00", likes: 0, isLiked: false }
-            ]
-        },
-        {
-            id: 2,
-            title: "Karadağ Yaz Tatili",
-            image: "https://images.unsplash.com/photo-1555885234-a169fa138e6e?auto=format&fit=crop&q=80&w=1000",
-            targetAmount: 25000,
-            currentAmount: 5000,
-            targetDate: "2026-08-15",
-            contributors: [
-                { name: "Yönetici", amount: 5000, avatarColor: "bg-blue-100 text-blue-600" }
-            ],
-            history: [
-                { id: 201, user: "Yönetici", action: "Para Eklendi", amount: 5000, date: "08 Mart 2026", time: "11:20", likes: 0, isLiked: false }
-            ]
-        }
-    ],
-    payments: [
-        { id: 1, title: "Ev Kirası", amount: 15000, date: "2026-03-15", iconName: "Home", color: "text-blue-500", isRecurring: true, transactionType: "expense", isCompleted: false, note: "" },
-        { id: 2, title: "Maaş Ödemesi", amount: 45000, date: "2026-04-01", iconName: "Banknote", color: "text-green-500", isRecurring: true, transactionType: "income", isCompleted: false, note: "" }
-    ]
+  goals: [
+    {
+      id: 1,
+      title: "MacBook Pro M3",
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1000",
+      targetAmount: 75000,
+      currentAmount: 30000,
+      targetDate: "2026-12-31",
+      contributors: [
+        { name: "Yönetici", amount: 20000, avatarColor: "bg-blue-100 text-blue-600" },
+        { name: "Ali", amount: 10000, avatarColor: "bg-green-100 text-green-600" }
+      ],
+      history: [
+        { id: 101, user: "Yönetici", action: "Para Eklendi", amount: 1500, date: "10 Mart 2026", time: "14:30", likes: 0, isLiked: false },
+        { id: 102, user: "Ali", action: "Para Eklendi", amount: 5000, date: "05 Mart 2026", time: "09:15", likes: 0, isLiked: false },
+        { id: 103, user: "Yönetici", action: "Hedef Oluşturuldu", amount: 18500, date: "01 Mart 2026", time: "20:00", likes: 0, isLiked: false }
+      ]
+    },
+    {
+      id: 2,
+      title: "Karadağ Yaz Tatili",
+      image: "https://images.unsplash.com/photo-1555885234-a169fa138e6e?auto=format&fit=crop&q=80&w=1000",
+      targetAmount: 25000,
+      currentAmount: 5000,
+      targetDate: "2026-08-15",
+      contributors: [
+        { name: "Yönetici", amount: 5000, avatarColor: "bg-blue-100 text-blue-600" }
+      ],
+      history: [
+        { id: 201, user: "Yönetici", action: "Para Eklendi", amount: 5000, date: "08 Mart 2026", time: "11:20", likes: 0, isLiked: false }
+      ]
+    }
+  ],
+  payments: [
+    { id: 1, title: "Ev Kirası", amount: 15000, date: "2026-03-15", iconName: "Home", color: "text-blue-500", isRecurring: true, transactionType: "expense", isCompleted: false, note: "" },
+    { id: 2, title: "Maaş Ödemesi", amount: 45000, date: "2026-04-01", iconName: "Banknote", color: "text-green-500", isRecurring: true, transactionType: "income", isCompleted: false, note: "" }
+  ]
 };
 
 // --- MIDDLEWARE ---
@@ -67,9 +67,9 @@ app.use(passport.initialize());
 // --- DATABASE (SQLite) ---
 let db;
 (async () => {
-    db = await open({ filename: './finance.db', driver: sqlite3.Database });
-    
-    await db.exec(`
+  db = await open({ filename: './finance.db', driver: sqlite3.Database });
+
+  await db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
@@ -79,7 +79,7 @@ let db;
         )
     `);
 
-    await db.exec(`
+  await db.exec(`
         CREATE TABLE IF NOT EXISTS images (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -90,76 +90,76 @@ let db;
         )
     `);
 
-    const adminExists = await db.get("SELECT * FROM users WHERE email = 'admin'");
-    if (!adminExists) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('admin', salt);
-        
-        await db.run(
-            "INSERT INTO users (username, email, password_hash, finances) VALUES ('Yönetici', 'admin', ?, ?)",
-            [hashedPassword, JSON.stringify(INITIAL_FINANCES)]
-        );
-        console.log("👑 Varsayılan admin kullanıcısı oluşturuldu ve örnek veriler yüklendi!");
-    } else {
-        // Mevcut admin kullanıcısının finans verisi boşsa örnek verileri yükle
-        const adminUser = await db.get("SELECT id, finances FROM users WHERE email = 'admin'");
-        const currentFinances = JSON.parse(adminUser.finances || '{}');
-        if (!currentFinances.goals) {
-            await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(INITIAL_FINANCES), adminUser.id]);
-            console.log("✅ Admin kullanıcısına başlangıç finans verileri yüklendi!");
-        }
+  const adminExists = await db.get("SELECT * FROM users WHERE email = 'admin'");
+  if (!adminExists) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('admin', salt);
+
+    await db.run(
+      "INSERT INTO users (username, email, password_hash, finances) VALUES ('Yönetici', 'admin', ?, ?)",
+      [hashedPassword, JSON.stringify(INITIAL_FINANCES)]
+    );
+    console.log("👑 Varsayılan admin kullanıcısı oluşturuldu ve örnek veriler yüklendi!");
+  } else {
+    // Mevcut admin kullanıcısının finans verisi boşsa örnek verileri yükle
+    const adminUser = await db.get("SELECT id, finances FROM users WHERE email = 'admin'");
+    const currentFinances = JSON.parse(adminUser.finances || '{}');
+    if (!currentFinances.goals) {
+      await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(INITIAL_FINANCES), adminUser.id]);
+      console.log("✅ Admin kullanıcısına başlangıç finans verileri yüklendi!");
     }
-    
-    console.log('SQLite veritabanı hazır!');
+  }
+
+  console.log('SQLite veritabanı hazır!');
 })();
 
 // --- Multer ile foto yükleme fonksiyonları ---
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
-const upload = multer({ 
-    storage, 
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5mb dosya yükleme sınırı varr
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Sadece fotoğraflara izin verilir.'), false);
-    }
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5mb dosya yükleme sınırı varr
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Sadece fotoğraflara izin verilir.'), false);
+  }
 });
 
 // --- PASSPORT.JS güvenlik stratejileri ---
 
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-    try {
-        const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
-        if (!user) return done(null, false, { message: 'Yanlış Email' });
+  try {
+    const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    if (!user) return done(null, false, { message: 'Yanlış Email' });
 
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) return done(null, false, { message: 'Yanlış Şifre' });
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) return done(null, false, { message: 'Yanlış Şifre' });
 
-        return done(null, user);
-    } catch (err) {
-        return done(err);
-    }
+    return done(null, user);
+  } catch (err) {
+    return done(err);
+  }
 }));
 
 const jwtOptions = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: JWT_SECRET
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: JWT_SECRET
 };
 
 passport.use(new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
-    try {
-        const user = await db.get('SELECT id, username, email FROM users WHERE id = ?', [jwt_payload.id]);
-        if (user) return done(null, user);
-        return done(null, false);
-    } catch (err) {
-        return done(err, false);
-    }
+  try {
+    const user = await db.get('SELECT id, username, email FROM users WHERE id = ?', [jwt_payload.id]);
+    if (user) return done(null, user);
+    return done(null, false);
+  } catch (err) {
+    return done(err, false);
+  }
 }));
 
 
@@ -169,29 +169,29 @@ passport.use(new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
 // istenilen:  username, email, password
 // döndürülen: userId, başarı yazısı
 app.post('/register', async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+  try {
+    const { username, email, password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-        const result = await db.run(
-            'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-            [username, email, hashedPassword]
-        );
+    const result = await db.run(
+      'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
+      [username, email, hashedPassword]
+    );
 
-        res.status(201).json({ message: "Kullanıcı başarıyla kayıt yaptı", userId: result.lastID });
-    } catch (error) {
-        if (error.message.includes('UNIQUE constraint failed')) {
-            return res.status(400).json({ error: "Bu Email zaten varki git giriş yap" });
-        }
-        res.status(500).json({ error: "Kayıt işlemi başarısız, kim bilir niye" });
+    res.status(201).json({ message: "Kullanıcı başarıyla kayıt yaptı", userId: result.lastID });
+  } catch (error) {
+    if (error.message.includes('UNIQUE constraint failed')) {
+      return res.status(400).json({ error: "Bu Email zaten varki git giriş yap" });
     }
+    res.status(500).json({ error: "Kayıt işlemi başarısız, kim bilir niye" });
+  }
 });
 
 // KULLANICI GİRİŞ YAP
 app.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
-    const token = jwt.sign({ id: req.user.id }, JWT_SECRET, { expiresIn: '1h' }); // Uzattım biraz :)
-    res.json({ message: "Başarıyla giriş yapıldı", token: `Bearer ${token}` });
+  const token = jwt.sign({ id: req.user.id }, JWT_SECRET, { expiresIn: '1h' }); // Uzattım biraz :)
+  res.json({ message: "Başarıyla giriş yapıldı", token: `Bearer ${token}` });
 });
 
 
@@ -200,105 +200,105 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 
 // Profil Verisi Getir
 app.get('/api/user/profile', requireAuth, (req, res) => {
-    res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
+  res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
 // Finans Verisini Getir
 app.get('/api/user/finances', requireAuth, async (req, res) => {
-    try {
-        const user = await db.get('SELECT finances FROM users WHERE id = ?', [req.user.id]);
-        res.json(JSON.parse(user.finances || '{}'));
-    } catch (error) {
-        res.status(500).json({ error: "Finans verisi getirilemedi." });
-    }
+  try {
+    const user = await db.get('SELECT finances FROM users WHERE id = ?', [req.user.id]);
+    res.json(JSON.parse(user.finances || '{}'));
+  } catch (error) {
+    res.status(500).json({ error: "Finans verisi getirilemedi." });
+  }
 });
 
 // Finans Verisini Düzenle
 app.patch('/api/user/finances', requireAuth, async (req, res) => {
-    try {
-        const userId = req.user.id; 
-        const newFinanceData = req.body; 
-        const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
-        
-        let currentFinances = JSON.parse(user.finances || '{}');
-        const updatedFinances = { ...currentFinances, ...newFinanceData };
+  try {
+    const userId = req.user.id;
+    const newFinanceData = req.body;
+    const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
 
-        await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(updatedFinances), userId]);
-        res.json({ message: "Finans verisi güncellendi!", finances: updatedFinances });
-    } catch (error) {
-        res.status(500).json({ error: "Finans verisi güncellenemedi." });
-    }
+    let currentFinances = JSON.parse(user.finances || '{}');
+    const updatedFinances = { ...currentFinances, ...newFinanceData };
+
+    await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(updatedFinances), userId]);
+    res.json({ message: "Finans verisi güncellendi!", finances: updatedFinances });
+  } catch (error) {
+    res.status(500).json({ error: "Finans verisi güncellenemedi." });
+  }
 });
 
 
 // Resim Yükle - Frontend formData ile 'image' ve 'name' yollamalı
 app.post('/api/user/images', requireAuth, upload.single('image'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ error: "Lütfen bir resim dosyası seçin." });
-        
-        const userId = req.user.id;
-        const imageName = req.body.name || 'İsimsiz Resim'; // mesela "kullanici_profili" veya "kullanici_istek_1"
-        const filePath = `/uploads/${req.file.filename}`;
+  try {
+    if (!req.file) return res.status(400).json({ error: "Lütfen bir resim dosyası seçin." });
 
-        const result = await db.run(
-            'INSERT INTO images (user_id, name, file_path) VALUES (?, ?, ?)',
-            [userId, imageName, filePath]
-        );
+    const userId = req.user.id;
+    const imageName = req.body.name || 'İsimsiz Resim'; // mesela "kullanici_profili" veya "kullanici_istek_1"
+    const filePath = `/uploads/${req.file.filename}`;
 
-        res.status(201).json({ message: "Resim başarıyla yüklendi!", imageId: result.lastID, filePath });
-    } catch (error) {
-        res.status(500).json({ error: "Resim yüklenirken bir hata oluştu." });
-    }
+    const result = await db.run(
+      'INSERT INTO images (user_id, name, file_path) VALUES (?, ?, ?)',
+      [userId, imageName, filePath]
+    );
+
+    res.status(201).json({ message: "Resim başarıyla yüklendi!", imageId: result.lastID, filePath });
+  } catch (error) {
+    res.status(500).json({ error: "Resim yüklenirken bir hata oluştu." });
+  }
 });
 
 // Kullanıcının Tüm Resimlerinin Listesini Getir (sadece isimlerini falan)
 app.get('/api/user/images', requireAuth, async (req, res) => {
-    try {
-        const images = await db.all('SELECT id, name, uploaded_at FROM images WHERE user_id = ?', [req.user.id]);
-        res.json({ images });
-    } catch (error) {
-        res.status(500).json({ error: "Resimler getirilemedi." });
-    }
+  try {
+    const images = await db.all('SELECT id, name, uploaded_at FROM images WHERE user_id = ?', [req.user.id]);
+    res.json({ images });
+  } catch (error) {
+    res.status(500).json({ error: "Resimler getirilemedi." });
+  }
 });
 
 // Belirli Bir Resmi Görüntüle / İndir (fotonun kendisi yani)
 app.get('/api/user/images/:imageId', requireAuth, async (req, res) => {
-    try {
-        const image = await db.get('SELECT file_path FROM images WHERE id = ? AND user_id = ?', [req.params.imageId, req.user.id]);
-        
-        if (!image) return res.status(404).json({ error: "Resim bulunamadı veya size ait değil." });
+  try {
+    const image = await db.get('SELECT file_path FROM images WHERE id = ? AND user_id = ?', [req.params.imageId, req.user.id]);
 
-        const absolutePath = path.resolve(__dirname, image.file_path.substring(1));
-        res.sendFile(absolutePath);
-    } catch (error) {
-        res.status(500).json({ error: "Resim dosyası gönderilirken hata oluştu." });
-    }
+    if (!image) return res.status(404).json({ error: "Resim bulunamadı veya size ait değil." });
+
+    const absolutePath = path.resolve(__dirname, image.file_path.substring(1));
+    res.sendFile(absolutePath);
+  } catch (error) {
+    res.status(500).json({ error: "Resim dosyası gönderilirken hata oluştu." });
+  }
 });
 
 // Resmi Sil (Hem veritabanından hem de 'uploads' klasöründen)
 app.delete('/api/user/images/:imageId', requireAuth, async (req, res) => {
-    try {
-        // 1. Resmi bul
-        const image = await db.get('SELECT file_path FROM images WHERE id = ? AND user_id = ?', [req.params.imageId, req.user.id]);
-        if (!image) return res.status(404).json({ error: "Resim bulunamadı." });
+  try {
+    // 1. Resmi bul
+    const image = await db.get('SELECT file_path FROM images WHERE id = ? AND user_id = ?', [req.params.imageId, req.user.id]);
+    if (!image) return res.status(404).json({ error: "Resim bulunamadı." });
 
-        // 2. Veritabanından sil
-        await db.run('DELETE FROM images WHERE id = ?', [req.params.imageId]);
+    // 2. Veritabanından sil
+    await db.run('DELETE FROM images WHERE id = ?', [req.params.imageId]);
 
-        // 3. Dosyayı sunucudan fiziksel olarak sil
-        const absolutePath = path.resolve(__dirname, image.file_path.substring(1));
-        fs.unlink(absolutePath, (err) => {
-            if (err) console.error("Dosya silinirken hata:", err);
-        });
+    // 3. Dosyayı sunucudan fiziksel olarak sil
+    const absolutePath = path.resolve(__dirname, image.file_path.substring(1));
+    fs.unlink(absolutePath, (err) => {
+      if (err) console.error("Dosya silinirken hata:", err);
+    });
 
-        res.json({ message: "Resim başarıyla silindi!" });
-    } catch (error) {
-        res.status(500).json({ error: "Resim silinemedi." });
-    }
+    res.json({ message: "Resim başarıyla silindi!" });
+  } catch (error) {
+    res.status(500).json({ error: "Resim silinemedi." });
+  }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Finans sunucusu http://localhost:${PORT}'da çalışıyor`);
+  console.log(`🚀 Finans sunucusu http://localhost:${PORT}'da çalışıyor`);
 });
 
 //------------------------------------------------------- */
@@ -375,16 +375,16 @@ app.get('/api/historical-rates', async (req, res) => {
 // DÜNYANIN EN BÜYÜK 10 BORSASI İÇİN HİBRİT MOTOR
 // =======================================================
 
-const TWELVE_DATA_API_KEY = 'cc04ac6874cb4301963a1977687aa9b9'; 
-const stockCache = {}; 
+const TWELVE_DATA_API_KEY = 'cc04ac6874cb4301963a1977687aa9b9';
+const stockCache = {};
 
 // Yahoo'nun kullandığı borsa uzantıları sözlüğü
 const GLOBAL_MARKETS = {
   '.IS': { name: 'Borsa İstanbul', exchange: 'BIST' },
-  '.L':  { name: 'Londra Borsası', exchange: 'LSE' },
+  '.L': { name: 'Londra Borsası', exchange: 'LSE' },
   '.DE': { name: 'Almanya (XETRA)', exchange: 'XETRA' },
   '.PA': { name: 'Paris Borsası', exchange: 'EPA' },
-  '.T':  { name: 'Tokyo Borsası', exchange: 'TSE' },
+  '.T': { name: 'Tokyo Borsası', exchange: 'TSE' },
   '.HK': { name: 'Hong Kong Borsası', exchange: 'HKG' },
   '.TO': { name: 'Toronto Borsası', exchange: 'TSX' },
   '.AX': { name: 'Avustralya Borsası', exchange: 'ASX' },
@@ -410,7 +410,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
     if (marketSuffix) {
       const marketInfo = GLOBAL_MARKETS[marketSuffix];
       console.log(`[🌍 YEDEK MOTOR] Global Hisse algılandı (${marketInfo.name}), Yahoo'ya gidiliyor: ${rawSymbol}`);
-      
+
       const yahooUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${rawSymbol}?interval=1d&range=2mo`;
       const response = await fetch(yahooUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
       const data = await response.json();
@@ -424,7 +424,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
 
       quoteData = {
         symbol: rawSymbol,
-        name: rawSymbol.replace(marketSuffix, '') + ` (${marketInfo.name})`, 
+        name: rawSymbol.replace(marketSuffix, '') + ` (${marketInfo.name})`,
         exchange: marketInfo.exchange,
         close: meta.regularMarketPrice,
         change: (meta.regularMarketPrice - meta.chartPreviousClose),
@@ -432,7 +432,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
       };
 
       const values = [];
-      for(let i = timestamps.length - 1; i >= 0; i--) {
+      for (let i = timestamps.length - 1; i >= 0; i--) {
         if (quotes.close[i] !== null && quotes.close[i] !== undefined) {
           values.push({
             datetime: new Date(timestamps[i] * 1000).toISOString().split('T')[0],
@@ -445,7 +445,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
       }
       historyData = { values: values };
 
-    } 
+    }
     // Uzantı yoksa demek ki Amerikan Hissesi (Wall Street)!
     else {
       console.log(`[🌍 API İSTEĞİ] Twelve Data'ya gidiliyor: ${rawSymbol}`);
@@ -471,7 +471,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
       const isPositive = closePrice >= openPrice;
       if (isPositive) greenDays++; else redDays++;
       return {
-        date: item.datetime.split('-').slice(1).join('/'), 
+        date: item.datetime.split('-').slice(1).join('/'),
         price: closePrice, open: openPrice, volume: parseInt(item.volume) / 1000000, isPositive
       };
     });
@@ -529,7 +529,7 @@ app.get('/api/crypto/search/:query', async (req, res) => {
 
     if (data && data.coins) {
       const results = data.coins.slice(0, 6); // Sadece ilk 6 sonucu al
-      
+
       // Sonucu hafızaya (Cache) kaydet
       cryptoSearchCache[query] = { timestamp: Date.now(), data: results };
       res.json(results);
@@ -586,7 +586,7 @@ app.get('/api/crypto/chart/:id', async (req, res) => {
   const { id } = req.params;
   const days = req.query.days || '1';
   const cacheKey = `${id}-${days}`;
-  
+
   if (chartCache[cacheKey] && (Date.now() - chartCache[cacheKey].timestamp < 120000)) {
     return res.json(chartCache[cacheKey].data);
   }
