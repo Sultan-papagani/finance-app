@@ -17,7 +17,7 @@ const app = express();
 const PORT = 3000;
 const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI';
 
-// Yeni kullanıcılar veya boş finans verisi olan admin için başlangıç verileri
+// admin için başlangıç verileri
 const INITIAL_FINANCES = {
     goals: [
         {
@@ -101,7 +101,7 @@ let db;
         );
         console.log("👑 Varsayılan admin kullanıcısı oluşturuldu ve örnek veriler yüklendi!");
     } else {
-        // Mevcut admin kullanıcısının finans verisi boşsa örnek verileri yükle
+        // Mevcut admin kullanıcısının finans verisi boş ise INITIAL_FINANCES örnek verileri yükle
         const adminUser = await db.get("SELECT id, finances FROM users WHERE email = 'admin'");
         const currentFinances = JSON.parse(adminUser.finances || '{}');
         if (!currentFinances.goals) {
@@ -303,7 +303,7 @@ app.listen(PORT, () => {
 
 //------------------------------------------------------- */
 // --- CANLI BORSA API ROUTE'U dövizzzz---
-app.get('/api/rates', async (req, res) => {
+app.get('/api/rates', requireAuth, async (req, res) => {
   try {
     // Backend'imiz Frankfurter'e gidip ham veriyi çeker
     const response = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=TRY,USD,GBP,CHF,JPY,AUD,CAD");
@@ -334,7 +334,7 @@ app.get('/api/rates', async (req, res) => {
 
 
 // --- GEÇMİŞ VERİLER (GRAFİK İÇİN) ---
-app.get('/api/historical-rates', async (req, res) => {
+app.get('/api/historical-rates',requireAuth, async (req, res) => {
   try {
     // Frontend'den gelen istekleri alıyoruz (Örn: base=EUR, symbol=TRY, days=30)
     const base = req.query.base || 'EUR';
@@ -391,7 +391,7 @@ const GLOBAL_MARKETS = {
   '.NS': { name: 'Hindistan Borsası', exchange: 'NSE' }
 };
 
-app.get('/api/stock/:symbol', async (req, res) => {
+app.get('/api/stock/:symbol',requireAuth, async (req, res) => {
   const rawSymbol = req.params.symbol.toUpperCase();
 
   // 1. (CACHE KONTROLÜ)
@@ -494,7 +494,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
 // =======================================================
 //  HİSSE ARAMA MOTORU (LİMİTSİZ YAHOO FINANCE ALTYAPISI)
 // =======================================================
-app.get('/api/search/:query', async (req, res) => {
+app.get('/api/search/:query',requireAuth, async (req, res) => {
   try {
     const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${req.params.query}&quotesCount=6&newsCount=0`, {
       headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
@@ -513,7 +513,7 @@ app.get('/api/search/:query', async (req, res) => {
 // =======================================================
 const cryptoSearchCache = {};
 
-app.get('/api/crypto/search/:query', async (req, res) => {
+app.get('/api/crypto/search/:query',requireAuth, async (req, res) => {
   const query = req.params.query.toLowerCase();
 
   // 1. HAFIZA KONTROLÜ: Eğer son 2 dakika içinde aynı kelime arandıysa CoinGecko'yu yorma!
@@ -548,7 +548,7 @@ app.get('/api/crypto/search/:query', async (req, res) => {
 
 // 1. Ana Sayfa Widget Hafızası (60 saniye tutar)
 let widgetCache = { data: null, timestamp: 0 };
-app.get('/api/crypto/widget', async (req, res) => {
+app.get('/api/crypto/widget',requireAuth, async (req, res) => {
   if (widgetCache.data && (Date.now() - widgetCache.timestamp < 60000)) {
     console.log("⚡ Widget hafızadan (cache) yüklendi!");
     return res.json(widgetCache.data);
@@ -565,7 +565,7 @@ app.get('/api/crypto/widget', async (req, res) => {
 
 // 2. Terminal Detay Hafızası (2 Dakika tutar)
 const detailsCache = {};
-app.get('/api/crypto/details/:id', async (req, res) => {
+app.get('/api/crypto/details/:id',requireAuth, async (req, res) => {
   const id = req.params.id;
   if (detailsCache[id] && (Date.now() - detailsCache[id].timestamp < 120000)) {
     return res.json(detailsCache[id].data);
@@ -582,7 +582,7 @@ app.get('/api/crypto/details/:id', async (req, res) => {
 
 // 3. Terminal Grafik Hafızası (2 Dakika tutar)
 const chartCache = {};
-app.get('/api/crypto/chart/:id', async (req, res) => {
+app.get('/api/crypto/chart/:id',requireAuth, async (req, res) => {
   const { id } = req.params;
   const days = req.query.days || '1';
   const cacheKey = `${id}-${days}`;

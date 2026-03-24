@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowRightLeft, TrendingUp, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiGet } from '../../../services/api';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate(); 
@@ -34,8 +35,7 @@ const MarketAnalysis = () => {
     const fetchHistory = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/historical-rates?base=${baseCurrency}&symbol=${targetCurrency}&days=${days}`);
-        const data = await res.json();
+        const data = await apiGet(`/api/historical-rates?base=${baseCurrency}&symbol=${targetCurrency}&days=${days}`);
 
         if (data && data.length > 0) {
           setChartData(data);
