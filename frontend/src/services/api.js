@@ -1,14 +1,25 @@
 const BASE_URL = 'http://localhost:3000';
 
-const getAuthHeader = () => {
+// Token'ı her seferinde taze olarak localStorage'dan çeken yardımcı fonksiyon
+const getHeaders = () => {
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
     const token = localStorage.getItem('token');
-    return token ? { Authorization: token } : {};
+    if (token) {
+        headers['Authorization'] = token; // Token varsa direkt ekle
+    }
+    
+    return headers;
 };
 
 export const apiGet = async (path) => {
     const res = await fetch(`${BASE_URL}${path}`, {
-        headers: { ...getAuthHeader() },
+        method: 'GET',
+        headers: getHeaders(), // Sadece fonksiyonu çağırdık
     });
+    
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Sunucu hatası: ${res.status}`);
@@ -19,12 +30,24 @@ export const apiGet = async (path) => {
 export const apiPatch = async (path, data) => {
     const res = await fetch(`${BASE_URL}${path}`, {
         method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader(),
-        },
+        headers: getHeaders(), // Burada da aynısı!
         body: JSON.stringify(data),
     });
+    
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Sunucu hatası: ${res.status}`);
+    }
+    return res.json();
+};
+
+export const apiPost = async (path, data) => {
+    const res = await fetch(`${BASE_URL}${path}`, {
+        method: 'POST',
+        headers: getHeaders(), // Token'ı sorunsuz alacak!
+        body: JSON.stringify(data),
+    });
+    
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Sunucu hatası: ${res.status}`);

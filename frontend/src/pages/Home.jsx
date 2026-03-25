@@ -3,6 +3,7 @@ import HomeHeader from "../components/HomeHeader";
 import MyGoalsWidget from "../components/MyGoal/MyGoalWidget";
 import UpcomingPayments from "../components/UpcomingPayments/UpcomingPayments";
 import { apiGet } from "../services/api";
+import CardView from "../components/CardView/CardView";
 
 const Home = () => {
   const [username, setUsername] = useState("");
@@ -21,6 +22,7 @@ const Home = () => {
       <div className="flex justify-center mt-8">
         <div className="max-w-6xl w-full px-6 space-y-6">
 
+          {/*
           <div className="bg-white p-6 md:p-8 rounded-[30px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
             <div className="relative z-10">
               <h1 className="text-2xl md:text-3xl font-black text-[#04009A]">
@@ -31,7 +33,9 @@ const Home = () => {
               </p>
             </div>
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-          </div>
+          </div>*/}
+
+          <CardView/>
 
           <MyGoalsWidget />
 

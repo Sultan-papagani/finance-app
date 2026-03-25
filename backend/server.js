@@ -811,3 +811,140 @@ app.post('/api/friends/shared-goals/:goalId/transaction', requireAuth, async (re
     res.status(500).json({ error: "İşlem gerçekleştirilemedi." });
   }
 });
+
+
+// 3. Yeni Kart/Hesap Oluşturma Rotası (Kullanıcılar İçin)
+app.post('/api/cards', requireAuth, async (req, res) => {
+  try {
+    const { name, initialBalance } = req.body;
+    const userId = req.user.id;
+
+    if (!name) {
+      return res.status(400).json({ error: "Lütfen kart/hesap adı girin." });
+    }
+
+    // 1. Kullanıcının mevcut finans verisini çek
+    const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
+    let finances = JSON.parse(user.finances || '{}');
+
+    // 2. Kullanıcının henüz 'cards' dizisi yoksa, sıfırdan oluştur
+    if (!finances.cards) finances.cards = [];
+
+    // 3. Yeni kart objesini hazırla
+    const startingBalance = Number(initialBalance) || 0;
+    const newCardId = "card_" + Date.now(); // Benzersiz ID üret
+    
+    const newCard = {
+      id: newCardId,
+      name: name,
+      balance: startingBalance,
+      history: []
+    };
+
+    // Opsiyonel: Eğer kullanıcı kartı oluştururken içine başlangıç parası koyduysa, 
+    // bunu geçmişe (history) ilk işlem olarak ekleyelim ki havadan gelmiş gibi durmasın.
+    if (startingBalance > 0) {
+      newCard.history.push({
+        id: "tx_" + Date.now(),
+        type: "income",
+        amount: startingBalance,
+        description: "Açılış Bakiyesi",
+        date: new Date().toISOString()
+      });
+    }
+
+    // 4. Yeni kartı kullanıcının verisine ekle
+    finances.cards.push(newCard);
+
+    // 5. Veritabanını güncelle
+    await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(finances), userId]);
+
+    res.status(201).json({ 
+      message: "Kart başarıyla oluşturuldu!", 
+      card: newCard 
+    });
+
+  } catch (error) {
+    console.error("Kart oluşturulurken hata:", error);
+    res.status(500).json({ error: "Sunucu hatası, kart oluşturulamadı." });
+  }
+});
+
+// Kartları/Hesapları Getirme Rotası (GET)
+app.get('/api/cards', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // Kullanıcının verisini çek
+    const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
+    const finances = JSON.parse(user.finances || '{}');
+    
+    // Eğer 'cards' dizisi varsa onu dön, yoksa boş dizi dön
+    const cards = finances.cards || [];
+    res.json(cards);
+    
+  } catch (error) {
+    console.error("Kartlar getirilirken hata:", error);
+    res.status(500).json({ error: "Sunucu hatası, kartlar alınamadı." });
+  }
+});
+
+// --------------------------------------------------
+// 2. YENİ İŞLEM EKLEME VE BAKİYE GÜNCELLEME ROTASI (SQLite Uyumlu)
+// --------------------------------------------------
+app.post('/api/transactions', requireAuth, async (req, res) => {
+  try {
+    // Frontend'den gelen veriler
+    const { cardId, amount, type, description } = req.body;
+    const userId = req.user.id;
+
+    // 1. Kullanıcının güncel finans verisini JSON olarak çek
+    const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
+    let finances = JSON.parse(user.finances || '{}');
+
+    // Güvenlik: Eğer kullanıcının hiç kart dizisi yoksa boş tanımla
+    if (!finances.cards) finances.cards = [];
+
+    // 2. İşlem yapılacak kartı mevcut JSON içinde bul
+    const cardIndex = finances.cards.findIndex(c => c.id === cardId);
+    if (cardIndex === -1) {
+      return res.status(404).json({ error: "Kart bulunamadı!" });
+    }
+
+    const card = finances.cards[cardIndex];
+    const numAmount = Number(amount);
+
+    // 3. İşlem türüne göre bakiyeyi güncelle
+    if (type === 'income') {
+      card.balance += numAmount; // Para eklendi
+    } else if (type === 'expense') {
+      card.balance -= numAmount; // Para çıktı
+    }
+
+    // 4. İşlemi o kartın geçmişine (history) yaz
+    const newTransaction = {
+      id: "tx_" + Date.now(), // İşleme özel benzersiz ID
+      type: type,
+      amount: numAmount,
+      description: description || "Açıklama yok",
+      date: new Date().toISOString()
+    };
+
+    if (!card.history) card.history = [];
+    card.history.unshift(newTransaction); // En yeni işlem en üste gelsin diye unshift kullanıyoruz
+
+    // 5. Güncellenmiş JSON'ı tekrar SQLite veritabanına kaydet
+    await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(finances), userId]);
+
+    // 6. Başarılı yanıt dön
+    res.status(201).json({
+      message: "İşlem başarıyla eklendi, bakiye güncellendi!",
+      updatedBalance: card.balance,
+      transaction: newTransaction
+    });
+
+  } catch (error) {
+    console.error("İşlem kaydedilirken hata:", error);
+    res.status(500).json({ error: "İşlem sırasında sunucu hatası oluştu." });
+  }
+});

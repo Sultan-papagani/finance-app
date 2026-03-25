@@ -26,6 +26,9 @@ import PersonalInfo from "./components/Profile/PersonalInfo";
 import SecuritySettings from "./components/Profile/SecuritySettings";
 import NotificationSettings from "./components/Profile/NotificationSettings";
 import HelpCenter from "./components/Profile/HelpCenter";
+
+import CardDetail from "./pages/CardDetail";
+
 function App() {
   const hasToken = localStorage.getItem("token");
 
@@ -84,6 +87,8 @@ function App() {
                     element={<NotificationSettings />}
                   />
                   <Route path="/help-center" element={<HelpCenter />} />
+
+                  <Route path="/card/:id" element={<CardDetail />} />
                 </Routes>
               </AppLayout>
             </ProtectedRoute>

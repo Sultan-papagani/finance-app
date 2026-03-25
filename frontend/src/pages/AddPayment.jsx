@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as LucideIcons from "lucide-react";
 import { fetchPayments, savePayments } from "../services/goalService";
+import { apiGet, apiPatch } from "../services/api";
 
 const AddPayment = () => {
   const navigate = useNavigate();
@@ -26,6 +27,9 @@ const AddPayment = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [analyticsTab, setAnalyticsTab] = useState("expense");
+
+  const [userCards, setUserCards] = useState([]);
+  const [selectedCardId, setSelectedCardId] = useState("");
 
   const colorPalette = [
     { bg: "bg-red-500", text: "text-red-500" },
@@ -55,6 +59,13 @@ const AddPayment = () => {
         setPayments(data);
       })
       .catch(err => console.error("Ödemeler yüklenemedi:", err));
+
+    apiGet('/api/user/finances').then(data => {
+    if(data.cards && data.cards.length > 0) {
+      setUserCards(data.cards);
+      setSelectedCardId(data.cards[0].id); // Varsayılan olarak ilk kartı seç
+    }
+  });
   }, []);
 
   // --- YARDIMCI FONKSİYONLAR ---
@@ -115,27 +126,66 @@ const AddPayment = () => {
     : filteredPayments.filter(p => p.transactionType === "income").reduce((sum, p) => sum + Number(p.amount), 0);
 
   // --- AKSİYONLAR ---
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!title || !amount || !date) { alert("Lütfen gerekli alanları doldur!"); return; }
-    const newPayment = {
-      id: Date.now(), title, amount: Number(amount), date, note,
-      iconName: selectedIcon, color: selectedColor, isRecurring, transactionType,
-      isCompleted: false
-    };
-    const updatedPayments = [...payments, newPayment].sort((a, b) => new Date(a.date) - new Date(b.date));
-    setPayments(updatedPayments);
-    setIsSaving(true);
-    try {
-      await savePayments(updatedPayments);
-    } catch (err) {
-      console.error("Kaydetme hatası:", err);
-      alert("Kaydetme sırasında bir hata oluştu.");
-    } finally {
-      setIsSaving(false);
-    }
-    setTitle(""); setAmount(""); setDate(""); setNote(""); setIconSearch(""); setIsRecurring(false);
+const handleSave = async (e) => {
+  e.preventDefault();
+  if (!title || !amount || !date || !selectedCardId) { alert("Lütfen gerekli alanları doldur!"); return; }
+  
+  const parsedAmount = Number(amount);
+
+  // 1. Yeni Payment objesi (Mevcut kodun)
+  const newPayment = {
+    id: Date.now(), title, amount: parsedAmount, date, note,
+    iconName: selectedIcon, color: selectedColor, isRecurring, transactionType,
+    isCompleted: false, cardId: selectedCardId // Hangi karta ait olduğunu payment'a da yazıyoruz
   };
+  const updatedPayments = [...payments, newPayment].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // 2. Kartın Bakiyesini ve Geçmişini Güncelleme
+  const updatedCards = userCards.map(card => {
+    if (card.id === selectedCardId) {
+      // İşlem türüne göre bakiyeyi artır veya azalt
+      const newBalance = transactionType === "income" 
+        ? card.balance + parsedAmount 
+        : card.balance - parsedAmount;
+
+      // Kartın kendi geçmişine işlemi ekle
+      const historyItem = {
+        id: newPayment.id,
+        action: title,
+        amount: parsedAmount,
+        type: transactionType,
+        date: date,
+        icon: selectedIcon
+      };
+
+      return { 
+        ...card, 
+        balance: newBalance, 
+        history: [historyItem, ...card.history] // En yeni işlem en başa
+      };
+    }
+    return card;
+  });
+
+  setPayments(updatedPayments);
+  setUserCards(updatedCards); // UI'ı güncelle
+  setIsSaving(true);
+
+  try {
+    // API'ye Hem Payments Hem de Cards'ı tek seferde yolla!
+    // server.js'deki patch rotası bunu { ...currentFinances, payments: [...], cards: [...] } şeklinde birleştirecektir.
+    await apiPatch('/api/user/finances', { 
+      payments: updatedPayments, 
+      cards: updatedCards 
+    });
+  } catch (err) {
+    console.error("Kaydetme hatası:", err);
+  } finally {
+    setIsSaving(false);
+  }
+  
+  setTitle(""); setAmount(""); setDate(""); setNote(""); setIconSearch(""); setIsRecurring(false);
+};
 
   const handleComplete = async (e, id) => {
     e.stopPropagation();
@@ -205,6 +255,20 @@ const AddPayment = () => {
                   <span className="font-bold text-gray-800 text-sm">Düzenli Ödeme</span>
                 </div>
                 <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${isRecurring ? 'bg-green-500' : 'bg-gray-300'}`}><div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${isRecurring ? 'translate-x-6' : 'translate-x-0'}`}></div></div>
+              </div>
+
+              {/* YENİ EKLENEN KART SEÇİCİ ALANI */}
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-3">
+                <LucideIcons.Wallet size={20} className="text-gray-400" />
+                <select 
+                  value={selectedCardId} 
+                  onChange={(e) => setSelectedCardId(e.target.value)}
+                  className="w-full bg-transparent border-none outline-none font-bold text-gray-700 cursor-pointer"
+                >
+                  {userCards.map(card => (
+                    <option key={card.id} value={card.id}>{card.name} ({card.balance.toLocaleString('tr-TR')} ₺)</option>
+                  ))}
+                </select>
               </div>
 
               {/*  NOT KISMI BURADA  */}

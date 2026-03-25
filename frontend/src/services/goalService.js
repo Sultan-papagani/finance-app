@@ -1,4 +1,4 @@
-import { apiGet, apiPatch } from './api';
+import { apiGet, apiPatch, apiPost } from './api';
 
 export const fetchFinances = () => apiGet('/api/user/finances');
 
@@ -22,3 +22,17 @@ export const fetchPayments = async () => {
 };
 
 export const savePayments = (payments) => apiPatch('/api/user/finances', { payments });
+
+// =======================================================
+// --- YENİ EKLENEN KART VE İŞLEM FONKSİYONLARI ---
+// =======================================================
+
+// Tüm kartları getirir
+export const fetchCards = () => apiGet('/api/cards');
+
+// Yeni bir kart/hesap oluşturur (name ve initialBalance bekler)
+export const createCard = (cardData) => apiPost('/api/cards', cardData);
+
+// Karta yeni bir işlem (gelir/gider) ekler
+export const addTransaction = (transactionData) => apiPost('/api/transactions', transactionData);
+
