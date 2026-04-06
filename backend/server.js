@@ -218,6 +218,39 @@ app.get('/api/user/profile', requireAuth, (req, res) => {
   res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
+// Profil Verisi Güncelle (kullanıcı adı ve/veya e-posta)
+app.patch('/api/user/profile', requireAuth, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const userId = req.user.id;
+
+    const updates = [];
+    const params = [];
+
+    if (username && username.trim()) {
+      updates.push('username = ?');
+      params.push(username.trim());
+    }
+    if (email && email.trim()) {
+      const existing = await db.get('SELECT id FROM users WHERE email = ? AND id != ?', [email.trim(), userId]);
+      if (existing) return res.status(400).json({ error: 'Bu e-posta adresi zaten başka bir hesapta kullanılıyor.' });
+      updates.push('email = ?');
+      params.push(email.trim());
+    }
+
+    if (updates.length === 0) return res.status(400).json({ error: 'Güncellenecek alan bulunamadı.' });
+
+    params.push(userId);
+    await db.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+
+    const updated = await db.get('SELECT id, username, email FROM users WHERE id = ?', [userId]);
+    res.json({ message: 'Profil başarıyla güncellendi!', user: updated });
+  } catch (error) {
+    console.error('Profil güncellenirken hata:', error);
+    res.status(500).json({ error: 'Profil güncellenemedi.' });
+  }
+});
+
 // Finans Verisini Getir
 app.get('/api/user/finances', requireAuth, async (req, res) => {
   try {
@@ -816,7 +849,7 @@ app.post('/api/friends/shared-goals/:goalId/transaction', requireAuth, async (re
 // 3. Yeni Kart/Hesap Oluşturma Rotası (Kullanıcılar İçin)
 app.post('/api/cards', requireAuth, async (req, res) => {
   try {
-    const { name, initialBalance } = req.body;
+    const { name, initialBalance, color } = req.body;
     const userId = req.user.id;
 
     if (!name) {
@@ -838,6 +871,7 @@ app.post('/api/cards', requireAuth, async (req, res) => {
       id: newCardId,
       name: name,
       balance: startingBalance,
+      color: color || "bg-gray-800",
       history: []
     };
 

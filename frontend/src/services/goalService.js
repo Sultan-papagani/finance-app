@@ -9,7 +9,7 @@ export const fetchGoals = async () => {
 
 export const fetchGoalById = async (id) => {
     const goals = await fetchGoals();
-    const goal = goals.find(g => g.id === parseInt(id));
+    const goal = goals.find(g => g.id.toString() === id.toString());
     if (!goal) throw new Error('Hedef bulunamadı');
     return goal;
 };

@@ -74,21 +74,16 @@ function App() {
                     element={<StockTerminalPage />}
                   />
 
-                  {/* Bilinmeyen saçma sapan bir URL girilirse anında Home'a geri şutla */}
-                  <Route path="*" element={<Navigate to="/home" replace />} />
-                  {/*Profile kısmı */}
+                  {/* Profile sub-routes */}
                   <Route path="/personal-info" element={<PersonalInfo />} />
-                  <Route
-                    path="/security-settings"
-                    element={<SecuritySettings />}
-                  />
-                  <Route
-                    path="/notification-settings"
-                    element={<NotificationSettings />}
-                  />
+                  <Route path="/security-settings" element={<SecuritySettings />} />
+                  <Route path="/notification-settings" element={<NotificationSettings />} />
                   <Route path="/help-center" element={<HelpCenter />} />
 
                   <Route path="/card/:id" element={<CardDetail />} />
+
+                  {/* Catch-all — must be last */}
+                  <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
               </AppLayout>
             </ProtectedRoute>
