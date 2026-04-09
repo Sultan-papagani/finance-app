@@ -982,3 +982,113 @@ app.post('/api/transactions', requireAuth, async (req, res) => {
     res.status(500).json({ error: "İşlem sırasında sunucu hatası oluştu." });
   }
 });
+
+// =======================================================
+//  YEREL MATEMATİKSEL ALTIN MOTORU (ONS + USD/TRY + MAKAS)
+// =======================================================
+let localGoldCache = { data: null, timestamp: 0 };
+
+app.get('/api/gold', async (req, res) => {
+  if (localGoldCache.data && (Date.now() - localGoldCache.timestamp < 60000)) {
+    return res.json(localGoldCache.data);
+  }
+  
+  try {
+    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d`;
+    const yahooRes = await fetch(yahooUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const yahooData = await yahooRes.json();
+    
+    if (!yahooData.chart.result) throw new Error("ONS Altın verisi alınamadı");
+    
+    const onsPriceUSD = yahooData.chart.result[0].meta.regularMarketPrice; 
+    const previousClose = yahooData.chart.result[0].meta.chartPreviousClose;
+    const changePercent = parseFloat((((onsPriceUSD - previousClose) / previousClose) * 100).toFixed(2));
+
+    const ratesRes = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=TRY,USD');
+    const ratesData = await ratesRes.json();
+    const usdToTry = ratesData.rates.TRY / ratesData.rates.USD; 
+
+    // 1 Ons = 31.1034768 Gram'dır
+    const gramAltinUSD = onsPriceUSD / 31.1034768; 
+    const gramAltinTRY = gramAltinUSD * usdToTry; 
+
+    //  MAKAS ALGORİTMASI: Kuyumcular genelde %1.5 makas uygular.
+    // Satış: Bize sattıkları (Pahalı) | Alış: Bizden aldıkları (Ucuz)
+    const calcWithSpread = (multiplier) => {
+        const midPrice = gramAltinTRY * multiplier;
+        return {
+            buy: midPrice * 0.985, // %1.5 Altı (Kuyumcu Alışı)
+            sell: midPrice * 1.015 // %1.5 Üstü (Kuyumcu Satışı)
+        };
+    };
+
+    const goldPrices = [
+      { id: 'gram', name: 'Gram Altın', ...calcWithSpread(1), change: changePercent },
+      { id: 'ceyrek', name: 'Çeyrek Altın', ...calcWithSpread(1.6065), change: changePercent },
+      { id: 'yarim', name: 'Yarım Altın', ...calcWithSpread(3.213), change: changePercent },
+      { id: 'tam', name: 'Tam Altın', ...calcWithSpread(6.426), change: changePercent },
+      { id: 'cumhuriyet', name: 'Cumhuriyet Altını', ...calcWithSpread(6.6), change: changePercent },
+      { id: 'ata5', name: 'Beşi Bir Yerde', ...calcWithSpread(33.0), change: changePercent },
+      { id: 'bilezik22', name: '22 Ayar Bilezik', ...calcWithSpread(0.916), change: changePercent }
+    ];
+
+    localGoldCache = { data: goldPrices, timestamp: Date.now() };
+    res.json(goldPrices);
+
+  } catch (error) {
+    console.error("Altın verisi hesaplanırken hata:", error);
+    res.status(500).json({ error: "Altın verisi hesaplanamadı." });
+  }
+});
+
+// =======================================================
+// ALTIN TARİHSEL GRAFİK MOTORU (RECHARTS İÇİN)
+// =======================================================
+app.get('/api/historical-gold', async (req, res) => {
+  try {
+    const days = req.query.days || '30';
+    let range = '1mo';
+    if(days === '90') range = '3mo';
+    if(days === '180') range = '6mo';
+    if(days === '365') range = '1y';
+
+    // 1. Yahoo'dan Altın (ONS) geçmişi
+    const goldRes = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=${range}`);
+    const goldData = await goldRes.json();
+
+    // 2. Yahoo'dan Dolar/TL geçmişi
+    const usdRes = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/TRY=X?interval=1d&range=${range}`);
+    const usdData = await usdRes.json();
+
+    const goldResult = goldData.chart.result[0];
+    const usdResult = usdData.chart.result[0];
+
+    const timestamps = goldResult.timestamp || [];
+    const goldPrices = goldResult.indicators.quote[0].close || [];
+    const usdPrices = usdResult.indicators.quote[0].close || [];
+
+    const chartData = [];
+
+    // ONS Fiyatı ile Dolar Kurunu gün gün eşleştirip HAS GRAM ALTIN fiyatını buluyoruz
+    for (let i = 0; i < timestamps.length; i++) {
+        if (goldPrices[i] && usdPrices[i]) {
+            const date = new Date(timestamps[i] * 1000);
+            const dayMonth = `${date.getDate().toString().padStart(2, '0')} ${date.toLocaleString('tr-TR', { month: 'short' })}`; 
+            const fullDate = date.toISOString().split('T')[0]; 
+
+            const gramPriceTRY = (goldPrices[i] / 31.1034768) * usdPrices[i];
+
+            chartData.push({
+                date: dayMonth,
+                fullDate: fullDate,
+                price: parseFloat(gramPriceTRY.toFixed(2))
+            });
+        }
+    }
+
+    res.json(chartData);
+  } catch (error) {
+    console.error("Tarihsel altın verisi hatası:", error);
+    res.status(500).json({ error: "Geçmiş veri alınamadı." });
+  }
+});

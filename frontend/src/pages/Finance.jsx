@@ -2,6 +2,7 @@ import React from 'react';
 import MarketAnalysis from '../components/Finance/MarketAnalysis/MarketAnalysis';
 import StockTerminal from '../components/Finance/StockTerminal/StockTerminal';
 import CryptoWidget from '../components/Finance/crypto/CryptoWidget'; 
+import GoldWidget from '../components/Finance/GoldWidget'; // Altın Widget'ını ekliyoruz
 const Finance = () => {
   return (
     // Sayfanın iskeleti: max-w-7xl, ortalanmış, boşluklu
@@ -9,12 +10,14 @@ const Finance = () => {
       
       {/* 1. Modül: Piyasa Analizi Component'ini Çağırıyoruz */}
       <MarketAnalysis />
+          {/* 4. Modül: Altın Widget'ı Component'ini Çağırıyoruz */}
+      <GoldWidget />
       {/* 2. Modül: Hisse Senedi Terminali Component'ini Çağırıyoruz */}
       <StockTerminal />
       {/* 3. Modül: Kripto Para Widget'ı Component'ini Çağırıyoruz */}
       <CryptoWidget />
       
-
+  
     </div>
   );
 };
