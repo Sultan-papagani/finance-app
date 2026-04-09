@@ -886,7 +886,10 @@ app.post('/api/cards', requireAuth, async (req, res) => {
         date: new Date().toISOString()
       });
     }
-
+//  3 KART SINIRI
+    if (finances.cards && finances.cards.length >= 3) {
+      return res.status(400).json({ error: "Sınırı aştınız! Maksimum 3 adet kart oluşturabilirsiniz." });
+    }
     // 4. Yeni kartı kullanıcının verisine ekle
     finances.cards.push(newCard);
 
@@ -924,62 +927,118 @@ app.get('/api/cards', requireAuth, async (req, res) => {
 });
 
 // --------------------------------------------------
-// 2. YENİ İŞLEM EKLEME VE BAKİYE GÜNCELLEME ROTASI (SQLite Uyumlu)
+// 2. YENİ İŞLEM EKLEME VE KASAYA TRANSFER ROTASI
 // --------------------------------------------------
-app.post('/api/transactions', requireAuth, async (req, res) => {
+// --------------------------------------------------
+// 🔥 GELİŞMİŞ İŞLEM VE VARLIK YÖNETİMİ ROTASI 🔥
+// --------------------------------------------------
+app.post('/api/transactions', async (req, res) => {
   try {
-    // Frontend'den gelen veriler
-    const { cardId, amount, type, description } = req.body;
-    const userId = req.user.id;
+    // Sende token doğrulaması varsa "req.user.id" kullan, yoksa db'deki test user id'ni yaz (örnek: 1)
+    const userId = 1; 
+    const { cardId, amount, type, description, assetCategory, assetName, quantity } = req.body;
 
-    // 1. Kullanıcının güncel finans verisini JSON olarak çek
     const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
     let finances = JSON.parse(user.finances || '{}');
 
-    // Güvenlik: Eğer kullanıcının hiç kart dizisi yoksa boş tanımla
     if (!finances.cards) finances.cards = [];
+    if (!finances.vault) finances.vault = { balance: 0, history: [] };
+    if (!finances.assets) finances.assets = []; // Varlıklar dizisi
 
-    // 2. İşlem yapılacak kartı mevcut JSON içinde bul
-    const cardIndex = finances.cards.findIndex(c => c.id === cardId);
-    if (cardIndex === -1) {
-      return res.status(404).json({ error: "Kart bulunamadı!" });
-    }
-
-    const card = finances.cards[cardIndex];
     const numAmount = Number(amount);
 
-    // 3. İşlem türüne göre bakiyeyi güncelle
-    if (type === 'income') {
-      card.balance += numAmount; // Para eklendi
-    } else if (type === 'expense') {
-      card.balance -= numAmount; // Para çıktı
+    // 🚀 EĞER İŞLEM "VARLIK ALIMI" İSE (Altın, Kripto vs.)
+    if (type === 'buy_asset') {
+      if (finances.vault.balance < numAmount) {
+        return res.status(400).json({ error: "Ana Kasa'da bu varlığı almak için yeterli bakiye yok!" });
+      }
+      
+      // Kasadan Parayı Düş
+      finances.vault.balance -= numAmount;
+      
+      // Varlıklara Ekle
+      finances.assets.unshift({
+        id: "ast_" + Date.now(),
+        category: assetCategory || "crypto",
+        name: assetName || "Belirtilmeyen Varlık",
+        quantity: Number(quantity) || 1,
+        totalCost: numAmount,
+        date: new Date().toISOString()
+      });
+
+      // Kasa Geçmişine Yaz
+      finances.vault.history.unshift({
+        id: "tx_v_" + Date.now(),
+        type: "expense",
+        amount: numAmount,
+        description: `Yatırım: ${quantity}x ${assetName}`,
+        date: new Date().toISOString()
+      });
+
+      await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(finances), userId]);
+      return res.status(201).json({ message: "Varlık başarıyla kasadan alındı!", vaultBalance: finances.vault.balance });
     }
 
-    // 4. İşlemi o kartın geçmişine (history) yaz
+// 💳 DİĞER STANDART KART İŞLEMLERİ (Gelir, Gider, Kasaya Aktar, Kasadan Çek)
+    const cardIndex = finances.cards.findIndex(c => c.id === cardId);
+    if (cardIndex === -1) return res.status(404).json({ error: "Kart bulunamadı!" });
+    const card = finances.cards[cardIndex];
+
     const newTransaction = {
-      id: "tx_" + Date.now(), // İşleme özel benzersiz ID
+      id: "tx_" + Date.now(),
       type: type,
       amount: numAmount,
       description: description || "Açıklama yok",
       date: new Date().toISOString()
     };
 
+    if (type === 'income') {
+      card.balance += numAmount;
+    } else if (type === 'expense') {
+      if (card.balance < numAmount) return res.status(400).json({ error: "Kartta yeterli bakiye yok!" });
+      card.balance -= numAmount;
+    } else if (type === 'transfer_to_vault') {
+      // Karttan Kasaya
+      if (card.balance < numAmount) return res.status(400).json({ error: "Kartta aktarılacak kadar bakiye yok!" });
+      card.balance -= numAmount; 
+      finances.vault.balance += numAmount; 
+      newTransaction.description = description || "Ana Kasaya Aktarım";
+      finances.vault.history.unshift({
+        id: "tx_v_" + Date.now(),
+        type: "income",
+        amount: numAmount,
+        description: `${card.name} üzerinden transfer`,
+        date: new Date().toISOString()
+      });
+    } else if (type === 'withdraw_from_vault') {
+      // 🔥 YENİ: KASADAN KARTA PARA ÇEKME 🔥
+      if (finances.vault.balance < numAmount) return res.status(400).json({ error: "Ana Kasa'da yeterli bakiye yok!" });
+      
+      finances.vault.balance -= numAmount; // Kasadan düş
+      card.balance += numAmount; // Karta ekle
+      
+      newTransaction.type = "income"; // Bu işlem KART için bir gelirdir
+      newTransaction.description = description || "Ana Kasadan Çekim";
+      
+      // Kasanın kendi geçmişine gider olarak yaz
+      finances.vault.history.unshift({
+        id: "tx_v_" + Date.now(),
+        type: "expense",
+        amount: numAmount,
+        description: `${card.name} kartına aktarım`,
+        date: new Date().toISOString()
+      });
+    }
+
     if (!card.history) card.history = [];
-    card.history.unshift(newTransaction); // En yeni işlem en üste gelsin diye unshift kullanıyoruz
+    card.history.unshift(newTransaction);
 
-    // 5. Güncellenmiş JSON'ı tekrar SQLite veritabanına kaydet
     await db.run('UPDATE users SET finances = ? WHERE id = ?', [JSON.stringify(finances), userId]);
-
-    // 6. Başarılı yanıt dön
-    res.status(201).json({
-      message: "İşlem başarıyla eklendi, bakiye güncellendi!",
-      updatedBalance: card.balance,
-      transaction: newTransaction
-    });
+    res.status(201).json({ message: "İşlem başarıyla eklendi!" });
 
   } catch (error) {
     console.error("İşlem kaydedilirken hata:", error);
-    res.status(500).json({ error: "İşlem sırasında sunucu hatası oluştu." });
+    res.status(500).json({ error: "Sunucu hatası." });
   }
 });
 

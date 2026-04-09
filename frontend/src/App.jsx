@@ -28,7 +28,7 @@ import NotificationSettings from "./components/Profile/NotificationSettings";
 import HelpCenter from "./components/Profile/HelpCenter";
 import GoldMarketsPage from './pages/GoldMarketsPage';
 import CardDetail from "./pages/CardDetail";
-
+import AssetDetail from "./pages/AssetDetail";
 function App() {
   const hasToken = localStorage.getItem("token");
 
@@ -81,7 +81,7 @@ function App() {
                   <Route path="/help-center" element={<HelpCenter />} />
 
                   <Route path="/card/:id" element={<CardDetail />} />
-        
+                  <Route path="/asset/:id" element={<AssetDetail />} />
                   {/* Catch-all — must be last */}
                   <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>

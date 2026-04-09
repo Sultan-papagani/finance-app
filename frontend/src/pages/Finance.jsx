@@ -3,11 +3,14 @@ import MarketAnalysis from '../components/Finance/MarketAnalysis/MarketAnalysis'
 import StockTerminal from '../components/Finance/StockTerminal/StockTerminal';
 import CryptoWidget from '../components/Finance/crypto/CryptoWidget'; 
 import GoldWidget from '../components/Finance/GoldWidget'; // Altın Widget'ını ekliyoruz
+import VaultCard from '../components/Finance/VaultCard';
+import MyAssets from '../components/Finance/MyAssets';
 const Finance = () => {
   return (
     // Sayfanın iskeleti: max-w-7xl, ortalanmış, boşluklu
     <div className="p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
-      
+      <VaultCard />
+      <MyAssets />
       {/* 1. Modül: Piyasa Analizi Component'ini Çağırıyoruz */}
       <MarketAnalysis />
           {/* 4. Modül: Altın Widget'ı Component'ini Çağırıyoruz */}
