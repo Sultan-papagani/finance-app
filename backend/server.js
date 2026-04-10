@@ -932,10 +932,9 @@ app.get('/api/cards', requireAuth, async (req, res) => {
 // --------------------------------------------------
 // 🔥 GELİŞMİŞ İŞLEM VE VARLIK YÖNETİMİ ROTASI 🔥
 // --------------------------------------------------
-app.post('/api/transactions', async (req, res) => {
+app.post('/api/transactions', requireAuth, async (req, res) => { // 🔥 1. DÜZELTME: requireAuth EKLENDİ!
   try {
-    // Sende token doğrulaması varsa "req.user.id" kullan, yoksa db'deki test user id'ni yaz (örnek: 1)
-    const userId = 1; 
+    const userId = req.user.id; // 🔥 2. DÜZELTME: SABİT '1' YERİNE GİRİŞ YAPAN KİŞİNİN ID'Sİ ALINDI!
     const { cardId, amount, type, description, assetCategory, assetName, quantity } = req.body;
 
     const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
@@ -979,7 +978,7 @@ app.post('/api/transactions', async (req, res) => {
       return res.status(201).json({ message: "Varlık başarıyla kasadan alındı!", vaultBalance: finances.vault.balance });
     }
 
-// 💳 DİĞER STANDART KART İŞLEMLERİ (Gelir, Gider, Kasaya Aktar, Kasadan Çek)
+    // 💳 DİĞER STANDART KART İŞLEMLERİ (Gelir, Gider, Kasaya Aktar, Kasadan Çek)
     const cardIndex = finances.cards.findIndex(c => c.id === cardId);
     if (cardIndex === -1) return res.status(404).json({ error: "Kart bulunamadı!" });
     const card = finances.cards[cardIndex];
@@ -1011,7 +1010,7 @@ app.post('/api/transactions', async (req, res) => {
         date: new Date().toISOString()
       });
     } else if (type === 'withdraw_from_vault') {
-      // 🔥 YENİ: KASADAN KARTA PARA ÇEKME 🔥
+      // 🔥 KASADAN KARTA PARA ÇEKME 🔥
       if (finances.vault.balance < numAmount) return res.status(400).json({ error: "Ana Kasa'da yeterli bakiye yok!" });
       
       finances.vault.balance -= numAmount; // Kasadan düş
@@ -1041,7 +1040,6 @@ app.post('/api/transactions', async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası." });
   }
 });
-
 // =======================================================
 //  YEREL MATEMATİKSEL ALTIN MOTORU (ONS + USD/TRY + MAKAS)
 // =======================================================
