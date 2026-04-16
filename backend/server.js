@@ -21,6 +21,12 @@ const JWT_SECRET = 'SUPER_GIZLI_ANAHATAR_KESINLIKLE_MAINE_PUSHLANMAMALI';
 // --- oluşturulan ark kodları
 const activeGoalCodes = new Map();
 
+// --- SECURITY: XSS Prevention Helper ---
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[<>]/g, '');
+}
+
 // Yeni kullanıcılar veya boş finans verisi olan admin için başlangıç verileri
 const INITIAL_FINANCES = {
   goals: [
@@ -79,9 +85,28 @@ let db;
             username TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            finances TEXT DEFAULT '{}'
+            finances TEXT DEFAULT '{}',
+            phone TEXT DEFAULT '',
+            occupation TEXT DEFAULT '',
+            monthly_income REAL DEFAULT 0,
+            birth_date TEXT DEFAULT '',
+            notification_settings TEXT DEFAULT '{"transfers":true,"goals":true,"likes":true,"newMembers":true,"pushApp":true,"email":false}',
+            theme TEXT DEFAULT 'light'
         )
     `);
+
+  // Mevcut tabloya yeni kolonları güvenli bir şekilde ekle (zaten varsa hata vermez)
+  const safeAddColumn = async (table, column, type, defaultVal) => {
+    try {
+      await db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type} DEFAULT ${defaultVal}`);
+    } catch (e) { /* kolon zaten var, sorun yok */ }
+  };
+  await safeAddColumn('users', 'phone', 'TEXT', "''");
+  await safeAddColumn('users', 'occupation', 'TEXT', "''");
+  await safeAddColumn('users', 'monthly_income', 'REAL', '0');
+  await safeAddColumn('users', 'birth_date', 'TEXT', "''");
+  await safeAddColumn('users', 'notification_settings', 'TEXT', "'{}'" );
+  await safeAddColumn('users', 'theme', 'TEXT', "'light'");
 
   await db.exec(`
         CREATE TABLE IF NOT EXISTS images (
@@ -205,6 +230,7 @@ app.post('/register', async (req, res) => {
 
 // KULLANICI GİRİŞ YAP
 app.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
+  // TODO: Add rate limiting to prevent brute-force attacks (e.g., express-rate-limit)
   const token = jwt.sign({ id: req.user.id }, JWT_SECRET, { expiresIn: '1h' }); // Uzattım biraz :)
   res.json({ message: "Başarıyla giriş yapıldı", token: `Bearer ${token}` });
 });
@@ -213,29 +239,66 @@ app.post('/login', passport.authenticate('local', { session: false }), (req, res
 // --- KORUMALI ROUTE'LAR (JWT gerektirir) ---
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-// Profil Verisi Getir
-app.get('/api/user/profile', requireAuth, (req, res) => {
-  res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
+// Profil Verisi Getir (Tüm alanlar dahil)
+app.get('/api/user/profile', requireAuth, async (req, res) => {
+  try {
+    const user = await db.get(
+      'SELECT id, username, email, phone, occupation, monthly_income, birth_date, notification_settings, theme FROM users WHERE id = ?',
+      [req.user.id]
+    );
+    if (!user) return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
+
+    res.json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      phone: user.phone || '',
+      occupation: user.occupation || '',
+      monthlyIncome: user.monthly_income || 0,
+      birthDate: user.birth_date || '',
+      notificationSettings: JSON.parse(user.notification_settings || '{}'),
+      theme: user.theme || 'light'
+    });
+  } catch (error) {
+    console.error('Profil getirme hatası:', error);
+    res.status(500).json({ error: 'Profil bilgileri getirilemedi.' });
+  }
 });
 
-// Profil Verisi Güncelle (kullanıcı adı ve/veya e-posta)
+// Profil Verisi Güncelle (tüm alanlar)
 app.patch('/api/user/profile', requireAuth, async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { username, email, phone, occupation, monthlyIncome, birthDate } = req.body;
     const userId = req.user.id;
 
     const updates = [];
     const params = [];
 
-    if (username && username.trim()) {
+    if (username !== undefined && username.trim()) {
       updates.push('username = ?');
-      params.push(username.trim());
+      params.push(sanitizeInput(username.trim()));
     }
-    if (email && email.trim()) {
+    if (email !== undefined && email.trim()) {
       const existing = await db.get('SELECT id FROM users WHERE email = ? AND id != ?', [email.trim(), userId]);
       if (existing) return res.status(400).json({ error: 'Bu e-posta adresi zaten başka bir hesapta kullanılıyor.' });
       updates.push('email = ?');
-      params.push(email.trim());
+      params.push(sanitizeInput(email.trim()));
+    }
+    if (phone !== undefined) {
+      updates.push('phone = ?');
+      params.push(sanitizeInput(phone.trim()));
+    }
+    if (occupation !== undefined) {
+      updates.push('occupation = ?');
+      params.push(sanitizeInput(occupation.trim()));
+    }
+    if (monthlyIncome !== undefined) {
+      updates.push('monthly_income = ?');
+      params.push(Number(monthlyIncome) || 0);
+    }
+    if (birthDate !== undefined) {
+      updates.push('birth_date = ?');
+      params.push(sanitizeInput(birthDate));
     }
 
     if (updates.length === 0) return res.status(400).json({ error: 'Güncellenecek alan bulunamadı.' });
@@ -243,11 +306,87 @@ app.patch('/api/user/profile', requireAuth, async (req, res) => {
     params.push(userId);
     await db.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
 
-    const updated = await db.get('SELECT id, username, email FROM users WHERE id = ?', [userId]);
-    res.json({ message: 'Profil başarıyla güncellendi!', user: updated });
+    const updated = await db.get(
+      'SELECT id, username, email, phone, occupation, monthly_income, birth_date FROM users WHERE id = ?',
+      [userId]
+    );
+    res.json({
+      message: 'Profil başarıyla güncellendi!',
+      user: {
+        id: updated.id,
+        username: updated.username,
+        email: updated.email,
+        phone: updated.phone,
+        occupation: updated.occupation,
+        monthlyIncome: updated.monthly_income,
+        birthDate: updated.birth_date
+      }
+    });
   } catch (error) {
     console.error('Profil güncellenirken hata:', error);
     res.status(500).json({ error: 'Profil güncellenemedi.' });
+  }
+});
+
+// Şifre Değiştir
+app.post('/api/user/change-password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Mevcut şifre ve yeni şifre zorunludur.' });
+    }
+    if (newPassword.length < 4) {
+      return res.status(400).json({ error: 'Yeni şifre en az 4 karakter olmalıdır.' });
+    }
+
+    const user = await db.get('SELECT password_hash FROM users WHERE id = ?', [userId]);
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Mevcut şifreniz hatalı.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const newHash = await bcrypt.hash(newPassword, salt);
+    await db.run('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, userId]);
+
+    res.json({ message: 'Şifreniz başarıyla güncellendi!' });
+  } catch (error) {
+    console.error('Şifre değiştirme hatası:', error);
+    res.status(500).json({ error: 'Şifre güncellenemedi.' });
+  }
+});
+
+// Bildirim Ayarlarını Güncelle
+app.patch('/api/user/notifications', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const settings = req.body;
+
+    await db.run('UPDATE users SET notification_settings = ? WHERE id = ?', [JSON.stringify(settings), userId]);
+    res.json({ message: 'Bildirim ayarları güncellendi!', notificationSettings: settings });
+  } catch (error) {
+    console.error('Bildirim ayarları hatası:', error);
+    res.status(500).json({ error: 'Bildirim ayarları güncellenemedi.' });
+  }
+});
+
+// Tema Güncelle
+app.patch('/api/user/theme', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { theme } = req.body;
+
+    if (!['light', 'dark'].includes(theme)) {
+      return res.status(400).json({ error: 'Geçersiz tema. "light" veya "dark" olmalı.' });
+    }
+
+    await db.run('UPDATE users SET theme = ? WHERE id = ?', [theme, userId]);
+    res.json({ message: 'Tema güncellendi!', theme });
+  } catch (error) {
+    console.error('Tema güncelleme hatası:', error);
+    res.status(500).json({ error: 'Tema güncellenemedi.' });
   }
 });
 
@@ -385,8 +524,8 @@ app.get('/api/rates', async (req, res) => {
 app.get('/api/historical-rates', async (req, res) => {
   try {
     // Frontend'den gelen istekleri alıyoruz (Örn: base=EUR, symbol=TRY, days=30)
-    const base = req.query.base || 'EUR';
-    const symbol = req.query.symbol || 'TRY';
+    const base = encodeURIComponent(req.query.base || 'EUR');
+    const symbol = encodeURIComponent(req.query.symbol || 'TRY');
     const days = parseInt(req.query.days) || 30; // Varsayılan 30 gün (1 Ay)
 
     // Tarihleri hesaplıyoruz (Bugün ve X gün öncesi)
@@ -544,7 +683,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
 // =======================================================
 app.get('/api/search/:query', async (req, res) => {
   try {
-    const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${req.params.query}&quotesCount=6&newsCount=0`, {
+    const response = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(req.params.query)}&quotesCount=6&newsCount=0`, {
       headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
     });
     const data = await response.json();
@@ -572,7 +711,7 @@ app.get('/api/crypto/search/:query', async (req, res) => {
 
   try {
     console.log(`[🌍 API İSTEĞİ] CoinGecko'da aranıyor: ${query}`);
-    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`);
+    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`);
     const data = await response.json();
 
     if (data && data.coins) {
@@ -633,13 +772,13 @@ const chartCache = {};
 app.get('/api/crypto/chart/:id', async (req, res) => {
   const { id } = req.params;
   const days = req.query.days || '1';
-  const cacheKey = `${id}-${days}`;
+  const cacheKey = `${encodeURIComponent(id)}-${encodeURIComponent(days)}`;
 
   if (chartCache[cacheKey] && (Date.now() - chartCache[cacheKey].timestamp < 120000)) {
     return res.json(chartCache[cacheKey].data);
   }
   try {
-    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}`);
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${encodeURIComponent(days)}`);
     const data = await response.json();
     chartCache[cacheKey] = { data, timestamp: Date.now() };
     res.json(data);
@@ -773,7 +912,16 @@ app.post('/api/friends/shared-goals/:goalId/transaction', requireAuth, async (re
   try {
     const { goalId } = req.params;
     const { amount, actionNote, type } = req.body; // type: 'add' veya 'withdraw'
-    
+
+    // Input Validation
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount <= 0 || !isFinite(numAmount)) {
+      return res.status(400).json({ error: "Tutar pozitif bir sayı olmalıdır." });
+    }
+    if (type !== 'add' && type !== 'withdraw') {
+      return res.status(400).json({ error: "İşlem türü 'add' veya 'withdraw' olmalıdır." });
+    }
+
     // 1. Yetki Kontrolü: Bu kullanıcı bu hedefe ortak mı?
     const shareRecord = await db.get(
       'SELECT friend_id FROM shared_goals WHERE user_id = ? AND goal_id = ?',
@@ -937,6 +1085,17 @@ app.post('/api/transactions', requireAuth, async (req, res) => { // 🔥 1. DÜZ
     const userId = req.user.id; // 🔥 2. DÜZELTME: SABİT '1' YERİNE GİRİŞ YAPAN KİŞİNİN ID'Sİ ALINDI!
     const { cardId, amount, type, description, assetCategory, assetName, quantity } = req.body;
 
+    const numAmount = Number(amount);
+
+    // Input Validation
+    if (isNaN(numAmount) || numAmount <= 0 || !isFinite(numAmount)) {
+      return res.status(400).json({ error: "Tutar pozitif bir sayı olmalıdır." });
+    }
+    const allowedTypes = ['income', 'expense', 'transfer_to_vault', 'withdraw_from_vault', 'buy_asset'];
+    if (!allowedTypes.includes(type)) {
+      return res.status(400).json({ error: "Geçersiz işlem türü." });
+    }
+
     const user = await db.get('SELECT finances FROM users WHERE id = ?', [userId]);
     let finances = JSON.parse(user.finances || '{}');
 
@@ -944,7 +1103,12 @@ app.post('/api/transactions', requireAuth, async (req, res) => { // 🔥 1. DÜZ
     if (!finances.vault) finances.vault = { balance: 0, history: [] };
     if (!finances.assets) finances.assets = []; // Varlıklar dizisi
 
-    const numAmount = Number(amount);
+    // For card-related transactions, validate cardId exists
+    if (['income', 'expense', 'transfer_to_vault', 'withdraw_from_vault'].includes(type)) {
+      if (!cardId || !finances.cards.some(c => c.id === cardId)) {
+        return res.status(400).json({ error: "Kart bulunamadı." });
+      }
+    }
 
     // 🚀 EĞER İŞLEM "VARLIK ALIMI" İSE (Altın, Kripto vs.)
     if (type === 'buy_asset') {

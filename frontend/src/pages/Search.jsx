@@ -13,168 +13,96 @@ import {
   Landmark,
   Send,
   HelpCircle,
+  Home,
+  User,
+  Shield,
+  Bell,
+  Moon,
+  BarChart3,
+  TrendingUp,
+  Coins,
+  PlusCircle,
+  Calendar,
+  ArrowRightLeft,
 } from "lucide-react";
 
-// --- SAHTE VERİLER (MOCK DATA) ---
-
-// 1. Uygulama İçi Menüler ve Sayfalar
-const MOCK_PAGES = [
-  {
-    id: "p1",
-    title: "Hedeflerim",
-    path: "/my-goal",
-    icon: Target,
-    desc: "Ortak veya bireysel birikim hedeflerin",
-  },
-  {
-    id: "p2",
-    title: "Para Transferi / Ekle",
-    path: "/add-transaction",
-    icon: CreditCard,
-    desc: "Yeni bir gelir veya gider kaydı oluştur",
-  },
-  {
-    id: "p3",
-    title: "Ayarlar",
-    path: "/settings",
-    icon: Settings,
-    desc: "Profil, bildirim ve güvenlik ayarları",
-  },
-  {
-    id: "p4",
-    title: "İşlem Geçmişi",
-    path: "/history",
-    icon: History,
-    desc: "Eski harcamalarını ve gelirlerini incele",
-  },
-  {
-    id: "p5",
-    title: "Finansal Özet",
-    path: "/finance",
-    icon: Wallet,
-    desc: "Grafikler, analizler ve istatistikler",
-  },
+// Uygulamadaki tum sayfalar ve bilesenler
+const APP_PAGES = [
+  { id: "p1", title: "Ana Sayfa", path: "/home", icon: Home, desc: "Genel bakis ve kart ozeti", tags: ["anasayfa", "home", "panel", "dashboard"] },
+  { id: "p2", title: "Hedeflerim", path: "/my-goal", icon: Target, desc: "Ortak veya bireysel birikim hedeflerin", tags: ["hedef", "birikim", "tasarruf", "goal"] },
+  { id: "p3", title: "Islem Ekle / Para Transferi", path: "/add-transaction", icon: PlusCircle, desc: "Yeni gelir, gider veya transfer kaydi olustur", tags: ["islem", "transfer", "gelir", "gider", "para", "ekle"] },
+  { id: "p4", title: "Islem Gecmisi", path: "/history", icon: History, desc: "Eski harcamalarini ve gelirlerini incele", tags: ["gecmis", "tarihce", "islem", "history"] },
+  { id: "p5", title: "Finansal Ozet", path: "/finance", icon: BarChart3, desc: "Grafikler, analizler ve istatistikler", tags: ["finans", "grafik", "analiz", "istatistik"] },
+  { id: "p6", title: "Doviz Kurlari", path: "/detail", icon: ArrowRightLeft, desc: "Canli doviz kurlari ve grafikleri", tags: ["doviz", "kur", "euro", "dolar", "usd", "eur"] },
+  { id: "p7", title: "Borsa Terminali", path: "/stock-terminal", icon: TrendingUp, desc: "Hisse senedi arama ve grafikleri", tags: ["borsa", "hisse", "stock", "bist"] },
+  { id: "p8", title: "Kripto Terminal", path: "/crypto-terminal", icon: Coins, desc: "Kripto para fiyatlari ve grafikleri", tags: ["kripto", "crypto", "bitcoin", "ethereum"] },
+  { id: "p9", title: "Altin Piyasalari", path: "/gold-market", icon: Coins, desc: "Gram altin, ceyrek altin fiyatlari", tags: ["altin", "gold", "gram", "ceyrek"] },
+  { id: "p10", title: "Odeme Planlayici", path: "/add-payment", icon: Calendar, desc: "Duzenli odemeleri planla ve takip et", tags: ["odeme", "plan", "fatura", "kira"] },
+  { id: "p11", title: "Profil Ayarlari", path: "/profile", icon: User, desc: "Profil bilgilerini duzenle", tags: ["profil", "ayar", "hesap"] },
+  { id: "p12", title: "Kisisel Bilgiler", path: "/personal-info", icon: User, desc: "Ad, telefon, e-posta ve meslek bilgileri", tags: ["kisisel", "isim", "telefon", "email", "meslek"] },
+  { id: "p13", title: "Guvenlik ve Sifre", path: "/security-settings", icon: Shield, desc: "Sifre degistirme ve 2FA ayarlari", tags: ["guvenlik", "sifre", "2fa", "parola"] },
+  { id: "p14", title: "Bildirim Ayarlari", path: "/notification-settings", icon: Bell, desc: "Bildirim tercihlerini yonet", tags: ["bildirim", "notification", "uyari"] },
+  { id: "p15", title: "Yardim Merkezi", path: "/help-center", icon: HelpCircle, desc: "SSS ve destek kanallari", tags: ["yardim", "destek", "sss", "faq", "soru"] },
+  { id: "p16", title: "Kartlarim", path: "/add-transaction", icon: CreditCard, desc: "Kart islemleri ve bakiye goruntuleme", tags: ["kart", "bakiye", "card"] },
+  { id: "p17", title: "Ayarlar", path: "/settings", icon: Settings, desc: "Genel uygulama ayarlari", tags: ["ayar", "setting", "tercih"] },
 ];
 
-// 2. Platformdaki Kullanıcılar
-const MOCK_USERS = [
-  {
-    id: "u1",
-    username: "ali.yilmaz",
-    name: "Ali Yılmaz",
-    color: "bg-green-100 text-green-600",
-  },
-  {
-    id: "u2",
-    username: "zeynep.kaya",
-    name: "Zeynep Kaya",
-    color: "bg-purple-100 text-purple-600",
-  },
-  {
-    id: "u5",
-    username: "ayberk.kaya",
-    name: "Ayberk Kaya",
-    color: "bg-blue-100 text-blue-600",
-  },
-];
-
-// 3. YENİ: Kayıtlı İban ve Banka Hesapları
-const MOCK_SAVED_ACCOUNTS = [
-  {
-    id: "acc1",
-    name: "Ev Sahibi (Ahmet Bey)",
-    bank: "Ziraat Bankası",
-    iban: "TR12 0001 ... 99",
-    color: "bg-red-100 text-red-600",
-  },
-  {
-    id: "acc2",
-    name: "Annem",
-    bank: "Enpara",
-    iban: "TR99 0004 ... 11",
-    color: "bg-purple-100 text-purple-600",
-  },
-  {
-    id: "acc3",
-    name: "Birikim Hesabım",
-    bank: "Garanti BBVA",
-    iban: "TR55 0006 ... 33",
-    color: "bg-blue-100 text-blue-600",
-  },
-];
-
-// 4. YENİ: Yardım ve SSS (Sıkça Sorulan Sorular)
-const MOCK_FAQS = [
-  {
-    id: "faq1",
-    question: "Aylık para gönderme limitim nedir?",
-    answer: "Onaylı hesaplar için aylık FAST ve Havale limiti 500.000 ₺'dir.",
-  },
-  {
-    id: "faq2",
-    question: "Hesabımı nasıl onaylarım?",
-    answer:
-      "Profil > Kimlik Doğrulama adımından çipli kimliğinizi NFC ile okutarak saniyeler içinde onaylayabilirsiniz.",
-  },
-  {
-    id: "faq3",
-    question: "Kredi kartı ile cüzdana para yükleyebilir miyim?",
-    answer:
-      "Evet, Ayarlar > Ödeme Yöntemleri kısmından banka veya kredi kartınızı kaydedebilirsiniz.",
-  },
-  {
-    id: "faq4",
-    question: "IBAN'a transfer ne kadar sürer?",
-    answer:
-      "FAST sistemi ile 7/24 anında karşı hesaba geçer. Herhangi bir bekleme süresi yoktur.",
-  },
+// SSS
+const FAQ_ITEMS = [
+  { id: "faq1", question: "Kart bakiyemi nasil gorebilirim?", answer: "Ana sayfadaki kartlariniza tiklayarak detayli bakiye ve islem gecmisine ulasabilirsiniz." },
+  { id: "faq2", question: "Hedef nasil olusturulur?", answer: "Hedeflerim sayfasindan yeni hedef olustur butonuna tiklayarak baslik, hedef tutar ve tarih belirleyebilirsiniz." },
+  { id: "faq3", question: "Sifremi nasil degistiririm?", answer: "Profil > Guvenlik ve Sifre bolumunden mevcut sifrenizi girerek yeni sifre belirleyebilirsiniz." },
+  { id: "faq4", question: "Kac kart olusturabilirim?", answer: "Her kullanici en fazla 3 adet sanal kart olusturabilir." },
+  { id: "faq5", question: "Doviz kurlarini nereden takip ederim?", answer: "Finans sayfasindan canli doviz kurlarini gorebilir, detay sayfasinda grafikleri inceleyebilirsiniz." },
+  { id: "faq6", question: "Bildirim ayarlarimi nasil degistiririm?", answer: "Profil > Bildirim Ayarlari bolumunden tum bildirim tercihlerinizi yonetebilirsiniz." },
+  { id: "faq7", question: "Arkadasimi hedefe nasil eklerim?", answer: "Hedef detay sayfasindan paylasim kodu olusturup arkadasiniza gonderebilirsiniz." },
+  { id: "faq8", question: "Tema nasil degistirilir?", answer: "Profil Ayarlari sayfasindaki Tema butonuna tiklayarak karanlik mod acip kapatabilirsiniz." },
 ];
 
 const Search = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- FİLTRELEME İŞLEMLERİ ---
-  const query = searchQuery.toLowerCase();
+  const query = searchQuery.toLowerCase().trim();
 
-  const filteredPages = MOCK_PAGES.filter(
-    (page) =>
-      page.title.toLowerCase().includes(query) ||
-      page.desc.toLowerCase().includes(query),
-  );
+  // Sayfalar icinde arama (baslik, aciklama ve tags)
+  const filteredPages = query
+    ? APP_PAGES.filter(
+        (page) =>
+          page.title.toLowerCase().includes(query) ||
+          page.desc.toLowerCase().includes(query) ||
+          page.tags.some((tag) => tag.includes(query))
+      )
+    : [];
 
-  const filteredUsers = MOCK_USERS.filter(
-    (user) =>
-      user.username.toLowerCase().includes(query) ||
-      user.name.toLowerCase().includes(query),
-  );
+  // SSS icinde arama
+  const filteredFAQs = query
+    ? FAQ_ITEMS.filter(
+        (faq) =>
+          faq.question.toLowerCase().includes(query) ||
+          faq.answer.toLowerCase().includes(query)
+      )
+    : [];
 
-  const filteredAccounts = MOCK_SAVED_ACCOUNTS.filter(
-    (acc) =>
-      acc.name.toLowerCase().includes(query) ||
-      acc.bank.toLowerCase().includes(query) ||
-      acc.iban.toLowerCase().includes(query),
-  );
+  const hasNoResults = query && filteredPages.length === 0 && filteredFAQs.length === 0;
 
-  const filteredFAQs = MOCK_FAQS.filter(
-    (faq) =>
-      faq.question.toLowerCase().includes(query) ||
-      faq.answer.toLowerCase().includes(query),
-  );
-
-  const hasNoResults =
-    filteredPages.length === 0 &&
-    filteredUsers.length === 0 &&
-    filteredAccounts.length === 0 &&
-    filteredFAQs.length === 0;
+  // Hizli erisim butonlari (arama yapilmadan once gosterilir)
+  const quickLinks = [
+    { label: "Hedeflerim", path: "/my-goal", icon: Target, color: "bg-purple-50 text-purple-600" },
+    { label: "Islem Ekle", path: "/add-transaction", icon: PlusCircle, color: "bg-emerald-50 text-emerald-600" },
+    { label: "Finans", path: "/finance", icon: BarChart3, color: "bg-blue-50 text-[#007AFF]" },
+    { label: "Profil", path: "/profile", icon: User, color: "bg-orange-50 text-orange-600" },
+    { label: "Guvenlik", path: "/security-settings", icon: Shield, color: "bg-red-50 text-red-500" },
+    { label: "Yardim", path: "/help-center", icon: HelpCircle, color: "bg-teal-50 text-teal-600" },
+  ];
 
   return (
     <div className="max-w-3xl mx-auto w-full pb-24 md:pb-10 pt-6 px-4 md:px-8">
-      {/* BAŞLIK VE ARAMA ÇUBUĞU */}
+      {/* Header and search */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Keşfet</h1>
-        <p className="text-gray-500 mb-6 text-sm">
-          Menüler, kişiler, kayıtlı hesaplar ve yardım makaleleri arasında ara.
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Keşfet</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
+          Sayfaları, işlemleri ve yardım makalelerini ara.
         </p>
 
         <div className="relative group">
@@ -186,7 +114,7 @@ const Search = () => {
           </div>
           <input
             type="text"
-            className="w-full pl-12 pr-12 py-4 bg-white border-2 border-transparent focus:border-[#007AFF] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] focus:shadow-[0_4px_25px_rgba(0,122,255,0.15)] outline-none transition-all text-gray-800 text-lg font-medium placeholder:text-gray-400 placeholder:font-normal"
+            className="w-full pl-12 pr-12 py-4 bg-white dark:bg-gray-800 border-2 border-transparent focus:border-[#007AFF] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] focus:shadow-[0_4px_25px_rgba(0,122,255,0.15)] outline-none transition-all text-gray-800 dark:text-gray-100 text-lg font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:font-normal"
             placeholder="Ne aramak istersin?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -203,50 +131,70 @@ const Search = () => {
         </div>
       </div>
 
-      {/* ARAMA SONUÇLARI */}
-      {searchQuery.trim() === "" ? (
-        // Arama yapılmadan önce görünen boş durum
-        <div className="text-center py-10 animate-in fade-in duration-500">
-          <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <SearchIcon size={32} className="text-[#007AFF]" />
+      {/* Content */}
+      {!query ? (
+        // Default state - quick links
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
+              Hizli Erisim
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {quickLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <button
+                    key={link.path}
+                    onClick={() => navigate(link.path)}
+                    className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-2.5 group"
+                  >
+                    <div className={`p-3 rounded-xl ${link.color} group-hover:scale-110 transition-transform`}>
+                      <Icon size={22} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{link.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">
-            Uygulamada Keşfe Çık
-          </h3>
-          <p className="text-gray-500 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
-            "Ev sahibi" yazarak IBAN bulabilir, "Limit" yazarak makaleleri
-            okuyabilir veya arkadaşlarına ulaşabilirsin.
-          </p>
+
+          <div className="text-center py-6">
+            <div className="bg-blue-50 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+              <SearchIcon size={28} className="text-[#007AFF]" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Uygulamada Keşfe Çık</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 max-w-sm mx-auto leading-relaxed">
+              Yukarıya yazarak sayfaları, işlemleri ve yardım makalelerini bulabilirsin.
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          {/* 1. UYGULAMA İÇİ SAYFALAR */}
+        <div className="space-y-8">
+          {/* Pages */}
           {filteredPages.length > 0 && (
             <div>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
-                Menüler ve İşlemler
+                Sayfalar ve Islemler
               </h3>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
                 {filteredPages.map((page, index) => {
                   const Icon = page.icon;
                   return (
                     <button
                       key={page.id}
                       onClick={() => navigate(page.path)}
-                      className={`w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors text-left ${index !== filteredPages.length - 1 ? "border-b border-gray-50" : ""}`}
+                      className={`w-full flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left ${
+                        index !== filteredPages.length - 1 ? "border-b border-gray-50 dark:border-gray-700" : ""
+                      }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#007AFF] shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#007AFF] shrink-0">
                         <Icon size={20} />
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">
-                          {page.title}
-                        </h4>
-                        <p className="text-xs text-gray-500 line-clamp-1">
-                          {page.desc}
-                        </p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-100">{page.title}</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{page.desc}</p>
                       </div>
-                      <ChevronRight size={18} className="text-gray-300" />
+                      <ChevronRight size={18} className="text-gray-300 dark:text-gray-600 shrink-0" />
                     </button>
                   );
                 })}
@@ -254,116 +202,26 @@ const Search = () => {
             </div>
           )}
 
-          {/* 2. KAYITLI İBAN VE HESAPLAR (YENİ) */}
-          {filteredAccounts.length > 0 && (
-            <div>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
-                Kayıtlı Hesaplar & IBAN
-              </h3>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                {filteredAccounts.map((acc, index) => (
-                  <div
-                    key={acc.id}
-                    className={`flex items-center justify-between p-4 hover:bg-gray-50 transition-colors ${index !== filteredAccounts.length - 1 ? "border-b border-gray-50" : ""}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${acc.color}`}
-                      >
-                        <Landmark size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800">
-                          {acc.name}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {acc.bank} • {acc.iban}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Hızlı Para Gönder Butonu */}
-                    <button
-                      onClick={() =>
-                        alert(
-                          `${acc.name} kişisine para gönderme ekranı açılacak!`,
-                        )
-                      }
-                      className="p-2.5 bg-blue-50 text-[#007AFF] hover:bg-[#007AFF] hover:text-white rounded-xl transition-colors shadow-sm"
-                      title="Para Gönder"
-                    >
-                      <Send size={18} className="ml-0.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 3. KİŞİLER / ARKADAŞLAR */}
-          {filteredUsers.length > 0 && (
-            <div>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
-                Kişiler
-              </h3>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                {filteredUsers.map((user, index) => (
-                  <div
-                    key={user.id}
-                    className={`flex items-center justify-between p-4 hover:bg-gray-50 transition-colors ${index !== filteredUsers.length - 1 ? "border-b border-gray-50" : ""}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${user.color}`}
-                      >
-                        {user.name.charAt(0)}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800">
-                          {user.name}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          @{user.username}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        alert(
-                          `${user.name} kullanıcısına arkadaşlık isteği gönderildi!`,
-                        )
-                      }
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-[#007AFF] hover:text-white rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      <UserPlus size={16} /> Ekle
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 4. YARDIM VE SSS (YENİ) */}
+          {/* FAQs */}
           {filteredFAQs.length > 0 && (
             <div>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
-                Yardım & SSS
+                Yardim & SSS
               </h3>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
                 {filteredFAQs.map((faq, index) => (
                   <div
                     key={faq.id}
-                    className={`flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors ${index !== filteredFAQs.length - 1 ? "border-b border-gray-50" : ""}`}
+                    className={`flex items-start gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                      index !== filteredFAQs.length - 1 ? "border-b border-gray-50 dark:border-gray-700" : ""
+                    }`}
                   >
-                    <div className="mt-0.5 text-[#007AFF] bg-blue-50 p-2 rounded-lg">
+                    <div className="mt-0.5 text-[#007AFF] bg-blue-50 dark:bg-blue-900/30 p-2 rounded-lg shrink-0">
                       <HelpCircle size={20} />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">
-                        {faq.question}
-                      </h4>
-                      <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                        {faq.answer}
-                      </p>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100">{faq.question}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">{faq.answer}</p>
                     </div>
                   </div>
                 ))}
@@ -371,18 +229,17 @@ const Search = () => {
             </div>
           )}
 
-          {/* HİÇBİR SONUÇ BULUNAMAZSA */}
+          {/* No results */}
           {hasNoResults && (
-            <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 shadow-sm">
-              <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-gray-50 dark:bg-gray-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <SearchIcon size={24} className="text-gray-400" />
               </div>
-              <p className="text-gray-800 font-semibold text-lg">
+              <p className="text-gray-800 dark:text-gray-100 font-semibold text-lg">
                 "{searchQuery}" bulunamadı
               </p>
-              <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
-                Yazım hatası yapmış olabilir misin? Farklı bir kelimeyle tekrar
-                dene.
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs mx-auto">
+                Yazım hatası yapmış olabilir misin? Farklı bir kelimeyle tekrar dene.
               </p>
             </div>
           )}

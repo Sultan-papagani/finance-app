@@ -28,7 +28,7 @@ function VaultCard() {
   }, []);
 
   if (loading) {
-    return <div className="animate-pulse h-[200px] bg-blue-100/50 rounded-[40px] w-full max-w-5xl mx-auto mb-10" />;
+    return <div className="animate-pulse h-[200px] bg-blue-100/50 dark:bg-gray-800 rounded-[40px] w-full max-w-5xl mx-auto mb-10" />;
   }
 
   return (

@@ -128,10 +128,10 @@ const CurrencyDetail = () => {
 
   if (loading || !stats) {
     return (
-      <div className="flex justify-center items-center h-screen w-full bg-gray-50/50">
+      <div className="flex justify-center items-center h-screen w-full bg-gray-50/50 dark:bg-gray-950">
         <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="text-[#007AFF] animate-spin" size={40} />
-          <span className="text-[#04009A] font-black text-xl tracking-wide text-center px-4">Piyasa Analizi Hazırlanıyor...</span>
+          <RefreshCw className="text-[#007AFF] dark:text-blue-400 animate-spin" size={40} />
+          <span className="text-blue-700 dark:text-blue-400 font-black text-xl tracking-wide text-center px-4">Piyasa Analizi Hazırlanıyor...</span>
         </div>
       </div>
     );
@@ -160,27 +160,27 @@ const CurrencyDetail = () => {
   };
 
   return (
-    <div className="p-4 md:p-10 max-w-[1400px] mx-auto w-full space-y-6 md:space-y-8 bg-[#FAFAFA] min-h-screen overflow-x-hidden">
+    <div className="p-4 md:p-10 max-w-[1400px] mx-auto w-full space-y-6 md:space-y-8 bg-[#FAFAFA] dark:bg-gray-950 min-h-screen overflow-x-hidden">
       
       {/* 1. SATIR: HEADER & KONTROL */}
-      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-100">
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-5 md:p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
         <div className="w-full xl:w-auto">
-          <h1 className="text-2xl md:text-3xl md:text-4xl font-black text-[#04009A] tracking-tight flex items-center gap-3">
-            <BarChart2 size={28} className="text-[#007AFF] shrink-0" />
+          <h1 className="text-2xl md:text-3xl md:text-4xl font-black text-blue-700 dark:text-blue-400 tracking-tight flex items-center gap-3">
+            <BarChart2 size={28} className="text-[#007AFF] dark:text-blue-400 shrink-0" />
             <span className="truncate">Gelişmiş Terminal</span>
           </h1>
-          <p className="text-sm md:text-base text-gray-500 font-medium mt-2 md:mt-1 xl:ml-11">Profesyonel piyasa hareketleri</p>
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mt-2 md:mt-1 xl:ml-11">Profesyonel piyasa hareketleri</p>
         </div>
 
-        <div className="bg-gray-50 p-2 rounded-2xl border border-gray-100 flex items-center justify-between w-full xl:w-auto shadow-inner gap-2">
-          <select value={base} onChange={(e) => setBase(e.target.value)} className="w-1/3 xl:w-auto bg-white text-gray-800 font-black text-sm md:text-lg py-2 px-2 md:px-4 rounded-xl border-none outline-none cursor-pointer hover:bg-gray-100 transition-colors shadow-sm appearance-none text-center">
+        <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center justify-between w-full xl:w-auto shadow-inner gap-2">
+          <select value={base} onChange={(e) => setBase(e.target.value)} className="w-1/3 xl:w-auto bg-white dark:bg-gray-700 text-gray-800 dark:text-white font-black text-sm md:text-lg py-2 px-2 md:px-4 rounded-xl border-none outline-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-sm appearance-none text-center">
             {currencies.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <div className="w-1/3 xl:w-auto flex flex-col items-center px-1 md:px-3">
-            <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">Anlık</span>
-            <span className="text-lg md:text-2xl font-black text-[#007AFF] truncate">{stats.lastRate.toFixed(4)}</span>
+            <span className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Anlık</span>
+            <span className="text-lg md:text-2xl font-black text-[#007AFF] dark:text-blue-400 truncate">{stats.lastRate.toFixed(4)}</span>
           </div>
-          <select value={target} onChange={(e) => setTarget(e.target.value)} className="w-1/3 xl:w-auto bg-[#007AFF] text-white font-black text-sm md:text-lg py-2 px-2 md:px-4 rounded-xl border-none outline-none cursor-pointer hover:bg-blue-600 transition-colors shadow-md appearance-none text-center">
+          <select value={target} onChange={(e) => setTarget(e.target.value)} className="w-1/3 xl:w-auto bg-[#007AFF] dark:bg-blue-600 text-white font-black text-sm md:text-lg py-2 px-2 md:px-4 rounded-xl border-none outline-none cursor-pointer hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors shadow-md appearance-none text-center">
             {currencies.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
@@ -188,7 +188,7 @@ const CurrencyDetail = () => {
 
       {/* 2. SATIR: ARBİTRAJ */}
       {arbitrageOpp && (
-        <div className="bg-gradient-to-r from-[#04009A] to-[#007AFF] rounded-3xl p-5 md:p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#04009A] dark:from-blue-900 to-[#007AFF] dark:to-blue-700 rounded-3xl p-5 md:p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
           
           <div className="flex items-center gap-4 z-10 w-full lg:w-auto">
@@ -230,19 +230,19 @@ const CurrencyDetail = () => {
       {/* 3. SATIR: İSTATİSTİK KARTLARI */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {[
-          { label: 'Dönem Zirvesi', value: stats.high.toFixed(4), color: 'text-gray-800' },
-          { label: 'Dönem Dibi', value: stats.low.toFixed(4), color: 'text-gray-800' },
-          { label: 'Ortalama Kur', value: stats.average.toFixed(4), color: 'text-gray-800' },
+          { label: 'Dönem Zirvesi', value: stats.high.toFixed(4), color: 'text-gray-800 dark:text-white' },
+          { label: 'Dönem Dibi', value: stats.low.toFixed(4), color: 'text-gray-800 dark:text-white' },
+          { label: 'Ortalama Kur', value: stats.average.toFixed(4), color: 'text-gray-800 dark:text-white' },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <div className="text-[10px] md:text-xs font-bold text-gray-400 mb-1 md:mb-2 uppercase tracking-widest">{stat.label}</div>
+          <div key={i} className="bg-white dark:bg-gray-900 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100 dark:border-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+            <div className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 mb-1 md:mb-2 uppercase tracking-widest">{stat.label}</div>
             <div className={`text-lg md:text-2xl font-black ${stat.color} truncate`}>{stat.value}</div>
           </div>
         ))}
-        
-        <div className={`p-4 md:p-6 rounded-2xl md:rounded-3xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${stats.changePercent >= 0 ? 'bg-green-50/50 border-green-100' : 'bg-red-50/50 border-red-100'}`}>
-          <div className={`text-[10px] md:text-xs font-bold mb-1 md:mb-2 uppercase tracking-widest ${stats.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>Net Değişim</div>
-          <div className={`text-lg md:text-2xl font-black flex items-center gap-1 md:gap-2 ${stats.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+
+        <div className={`p-4 md:p-6 rounded-2xl md:rounded-3xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] ${stats.changePercent >= 0 ? 'bg-green-50/50 dark:bg-green-900/20 border-green-100 dark:border-green-800' : 'bg-red-50/50 dark:bg-red-900/20 border-red-100 dark:border-red-800'}`}>
+          <div className={`text-[10px] md:text-xs font-bold mb-1 md:mb-2 uppercase tracking-widest ${stats.changePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>Net Değişim</div>
+          <div className={`text-lg md:text-2xl font-black flex items-center gap-1 md:gap-2 ${stats.changePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {stats.changePercent >= 0 ? <TrendingUp size={20} className="shrink-0" /> : <TrendingDown size={20} className="shrink-0" />}
             <span className="truncate">{stats.changePercent >= 0 ? '+' : ''}{stats.changePercent.toFixed(2)}%</span>
           </div>
@@ -250,19 +250,19 @@ const CurrencyDetail = () => {
       </div>
 
       {/* 4. SATIR: ANA GRAFİK */}
-      <div className="bg-white rounded-3xl p-4 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl p-4 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
-          <h3 className="text-lg md:text-xl font-black text-[#04009A] flex items-center gap-2">
-            <TrendingUp className="text-[#007AFF] shrink-0" /> <span className="truncate">Performans ({days} Gün)</span>
+          <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 flex items-center gap-2">
+            <TrendingUp className="text-[#007AFF] dark:text-blue-400 shrink-0" /> <span className="truncate">Performans ({days} Gün)</span>
           </h3>
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-50 px-3 md:px-4 py-1.5 rounded-xl border border-red-100">
-              <span className="text-[10px] md:text-xs font-bold text-red-500 uppercase">Direnç:</span>
-              <span className="text-xs md:text-sm font-black text-red-700">{stats.resistance.toFixed(4)}</span>
+            <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 md:px-4 py-1.5 rounded-xl border border-red-100 dark:border-red-800">
+              <span className="text-[10px] md:text-xs font-bold text-red-500 dark:text-red-400 uppercase">Direnç:</span>
+              <span className="text-xs md:text-sm font-black text-red-700 dark:text-red-400">{stats.resistance.toFixed(4)}</span>
             </div>
-            <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-green-50 px-3 md:px-4 py-1.5 rounded-xl border border-green-100">
-              <span className="text-[10px] md:text-xs font-bold text-green-600 uppercase">Destek:</span>
-              <span className="text-xs md:text-sm font-black text-green-700">{stats.support.toFixed(4)}</span>
+            <div className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-green-50 dark:bg-green-900/20 px-3 md:px-4 py-1.5 rounded-xl border border-green-100 dark:border-green-800">
+              <span className="text-[10px] md:text-xs font-bold text-green-600 dark:text-green-400 uppercase">Destek:</span>
+              <span className="text-xs md:text-sm font-black text-green-700 dark:text-green-400">{stats.support.toFixed(4)}</span>
             </div>
           </div>
         </div>
@@ -290,19 +290,19 @@ const CurrencyDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         
         {/* GEÇMİŞ VERİ TABLOSU */}
-        <div className="lg:col-span-2 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex flex-col">
-          <div className="p-5 md:p-6 border-b border-gray-100">
-            <h3 className="text-lg md:text-xl font-black text-[#04009A] flex items-center gap-2">
-              <Calendar className="text-[#007AFF]" /> Döküm Tablosu
+        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col">
+          <div className="p-5 md:p-6 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 flex items-center gap-2">
+              <Calendar className="text-[#007AFF] dark:text-blue-400" /> Döküm Tablosu
             </h3>
           </div>
           <div className="overflow-x-auto max-h-[1050px] overflow-y-auto scrollbar-hide">
             <table className="w-full text-left border-collapse min-w-[400px]">
-              <thead className="bg-gray-50/90 backdrop-blur-md sticky top-0 z-10">
+              <thead className="bg-gray-50/90 dark:bg-gray-800/50 backdrop-blur-md sticky top-0 z-10">
                 <tr>
-                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Tarih</th>
-                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Kapanış ({target})</th>
-                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Durum</th>
+                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tarih</th>
+                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Kapanış ({target})</th>
+                  <th className="py-3 px-4 md:px-6 text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right">Durum</th>
                 </tr>
               </thead>
               <tbody>
@@ -313,18 +313,18 @@ const CurrencyDetail = () => {
                   const isSame = diff === 0;
 
                   return (
-                    <tr key={day.date} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors">
-                      <td className="py-3 md:py-4 px-4 md:px-6 text-sm md:text-base font-semibold text-gray-600">{day.date}</td>
-                      <td className="py-3 md:py-4 px-4 md:px-6 text-sm md:text-base font-black text-gray-800">{day.rate.toFixed(4)}</td>
+                    <tr key={day.date} className="border-b border-gray-50 dark:border-gray-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors">
+                      <td className="py-3 md:py-4 px-4 md:px-6 text-sm md:text-base font-semibold text-gray-600 dark:text-gray-400">{day.date}</td>
+                      <td className="py-3 md:py-4 px-4 md:px-6 text-sm md:text-base font-black text-gray-800 dark:text-white">{day.rate.toFixed(4)}</td>
                       <td className="py-3 md:py-4 px-4 md:px-6 text-right flex items-center justify-end gap-1 md:gap-2 font-bold">
                         {isSame ? (
-                          <span className="text-gray-400 bg-gray-50 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm">Sabit</span>
+                          <span className="text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm">Sabit</span>
                         ) : isUp ? (
-                          <span className="text-green-600 bg-green-50 px-2 py-1 md:px-3 md:py-1.5 rounded-lg flex items-center gap-1 text-xs md:text-sm">
+                          <span className="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 md:px-3 md:py-1.5 rounded-lg flex items-center gap-1 text-xs md:text-sm">
                             <TrendingUp size={14} /> +{diff.toFixed(4)}
                           </span>
                         ) : (
-                          <span className="text-red-600 bg-red-50 px-2 py-1 md:px-3 md:py-1.5 rounded-lg flex items-center gap-1 text-xs md:text-sm">
+                          <span className="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 md:px-3 md:py-1.5 rounded-lg flex items-center gap-1 text-xs md:text-sm">
                             <TrendingDown size={14} /> {diff.toFixed(4)}
                           </span>
                         )}
@@ -341,9 +341,9 @@ const CurrencyDetail = () => {
         <div className="space-y-6 md:space-y-8">
           
           {/* 1. KÜRESEL ENDEKS (RADAR) */}
-          <div className="bg-white rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-            <h3 className="text-lg md:text-xl font-black text-[#04009A] mb-2 w-full flex items-center gap-2">
-              <RadarIcon className="text-[#007AFF] shrink-0" /> Küresel Endeks
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+            <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 mb-2 w-full flex items-center gap-2">
+              <RadarIcon className="text-[#007AFF] dark:text-blue-400 shrink-0" /> Küresel Endeks
             </h3>
             <div className="w-full h-[200px] md:h-[220px] mt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -358,11 +358,11 @@ const CurrencyDetail = () => {
           </div>
 
           {/* 2. YENİ: GÜNLÜK İVME (MOMENTUM BAR CHART) */}
-          <div className="bg-white rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-            <h3 className="text-lg md:text-xl font-black text-[#04009A] mb-2 w-full flex items-center gap-2">
-              <Activity className="text-[#007AFF] shrink-0" /> Günlük İvme (Momentum)
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+            <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 mb-2 w-full flex items-center gap-2">
+              <Activity className="text-[#007AFF] dark:text-blue-400 shrink-0" /> Günlük İvme (Momentum)
             </h3>
-            <p className="text-xs text-gray-400 font-medium w-full mb-4">Son 14 gündeki net değer kazancı/kaybı</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium w-full mb-4">Son 14 gündeki net değer kazancı/kaybı</p>
             <div className="w-full h-[180px] md:h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={momentumData}>
@@ -385,11 +385,11 @@ const CurrencyDetail = () => {
           </div>
 
           {/* 3. VOLATİLİTE VE RİSK ANALİZİ (DİNAMİK) */}
-          <div className="bg-white rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-            <h3 className="text-lg md:text-xl font-black text-[#04009A] mb-2 w-full flex items-center gap-2">
-              <AlertTriangle className="text-[#007AFF] shrink-0" /> Risk & Volatilite
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+            <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 mb-2 w-full flex items-center gap-2">
+              <AlertTriangle className="text-[#007AFF] dark:text-blue-400 shrink-0" /> Risk & Volatilite
             </h3>
-            <p className="text-xs text-gray-400 font-medium w-full mb-2">Kur makası ve dalgalanma şiddeti</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium w-full mb-2">Kur makası ve dalgalanma şiddeti</p>
             <div className="w-full h-[200px] md:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -410,11 +410,11 @@ const CurrencyDetail = () => {
           </div>
 
           {/* 4. REZERV PAYI (SABİT - MAKROEKONOMİ) */}
-          <div className="bg-white rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-            <h3 className="text-lg md:text-xl font-black text-[#04009A] mb-2 w-full flex items-center gap-2">
-              <Globe className="text-[#007AFF] shrink-0" /> Rezerv Payı
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+            <h3 className="text-lg md:text-xl font-black text-blue-700 dark:text-blue-400 mb-2 w-full flex items-center gap-2">
+              <Globe className="text-[#007AFF] dark:text-blue-400 shrink-0" /> Rezerv Payı
             </h3>
-            <p className="text-xs text-gray-400 font-medium w-full mb-2">Merkez bankaları sabit döviz dağılımı</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium w-full mb-2">Merkez bankaları sabit döviz dağılımı</p>
             <div className="w-full h-[200px] md:h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>

@@ -30,12 +30,12 @@ const CryptoWidget = () => {
 
   if (loading) {
     return (
-      <div className="w-full bg-white/50 backdrop-blur-xl rounded-[3rem] p-10 flex flex-col items-center justify-center h-[380px] shadow-sm border border-gray-100">
+      <div className="w-full bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-[3rem] p-10 flex flex-col items-center justify-center h-[380px] shadow-sm border border-gray-100 dark:border-gray-800">
         <div className="relative">
           <div className="absolute inset-0 bg-blue-500 blur-xl opacity-30 rounded-full animate-pulse"></div>
-          <Loader2 className="animate-spin text-[#04009A] relative z-10" size={56} />
+          <Loader2 className="animate-spin text-blue-700 dark:text-blue-400 relative z-10" size={56} />
         </div>
-        <p className="mt-6 text-gray-400 font-bold tracking-[0.2em] uppercase text-sm animate-pulse">Piyasa Okunuyor...</p>
+        <p className="mt-6 text-gray-400 dark:text-gray-500 font-bold tracking-[0.2em] uppercase text-sm animate-pulse">Piyasa Okunuyor...</p>
       </div>
     );
   }
@@ -47,10 +47,10 @@ const CryptoWidget = () => {
  
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between px-4 gap-4">
         <div>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter">
             Trend Kriptolar
           </h2>
-          <p className="text-gray-400 font-semibold mt-1">Piyasa değerine göre en büyük 4 varlık.</p>
+          <p className="text-gray-400 dark:text-gray-500 font-semibold mt-1">Piyasa değerine göre en büyük 4 varlık.</p>
         </div>
         
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -62,9 +62,9 @@ const CryptoWidget = () => {
             <span className="text-xs font-black text-green-700 tracking-widest uppercase">Canlı</span>
           </div>
 
-          <button 
-            onClick={() => navigate('/crypto-terminal')} 
-            className="w-full md:w-auto bg-gray-900 hover:bg-[#04009A] text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2 group"
+          <button
+            onClick={() => navigate('/crypto-terminal')}
+            className="w-full md:w-auto bg-gray-900 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-md hover:shadow-xl flex items-center justify-center gap-2 group"
           >
             Terminali Keşfet
             <ChevronRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
@@ -79,9 +79,9 @@ const CryptoWidget = () => {
           const gradientId = `color-${coin.id}`; 
 
           return (
-            <div 
-              key={coin.id} 
-              className="relative bg-white rounded-[3rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] border border-gray-100 hover:border-gray-200 transition-all duration-700 hover:-translate-y-4 group overflow-hidden flex flex-col h-[380px]"
+            <div
+              key={coin.id}
+              className="relative bg-white dark:bg-gray-900 rounded-[3rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-700 hover:-translate-y-4 group overflow-hidden flex flex-col h-[380px]"
             >
               <img 
                 src={coin.image} 
@@ -99,18 +99,18 @@ const CryptoWidget = () => {
                   />
                 </div>
                 
-                <div className={`px-4 py-2 rounded-2xl font-black text-sm flex items-center gap-1.5 shadow-sm transition-transform duration-500 group-hover:scale-105 ${isPositive ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                <div className={`px-4 py-2 rounded-2xl font-black text-sm flex items-center gap-1.5 shadow-sm transition-transform duration-500 group-hover:scale-105 ${isPositive ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-700' : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-700'}`}>
                   {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                   {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                 </div>
               </div>
 
               <div className="mt-auto mb-10 z-10 relative">
-                <h3 className="text-gray-400 font-bold tracking-widest uppercase text-sm mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                <h3 className="text-gray-400 dark:text-gray-500 font-bold tracking-widest uppercase text-sm mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
                   {coin.name} ({coin.symbol})
                 </h3>
-                
-                <div className="text-5xl font-black text-gray-900 tracking-tighter group-hover:text-[#04009A] transition-colors duration-500">
+
+                <div className="text-5xl font-black text-gray-900 dark:text-white tracking-tighter group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors duration-500">
                   ${coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                 </div>
               </div>

@@ -8,7 +8,7 @@ import MyAssets from '../components/Finance/MyAssets';
 const Finance = () => {
   return (
     // Sayfanın iskeleti: max-w-7xl, ortalanmış, boşluklu
-    <div className="p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10 dark:bg-gray-950">
       <VaultCard />
       <MyAssets />
       {/* 1. Modül: Piyasa Analizi Component'ini Çağırıyoruz */}

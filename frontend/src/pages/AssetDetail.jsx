@@ -76,7 +76,7 @@ function AssetDetail() {
     fetchAssetDetails();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><LucideIcons.Loader2 className="animate-spin text-[#04009A]" size={40} /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"><LucideIcons.Loader2 className="animate-spin text-blue-700" size={40} /></div>;
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">{error}</div>;
 
   const totalCurrentValue = livePrice * asset.quantity;
@@ -107,13 +107,13 @@ function AssetDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* ÜST BAŞLIK */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-4 flex items-center justify-between shadow-sm">
-        <button onClick={() => navigate(-1)} className="p-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 transition-all">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 px-4 py-4 flex items-center justify-between shadow-sm">
+        <button onClick={() => navigate(-1)} className="p-2.5 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl text-gray-600 dark:text-gray-300 transition-all">
           <LucideIcons.ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-black text-gray-900 flex items-center gap-2">
+        <h1 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
           <TheIcon className={theme.text} size={24} /> {asset.name}
         </h1>
         <div className="w-10"></div> {/* Ortalamak için boş div */}
@@ -122,9 +122,9 @@ function AssetDetail() {
       <div className="max-w-4xl mx-auto px-4 mt-6 space-y-6">
         
         {/* FİYAT VE KAR/ZARAR KARTI */}
-        <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[32px] shadow-sm border border-gray-100 dark:border-gray-700">
           <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Güncel Portföy Değeri</p>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4">
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter mb-4">
             {totalCurrentValue.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} <span className="text-2xl text-gray-400">₺</span>
           </h2>
           
@@ -139,7 +139,7 @@ function AssetDetail() {
               </div>
             </div>
             
-            <div className="bg-gray-50 px-4 py-3 rounded-2xl flex items-center gap-3 text-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 rounded-2xl flex items-center gap-3 text-gray-700 dark:text-gray-300">
               <div className="p-2 rounded-full bg-white border border-gray-100"><LucideIcons.Briefcase size={20} /></div>
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sahip Olunan Adet</p>
@@ -150,8 +150,8 @@ function AssetDetail() {
         </div>
 
         {/* EFSANEVİ 30 GÜNLÜK GRAFİK (AreaChart) */}
-        <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm border border-gray-100">
-          <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[32px] shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <LucideIcons.LineChart className={theme.text} size={20} /> 30 Günlük Fiyat Trendi
           </h3>
           <div className="w-full h-[300px] md:h-[400px]">
@@ -174,22 +174,22 @@ function AssetDetail() {
         </div>
 
         {/* DETAYLI BİLGİLER KARTI */}
-        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 grid grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-[32px] shadow-sm border border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-6">
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Toplam Maliyet (Ödenen)</p>
-            <p className="font-black text-gray-900 text-xl">{asset.totalCost.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺</p>
+            <p className="font-black text-gray-900 dark:text-white text-xl">{asset.totalCost.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺</p>
           </div>
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ortalama Birim Maliyet</p>
-            <p className="font-black text-gray-900 text-xl">{(asset.totalCost / asset.quantity).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺</p>
+            <p className="font-black text-gray-900 dark:text-white text-xl">{(asset.totalCost / asset.quantity).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺</p>
           </div>
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Anlık Birim Fiyatı</p>
-            <p className="font-black text-[#04009A] text-xl">{livePrice > 0 ? livePrice.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : 'Hesaplanıyor...'} ₺</p>
+            <p className="font-black text-blue-700 text-xl">{livePrice > 0 ? livePrice.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) : 'Hesaplanıyor...'} ₺</p>
           </div>
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Alım Tarihi</p>
-            <p className="font-bold text-gray-700 text-sm mt-1">{new Date(asset.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            <p className="font-bold text-gray-700 dark:text-gray-300 text-sm mt-1">{new Date(asset.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
         </div>
 

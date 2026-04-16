@@ -15,7 +15,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-24">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 pb-24 transition-colors duration-300">
 
       <HomeHeader />
 
@@ -25,7 +25,7 @@ const Home = () => {
           {/*
           <div className="bg-white p-6 md:p-8 rounded-[30px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">
             <div className="relative z-10">
-              <h1 className="text-2xl md:text-3xl font-black text-[#04009A]">
+              <h1 className="text-2xl md:text-3xl font-black text-blue-700">
                 Hoş Geldin{username ? `, ${username}` : ""}! 👋
               </h1>
               <p className="mt-2 text-gray-500 font-medium">

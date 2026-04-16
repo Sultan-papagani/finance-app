@@ -39,24 +39,24 @@ function Login() {
 
   return (
     // Arka plan rengi ve tam ekran ortalama (Flexbox)
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       
       {/* Form Kartı */}
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
         
         {/* Başlık ve Açıklama */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             Hesabınıza Giriş Yapın
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Şimdilik kullanıcı adı <span className="font-semibold text-gray-800">"admin"</span>, şifre <span className="font-semibold text-gray-800">"admin"</span> olarak giriver.
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Şimdilik kullanıcı adı <span className="font-semibold text-gray-800 dark:text-gray-200">"admin"</span>, şifre <span className="font-semibold text-gray-800 dark:text-gray-200">"admin"</span> olarak giriver.
           </p>
         </div>
 
         {/* Hata Mesajı Kutusu */}
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center font-medium border border-red-100">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg text-center font-medium border border-red-100 dark:border-red-800">
             {error}
           </div>
         )}
@@ -66,7 +66,7 @@ function Login() {
           
           {/* Email / Kullanıcı Adı Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Kullanıcı Adı
             </label>
             <input
@@ -74,14 +74,14 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-black focus:border-black transition-colors outline-none text-gray-900 bg-gray-50 focus:bg-white"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:border-black transition-colors outline-none text-gray-900 bg-gray-50 focus:bg-white"
               placeholder="Kullanıcı adınızı girin"
             />
           </div>
 
           {/* Şifre Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Şifre
             </label>
             <input
@@ -89,7 +89,7 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-black focus:border-black transition-colors outline-none text-gray-900 bg-gray-50 focus:bg-white"
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder:text-gray-400 focus:ring-2 focus:ring-black focus:border-black transition-colors outline-none text-gray-900 bg-gray-50 focus:bg-white"
               placeholder="••••••••"
             />
           </div>
@@ -98,7 +98,7 @@ function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
+            className="w-full bg-black dark:bg-white dark:text-black dark:hover:bg-gray-200 hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
           >
             {isLoading ? (
               <span className="animate-pulse">Giriş Yapılıyor...</span>

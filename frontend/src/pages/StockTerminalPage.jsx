@@ -116,26 +116,26 @@ const StockTerminalPage = () => {
   const isCenterMode = !stockData && !loading;
 
   return (
-    <div className="p-4 md:p-10 max-w-[1400px] mx-auto w-full min-h-screen flex flex-col transition-all duration-500 bg-[#FAFAFA]">
+    <div className="p-4 md:p-10 max-w-[1400px] mx-auto w-full min-h-screen flex flex-col transition-all duration-500 bg-[#FAFAFA] dark:bg-gray-950">
       
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate('/finance')} className="bg-white border border-gray-200 p-3 rounded-2xl shadow-sm"><ArrowLeft size={20} /></button>
-        <h1 className="text-3xl md:text-4xl font-black text-[#04009A] flex items-center gap-3"><Activity size={32} className="text-[#007AFF]"/> Hisse Terminali</h1>
+        <button onClick={() => navigate('/finance')} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 rounded-2xl shadow-sm dark:shadow-lg dark:text-white"><ArrowLeft size={20} /></button>
+        <h1 className="text-3xl md:text-4xl font-black text-blue-700 dark:text-blue-400 flex items-center gap-3"><Activity size={32} className="text-[#007AFF] dark:text-blue-400"/> Hisse Terminali</h1>
       </div>
 
       <div className={`w-full max-w-4xl mx-auto transition-all duration-700 ease-in-out z-50 ${isCenterMode ? 'mt-24 scale-100' : 'mt-0 scale-100 mb-10'}`}>
         
         {isCenterMode && (
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-5xl font-black text-gray-800 tracking-tight mb-4">Piyasayı Keşfet</h2>
-            <p className="text-gray-500 font-medium text-lg">10 farklı global borsada hisse senedi araması yapın.</p>
+            <h2 className="text-3xl md:text-5xl font-black text-gray-800 dark:text-white tracking-tight mb-4">Piyasayı Keşfet</h2>
+            <p className="text-gray-500 dark:text-gray-400 font-medium text-lg">10 farklı global borsada hisse senedi araması yapın.</p>
           </div>
         )}
 
-        <form onSubmit={handleSearchSubmit} className="relative w-full shadow-[0_20px_50px_rgba(0,0,0,0.08)] rounded-[2rem] bg-white flex flex-col md:flex-row items-center border border-gray-100" ref={dropdownRef}>
+        <form onSubmit={handleSearchSubmit} className="relative w-full shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-[2rem] bg-white dark:bg-gray-900 flex flex-col md:flex-row items-center border border-gray-100 dark:border-gray-800" ref={dropdownRef}>
           
-          <div className="relative w-full md:w-auto border-b md:border-b-0 md:border-r border-gray-100" ref={filterRef}>
-            <button type="button" onClick={() => setShowExchangeMenu(!showExchangeMenu)} className="flex items-center justify-between w-full gap-3 px-6 py-4 md:py-6 text-gray-700 font-black hover:text-[#007AFF] hover:bg-gray-50 rounded-t-[2rem] md:rounded-t-none md:rounded-l-[2rem] min-w-[220px]">
+          <div className="relative w-full md:w-auto border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-800" ref={filterRef}>
+            <button type="button" onClick={() => setShowExchangeMenu(!showExchangeMenu)} className="flex items-center justify-between w-full gap-3 px-6 py-4 md:py-6 text-gray-700 dark:text-white font-black hover:text-[#007AFF] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-t-[2rem] md:rounded-t-none md:rounded-l-[2rem] min-w-[220px]">
               <div className="flex items-center gap-2">
                 <span className="text-xl">{activeMarket?.icon}</span>
                 <span>{activeMarket?.label?.split(' ')[0]}</span>
@@ -144,9 +144,9 @@ const StockTerminalPage = () => {
             </button>
 
             {showExchangeMenu && (
-              <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-[60] py-2 max-h-72 overflow-y-auto animate-in slide-in-from-top-2">
+              <div className="absolute top-full left-0 mt-2 w-full md:w-64 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl dark:shadow-2xl z-[60] py-2 max-h-72 overflow-y-auto animate-in slide-in-from-top-2">
                 {MARKETS.map(market => (
-                  <button key={market.id} type="button" onClick={() => { setExchangeFilter(market.id); setShowExchangeMenu(false); setShowSuggestions(true); }} className="w-full text-left px-5 py-3 hover:bg-blue-50 font-bold text-gray-700 flex items-center gap-3">
+                  <button key={market.id} type="button" onClick={() => { setExchangeFilter(market.id); setShowExchangeMenu(false); setShowSuggestions(true); }} className="w-full text-left px-5 py-3 hover:bg-blue-50 dark:hover:bg-gray-800 font-bold text-gray-700 dark:text-white flex items-center gap-3">
                     <span className="text-xl">{market.icon}</span> {market.label}
                   </button>
                 ))}
@@ -155,38 +155,38 @@ const StockTerminalPage = () => {
           </div>
 
           <div className="relative w-full flex-1">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Search size={24} className="text-[#007AFF]/50" /></div>
-            <input type="text" value={searchTerm} onChange={handleInputChange} onFocus={() => { if(searchTerm) setShowSuggestions(true); }} placeholder={activeMarket?.placeholder || "Hisse senedi sembolü yazın..."} className="w-full pl-12 pr-6 py-5 md:py-6 bg-transparent focus:outline-none text-xl md:text-2xl font-black text-gray-800 uppercase" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Search size={24} className="text-[#007AFF]/50 dark:text-blue-400/50" /></div>
+            <input type="text" value={searchTerm} onChange={handleInputChange} onFocus={() => { if(searchTerm) setShowSuggestions(true); }} placeholder={activeMarket?.placeholder || "Hisse senedi sembolü yazın..."} className="w-full pl-12 pr-6 py-5 md:py-6 bg-transparent dark:bg-transparent focus:outline-none text-xl md:text-2xl font-black text-gray-800 dark:text-white uppercase" />
           </div>
           
           <div className="p-2 w-full md:w-auto">
-            <button type="submit" disabled={loading} className="w-full md:w-auto bg-[#04009A] hover:bg-[#007AFF] text-white px-8 py-4 md:py-4 rounded-xl font-black transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading} className="w-full md:w-auto bg-blue-700 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white px-8 py-4 md:py-4 rounded-xl font-black transition-colors shadow-md dark:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
               {loading ? <RefreshCw className="animate-spin" size={24} /> : 'Ara'}
             </button>
           </div>
 
           {showSuggestions && searchTerm?.trim().length > 0 && (
-            <ul className="absolute top-[110%] left-0 right-0 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15)] max-h-96 overflow-y-auto z-50 divide-y divide-gray-50">
+            <ul className="absolute top-[110%] left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.4)] max-h-96 overflow-y-auto z-50 divide-y divide-gray-50 dark:divide-gray-800">
               {isSearching ? (
-                <li className="px-6 py-8 text-center text-gray-500 font-bold flex flex-col items-center gap-3"><RefreshCw className="animate-spin text-[#007AFF]" size={28} /> {activeMarket?.label} taranıyor...</li>
+                <li className="px-6 py-8 text-center text-gray-500 dark:text-gray-400 font-bold flex flex-col items-center gap-3"><RefreshCw className="animate-spin text-[#007AFF] dark:text-blue-400" size={28} /> {activeMarket?.label} taranıyor...</li>
               ) : searchResults?.length > 0 ? (
                 searchResults.map((stock, i) => {
                   const ui = getMarketUIBySymbol(stock?.symbol);
                   return (
-                    <li key={`${stock?.symbol}-${i}`} onClick={() => { setSearchTerm(stock?.symbol); fetchStockData(stock?.symbol); }} className="px-6 py-4 md:py-5 hover:bg-blue-50/80 cursor-pointer flex items-center justify-between group">
+                    <li key={`${stock?.symbol}-${i}`} onClick={() => { setSearchTerm(stock?.symbol); fetchStockData(stock?.symbol); }} className="px-6 py-4 md:py-5 hover:bg-blue-50/80 dark:hover:bg-blue-900/20 cursor-pointer flex items-center justify-between group">
                       <div className="flex items-center gap-4">
-                        <div className="hidden md:flex bg-gray-50 border border-gray-100 rounded-xl w-12 h-12 items-center justify-center text-2xl shadow-sm">{ui.icon}</div>
-                        <div><div className="text-xl text-[#04009A] font-black group-hover:text-[#007AFF]">{stock?.symbol}</div><div className="text-sm font-bold text-gray-400 truncate w-40 md:w-96">{stock?.name}</div></div>
+                        <div className="hidden md:flex bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl w-12 h-12 items-center justify-center text-2xl shadow-sm">{ui.icon}</div>
+                        <div><div className="text-xl text-blue-700 dark:text-blue-400 font-black group-hover:text-[#007AFF] dark:group-hover:text-blue-300">{stock?.symbol}</div><div className="text-sm font-bold text-gray-400 dark:text-gray-500 truncate w-40 md:w-96">{stock?.name}</div></div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1.5 rounded-lg font-black">{stock?.exchange}</span>
-                        <ChevronRight size={20} className="text-gray-300 group-hover:text-[#007AFF]" />
+                        <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-lg font-black">{stock?.exchange}</span>
+                        <ChevronRight size={20} className="text-gray-300 dark:text-gray-600 group-hover:text-[#007AFF] dark:group-hover:text-blue-400" />
                       </div>
                     </li>
                   )
                 })
               ) : (
-                <li className="px-6 py-8 text-center text-gray-500 font-bold text-lg">Sonuç bulunamadı.</li>
+                <li className="px-6 py-8 text-center text-gray-500 dark:text-gray-400 font-bold text-lg">Sonuç bulunamadı.</li>
               )}
             </ul>
           )}
@@ -194,14 +194,14 @@ const StockTerminalPage = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 p-5 rounded-2xl flex items-center justify-center gap-3 max-w-4xl mx-auto w-full">
-          <AlertCircle className="text-red-500 shrink-0" size={24} /><p className="text-red-700 font-bold text-lg">{error}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-5 rounded-2xl flex items-center justify-center gap-3 max-w-4xl mx-auto w-full">
+          <AlertCircle className="text-red-500 dark:text-red-400 shrink-0" size={24} /><p className="text-red-700 dark:text-red-400 font-bold text-lg">{error}</p>
         </div>
       )}
 
       {stockData && stockData.chartData && stockData.chartData.length > 0 && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 w-full">
-          <div className="bg-gradient-to-r from-[#04009A] to-[#007AFF] rounded-[2.5rem] p-8 md:p-10 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#04009A] dark:from-blue-900 to-[#007AFF] dark:to-blue-700 rounded-[2.5rem] p-8 md:p-10 shadow-2xl dark:shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
              <div className="z-10 flex items-center gap-4">
                <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm shadow-inner text-4xl">{currentUI?.icon}</div>
@@ -221,8 +221,8 @@ const StockTerminalPage = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            <div className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-              <h3 className="text-xl font-black text-[#04009A] mb-8 flex items-center gap-3"><BarChart2 className="text-[#007AFF]" size={24} /> Fiyat Geçmişi</h3>
+            <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800">
+              <h3 className="text-xl font-black text-blue-700 dark:text-blue-400 mb-8 flex items-center gap-3"><BarChart2 className="text-[#007AFF] dark:text-blue-400" size={24} /> Fiyat Geçmişi</h3>
               <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={stockData.chartData}>
@@ -238,8 +238,8 @@ const StockTerminalPage = () => {
             </div>
 
             <div className="space-y-6 md:space-y-8">
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-                <h3 className="text-xl font-black text-[#04009A] mb-4 w-full flex items-center gap-3"><Activity className="text-[#007AFF]" size={24} /> İşlem Hacmi</h3>
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+                <h3 className="text-xl font-black text-blue-700 dark:text-blue-400 mb-4 w-full flex items-center gap-3"><Activity className="text-[#007AFF] dark:text-blue-400" size={24} /> İşlem Hacmi</h3>
                 <div className="h-[140px] w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stockData.chartData}>
@@ -252,8 +252,8 @@ const StockTerminalPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
-                <h3 className="text-xl font-black text-[#04009A] mb-4 w-full flex items-center gap-3"><PieIcon className="text-[#007AFF]" size={24} /> Momentum</h3>
+              <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+                <h3 className="text-xl font-black text-blue-700 dark:text-blue-400 mb-4 w-full flex items-center gap-3"><PieIcon className="text-[#007AFF] dark:text-blue-400" size={24} /> Momentum</h3>
                 <div className="h-[140px] w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>

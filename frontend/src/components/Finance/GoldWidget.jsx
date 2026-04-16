@@ -60,12 +60,12 @@ const GoldWidget = () => {
 
   if (loading && goldData.length === 0) {
     return (
-      <div className="w-full py-20 flex flex-col items-center justify-center bg-gradient-to-b from-transparent to-blue-50/30 rounded-3xl">
+      <div className="w-full py-20 flex flex-col items-center justify-center bg-gradient-to-b from-transparent to-blue-50/30 dark:to-gray-800/30 rounded-3xl">
         <div className="relative">
           <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-20 rounded-full animate-pulse"></div>
-          <Loader2 className="animate-spin text-[#04009A] relative z-10" size={48} />
+          <Loader2 className="animate-spin text-blue-700 dark:text-blue-400 relative z-10" size={48} />
         </div>
-        <p className="mt-6 text-[#04009A] font-black tracking-[0.2em] text-xs uppercase animate-pulse">
+        <p className="mt-6 text-blue-700 dark:text-blue-400 font-black tracking-[0.2em] text-xs uppercase animate-pulse">
           Kapalıçarşı Verileri Bekleniyor...
         </p>
       </div>
@@ -80,15 +80,15 @@ const GoldWidget = () => {
     const next = (currentIndex + 1) % length;
 
     if (index === currentIndex) {
-      return "left-1/2 -translate-x-1/2 scale-[1.15] z-30 opacity-100 shadow-[0_20px_60px_-15px_rgba(4,0,154,0.4)] border-[#04009A] bg-white cursor-pointer";
-    } 
-    if (index === prev) {
-      return "left-[15%] md:left-[20%] -translate-x-1/2 scale-90 z-20 opacity-60 blur-[1px] border-gray-200 bg-gray-50/80 cursor-pointer hover:opacity-100 hover:blur-none hover:-translate-y-2";
-    } 
-    if (index === next) {
-      return "left-[85%] md:left-[80%] -translate-x-1/2 scale-90 z-20 opacity-60 blur-[1px] border-gray-200 bg-gray-50/80 cursor-pointer hover:opacity-100 hover:blur-none hover:-translate-y-2";
+      return "left-1/2 -translate-x-1/2 scale-[1.15] z-30 opacity-100 shadow-[0_20px_60px_-15px_rgba(4,0,154,0.4)] border-blue-700 dark:border-blue-500 bg-white dark:bg-gray-900 cursor-pointer";
     }
-    
+    if (index === prev) {
+      return "left-[15%] md:left-[20%] -translate-x-1/2 scale-90 z-20 opacity-60 blur-[1px] border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 cursor-pointer hover:opacity-100 hover:blur-none hover:-translate-y-2";
+    }
+    if (index === next) {
+      return "left-[85%] md:left-[80%] -translate-x-1/2 scale-90 z-20 opacity-60 blur-[1px] border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 cursor-pointer hover:opacity-100 hover:blur-none hover:-translate-y-2";
+    }
+
     return "left-1/2 -translate-x-1/2 scale-50 z-0 opacity-0 pointer-events-none";
   };
 
@@ -98,18 +98,18 @@ const GoldWidget = () => {
       <div className="w-full px-4 mb-10 flex justify-between items-end max-w-5xl">
         <div className="relative">
           <div className="absolute -left-4 -top-4 w-12 h-12 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter flex items-center gap-3 relative z-10">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter flex items-center gap-3 relative z-10">
             Altın Piyasası <Sparkles className="text-yellow-500" size={28} />
           </h2>
-          <p className="text-gray-400 font-semibold mt-1">Kapalıçarşı canlı kurlar ve fiziki makas oranları</p>
+          <p className="text-gray-400 dark:text-gray-500 font-semibold mt-1">Kapalıçarşı canlı kurlar ve fiziki makas oranları</p>
         </div>
       </div>
 
       <div className="relative w-full max-w-6xl flex items-center justify-center h-[460px] px-4">
         
-        <button 
+        <button
           onClick={handlePrev}
-          className="absolute left-2 md:left-8 z-40 p-3 bg-white/80 backdrop-blur-md border border-gray-100 shadow-xl rounded-full text-[#04009A] hover:bg-[#04009A] hover:text-white transition-all duration-300 group"
+          className="absolute left-2 md:left-8 z-40 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-100 dark:border-gray-700 shadow-xl rounded-full text-blue-700 dark:text-blue-400 hover:bg-blue-700 dark:hover:bg-blue-500 hover:text-white transition-all duration-300 group"
         >
           <ChevronLeft size={28} className="transition-transform group-hover:-translate-x-1" />
         </button>
@@ -124,7 +124,7 @@ const GoldWidget = () => {
                 onClick={() => handleCardClick(index, coin.id)} // 🔥 ARTIK COIN ID'Sİ DE GİDİYOR
                 className={`absolute top-4 transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)] flex flex-col items-center rounded-[2.5rem] p-6 md:p-8 w-[280px] md:w-[320px] border-2 ${getCardStyle(index)}`}
               >
-                <h3 className={`text-xl md:text-2xl font-black mb-4 text-center transition-colors duration-500 ${isCenter ? 'text-[#04009A]' : 'text-gray-500'}`}>
+                <h3 className={`text-xl md:text-2xl font-black mb-4 text-center transition-colors duration-500 ${isCenter ? 'text-blue-700 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
                   {coin.name}
                 </h3>
 
@@ -138,37 +138,37 @@ const GoldWidget = () => {
                 </div>
 
                 <div className="w-full mb-6">
-                  <div className={`flex justify-between items-center rounded-2xl p-3 border transition-colors duration-500 ${isCenter ? 'bg-gray-50 border-gray-100' : 'bg-transparent border-transparent'}`}>
+                  <div className={`flex justify-between items-center rounded-2xl p-3 border transition-colors duration-500 ${isCenter ? 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700' : 'bg-transparent border-transparent'}`}>
                     <div className="text-left">
-                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Alış</div>
-                      <div className={`text-lg md:text-xl font-black transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-400'}`}>
+                      <div className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-0.5">Alış</div>
+                      <div className={`text-lg md:text-xl font-black transition-colors duration-500 ${isCenter ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>
                         ₺{coin.buy.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
-                    <div className={`h-8 w-px transition-colors duration-500 ${isCenter ? 'bg-gray-200' : 'bg-transparent'}`}></div>
+                    <div className={`h-8 w-px transition-colors duration-500 ${isCenter ? 'bg-gray-200 dark:bg-gray-600' : 'bg-transparent'}`}></div>
                     <div className="text-right">
-                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Satış</div>
-                      <div className={`text-lg md:text-xl font-black transition-colors duration-500 ${isCenter ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                      <div className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-0.5">Satış</div>
+                      <div className={`text-lg md:text-xl font-black transition-colors duration-500 ${isCenter ? 'text-[#10B981] dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
                         ₺{coin.sell.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
                   </div>
-                  
-                  <div className={`text-xs font-bold mt-3 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl w-full transition-all duration-500 ${isCenter ? (coin.change >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600') : 'bg-gray-100 text-gray-400 opacity-50'}`}>
+
+                  <div className={`text-xs font-bold mt-3 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl w-full transition-all duration-500 ${isCenter ? (coin.change >= 0 ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400') : 'bg-gray-100 dark:bg-gray-700 text-gray-400 opacity-50'}`}>
                     {coin.change >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                     Değişim: {coin.change > 0 ? '+' : ''}{coin.change}%
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                     if (isCenter) navigate(`/gold-market?id=${coin.id}`);
                   }}
                   className={`w-full py-3 rounded-2xl font-black text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
-                    isCenter 
-                    ? 'bg-[#04009A] text-white hover:bg-blue-700 hover:shadow-lg hover:-translate-y-1' 
-                    : 'bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100'
+                    isCenter
+                    ? 'bg-blue-700 dark:bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500 hover:shadow-lg hover:-translate-y-1'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100'
                   }`}
                   style={{ opacity: isCenter ? 1 : 0, pointerEvents: isCenter ? 'auto' : 'none' }}
                 >
@@ -179,9 +179,9 @@ const GoldWidget = () => {
           })}
         </div>
 
-        <button 
+        <button
           onClick={handleNext}
-          className="absolute right-2 md:right-8 z-40 p-3 bg-white/80 backdrop-blur-md border border-gray-100 shadow-xl rounded-full text-[#04009A] hover:bg-[#04009A] hover:text-white transition-all duration-300 group"
+          className="absolute right-2 md:right-8 z-40 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-100 dark:border-gray-700 shadow-xl rounded-full text-blue-700 dark:text-blue-400 hover:bg-blue-700 dark:hover:bg-blue-500 hover:text-white transition-all duration-300 group"
         >
           <ChevronRight size={28} className="transition-transform group-hover:translate-x-1" />
         </button>

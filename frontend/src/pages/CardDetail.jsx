@@ -74,7 +74,7 @@ function CardDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex justify-center items-center">
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 flex justify-center items-center">
         <LucideIcons.Loader2 className="animate-spin text-[#007AFF]" size={40} />
       </div>
     );
@@ -92,7 +92,7 @@ function CardDetail() {
   const history = (card.history || []).map(normalizeHistoryItem);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-24">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 pb-24">
       {/* Header / card banner */}
       <div
         className={`${cardColor} pt-12 pb-16 px-6 rounded-b-[40px] shadow-lg relative transition-colors duration-500`}
@@ -124,9 +124,9 @@ function CardDetail() {
 
       {/* History list */}
       <div className="max-w-3xl mx-auto px-6 -mt-8 relative z-10">
-        <div className="bg-white rounded-[30px] shadow-xl p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-[30px] shadow-xl p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
               <LucideIcons.History size={20} className="text-[#007AFF]" />
               Hesap Geçmişi
             </h3>
@@ -140,7 +140,7 @@ function CardDetail() {
 
           <div className="space-y-3">
             {history.length === 0 ? (
-              <p className="text-center text-gray-400 py-8">
+              <p className="text-center text-gray-400 dark:text-gray-500 py-8">
                 Henüz bu kartta bir işlem yok.
               </p>
             ) : (
@@ -150,7 +150,7 @@ function CardDetail() {
                 return (
                   <div
                     key={item.id}
-                    className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors"
+                    className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       <div
@@ -163,8 +163,8 @@ function CardDetail() {
                         <Icon size={20} />
                       </div>
                       <div>
-                        <p className="font-bold text-gray-800">{item.label}</p>
-                        <p className="text-xs text-gray-400 font-medium">
+                        <p className="font-bold text-gray-800 dark:text-white">{item.label}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-400 font-medium">
                           {item.date}
                         </p>
                       </div>
@@ -188,12 +188,12 @@ function CardDetail() {
       {/* ---- Add Transaction Modal ---- */}
       {isAddOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">Yeni İşlem Ekle</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Yeni İşlem Ekle</h2>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 p-2 rounded-full"
+                className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:bg-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 p-2 rounded-full"
               >
                 <LucideIcons.X size={20} />
               </button>
@@ -208,7 +208,7 @@ function CardDetail() {
                   className={`py-3 rounded-xl font-bold transition-all ${
                     txForm.type === "income"
                       ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
                   + Gelir
@@ -219,7 +219,7 @@ function CardDetail() {
                   className={`py-3 rounded-xl font-bold transition-all ${
                     txForm.type === "expense"
                       ? "bg-red-500 text-white shadow-lg shadow-red-500/30"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
                   − Gider
@@ -228,7 +228,7 @@ function CardDetail() {
 
               {/* Amount */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                   Tutar (₺)
                 </label>
                 <div className="relative">
@@ -238,9 +238,9 @@ function CardDetail() {
                     min="1"
                     value={txForm.amount}
                     onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
-                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none font-bold text-lg transition-all"
+                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none font-bold text-lg transition-all dark:bg-gray-700 dark:text-white"
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-semibold">
                     ₺
                   </span>
                 </div>
@@ -248,7 +248,7 @@ function CardDetail() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                   Açıklama (İsteğe Bağlı)
                 </label>
                 <input
@@ -256,7 +256,7 @@ function CardDetail() {
                   value={txForm.description}
                   onChange={(e) => setTxForm({ ...txForm, description: e.target.value })}
                   placeholder="Örn: Market alışverişi"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:border-[#007AFF] focus:ring-2 focus:ring-blue-100 outline-none transition-all dark:bg-gray-700 dark:text-white"
                 />
               </div>
 

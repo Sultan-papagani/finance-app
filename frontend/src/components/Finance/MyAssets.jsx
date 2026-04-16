@@ -82,7 +82,7 @@ function MyAssets() {
     }
   };
 
-  if (loading) return <div className="animate-pulse h-24 bg-gray-100 rounded-[24px] mx-4 mb-8" />;
+  if (loading) return <div className="animate-pulse h-24 bg-gray-100 dark:bg-gray-800 rounded-[24px] mx-4 mb-8" />;
   if (assets.length === 0) return null;
 
   const getIcon = (category) => {
@@ -99,15 +99,15 @@ function MyAssets() {
   return (
     <div className="w-full px-4 mb-12">
       <div className="flex items-center justify-between mb-4 px-2">
-        <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
-          <Gem size={24} className="text-[#04009A]" /> Portföyüm
+        <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+          <Gem size={24} className="text-blue-700 dark:text-blue-400" /> Portföyüm
         </h2>
         <div className="flex items-center gap-3">
-          <span className="font-black text-[#04009A] text-lg">{totalCurrentValue.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺</span>
-          <button 
-            onClick={() => fetchAssetsAndPrices(true)} 
+          <span className="font-black text-blue-700 dark:text-blue-400 text-lg">{totalCurrentValue.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺</span>
+          <button
+            onClick={() => fetchAssetsAndPrices(true)}
             disabled={refreshing}
-            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all disabled:opacity-50 text-gray-600"
+            className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-all disabled:opacity-50 text-gray-600 dark:text-gray-400"
             title="Piyasayı Güncelle"
           >
             {refreshing ? <Loader2 className="animate-spin" size={18} /> : <RefreshCw size={18} />}
@@ -123,41 +123,41 @@ function MyAssets() {
           const isProfit = assetProfit >= 0;
 
           return (
-            <div 
-              key={asset.id} 
+            <div
+              key={asset.id}
               // 🔥 YENİ: Kutuya tıklandığında detay sayfasına yönlendirir
               onClick={() => navigate(`/asset/${asset.id}`)}
-              className="cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all gap-4 sm:gap-0"
+              className="cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all gap-4 sm:gap-0"
             >
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                  asset.category === 'gold' ? 'bg-yellow-50' : 
-                  asset.category === 'crypto' ? 'bg-orange-50' : 'bg-blue-50'
+                  asset.category === 'gold' ? 'bg-yellow-50 dark:bg-yellow-900/30' :
+                  asset.category === 'crypto' ? 'bg-orange-50 dark:bg-orange-900/30' : 'bg-blue-50 dark:bg-blue-900/30'
                 }`}>
                   {getIcon(asset.category)}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 leading-tight">{asset.name}</h3>
-                  <p className="text-xs font-bold text-gray-400 mt-0.5">{asset.quantity} Adet/Gram</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white leading-tight">{asset.name}</h3>
+                  <p className="text-xs font-bold text-gray-400 dark:text-gray-500 mt-0.5">{asset.quantity} Adet/Gram</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pl-16 sm:pl-0">
                 <div className="text-left sm:text-right">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Değer</p>
-                  <p className="font-black text-gray-800">{currentTotalValue.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺</p>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">Değer</p>
+                  <p className="font-black text-gray-800 dark:text-gray-200">{currentTotalValue.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺</p>
                 </div>
 
-                <div className={`text-right min-w-[70px] ${isProfit ? 'text-green-500' : 'text-red-500'}`}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5 text-gray-400">Durum</p>
+                <div className={`text-right min-w-[70px] ${isProfit ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5 text-gray-400 dark:text-gray-500">Durum</p>
                   <p className="font-black text-sm">
                     {isProfit ? '+' : ''}{assetProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺
                   </p>
                 </div>
 
-                <button 
+                <button
                   onClick={(e) => handleDeleteAsset(e, asset.id)}
-                  className="p-2.5 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                  className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                   title="Varlığı Sil"
                 >
                   <Trash2 size={18} />

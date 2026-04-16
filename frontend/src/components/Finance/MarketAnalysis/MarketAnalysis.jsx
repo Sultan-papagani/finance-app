@@ -77,37 +77,37 @@ const MarketAnalysis = () => {
     <div className="w-full">
       {/* BAŞLIK */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="bg-blue-100 p-2 rounded-xl">
-          <TrendingUp className="text-[#007AFF]" size={24} />
+        <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-xl">
+          <TrendingUp className="text-[#007AFF] dark:text-blue-400" size={24} />
         </div>
-        <h2 className="text-2xl font-black text-[#04009A] uppercase tracking-wide">
+        <h2 className="text-2xl font-black text-blue-700 dark:text-blue-400 uppercase tracking-wide">
           Piyasa Analizi
         </h2>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col">
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
           {/* SOL TARAF: DÖVİZ ÇEVİRİCİ */}
           <div className="lg:col-span-1 flex flex-col justify-center">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Döviz Çevirici</h3>
+            <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">Döviz Çevirici</h3>
             
             <div className="space-y-4 relative">
               {/* Kaynak Kur */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:border-blue-200 transition-colors group">
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-600 transition-colors group">
                 <div className="flex justify-between items-center">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="bg-transparent text-2xl font-black text-gray-800 w-full outline-none"
+                    className="bg-transparent text-2xl font-black text-gray-800 dark:text-white w-full outline-none"
                     min="0"
                   />
-                  <select 
+                  <select
                     value={baseCurrency}
                     onChange={(e) => setBaseCurrency(e.target.value)}
-                    className="bg-white border border-gray-200 text-gray-700 font-bold py-1.5 px-3 rounded-lg outline-none cursor-pointer hover:bg-gray-50 scrollbar-hide"
+                    className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-white font-bold py-1.5 px-3 rounded-lg outline-none cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 scrollbar-hide"
                   >
                     {currencies.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -115,23 +115,23 @@ const MarketAnalysis = () => {
               </div>
 
               {/* Takla Butonu */}
-              <button 
+              <button
                 onClick={handleSwap}
-                className="absolute left-1/2 -translate-x-1/2 top-[55%] -translate-y-1/2 bg-white p-2.5 rounded-full shadow-md border border-gray-200 z-10 hover:bg-gray-100 hover:scale-110 active:scale-95 transition-all cursor-pointer focus:outline-none"
+                className="absolute left-1/2 -translate-x-1/2 top-[55%] -translate-y-1/2 bg-white dark:bg-gray-700 p-2.5 rounded-full shadow-md border border-gray-200 dark:border-gray-600 z-10 hover:bg-gray-100 dark:hover:bg-gray-600 hover:scale-110 active:scale-95 transition-all cursor-pointer focus:outline-none"
               >
                 <ArrowRightLeft size={16} className="text-[#007AFF] rotate-90" />
               </button>
 
               {/* Hedef Kur */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:border-blue-200 transition-colors">
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-600 transition-colors">
                 <div className="flex justify-between items-center">
-                  <div className="text-2xl font-black text-[#007AFF] truncate pr-4">
+                  <div className="text-2xl font-black text-[#007AFF] dark:text-blue-400 truncate pr-4">
                     {(amount * currentRate).toFixed(4)}
                   </div>
-                  <select 
+                  <select
                     value={targetCurrency}
                     onChange={(e) => setTargetCurrency(e.target.value)}
-                    className="bg-blue-100 text-[#007AFF] font-bold py-1.5 px-3 rounded-lg outline-none cursor-pointer hover:bg-blue-200 scrollbar-hide"
+                    className="bg-blue-100 dark:bg-blue-900/30 text-[#007AFF] dark:text-blue-400 font-bold py-1.5 px-3 rounded-lg outline-none cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-900/50 scrollbar-hide"
                   >
                     {currencies.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -144,15 +144,15 @@ const MarketAnalysis = () => {
           <div className="lg:col-span-2">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   1 {baseCurrency} eşittir
                 </p>
-                <h4 className="text-4xl font-black text-gray-800 flex items-baseline gap-2">
-                  {currentRate.toFixed(4)} <span className="text-xl text-gray-400 font-bold">{targetCurrency}</span>
+                <h4 className="text-4xl font-black text-gray-800 dark:text-white flex items-baseline gap-2">
+                  {currentRate.toFixed(4)} <span className="text-xl text-gray-400 dark:text-gray-500 font-bold">{targetCurrency}</span>
                 </h4>
               </div>
 
-              <div className="flex bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+              <div className="flex bg-gray-50 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-100 dark:border-gray-700">
                 {[
                   { label: '1A', val: 30 },
                   { label: '6A', val: 180 },
@@ -162,9 +162,9 @@ const MarketAnalysis = () => {
                     key={btn.val}
                     onClick={() => setDays(btn.val)}
                     className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                      days === btn.val 
-                        ? 'bg-white text-[#007AFF] shadow-sm' 
-                        : 'text-gray-400 hover:text-gray-600'
+                      days === btn.val
+                        ? 'bg-white dark:bg-gray-700 text-[#007AFF] dark:text-blue-400 shadow-sm'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'
                     }`}
                   >
                     {btn.label}
@@ -175,8 +175,8 @@ const MarketAnalysis = () => {
 
             <div className="h-[280px] w-full relative">
               {loading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-10">
-                  <span className="text-sm font-bold text-[#007AFF] animate-pulse">Grafik Çiziliyor...</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 z-10">
+                  <span className="text-sm font-bold text-[#007AFF] dark:text-blue-400 animate-pulse">Grafik Çiziliyor...</span>
                 </div>
               ) : null}
               
@@ -211,11 +211,11 @@ const MarketAnalysis = () => {
         </div>
 
   
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <button 
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+          <button
 
             onClick={() => navigate(`/detail?base=${baseCurrency}&target=${targetCurrency}`)}
-            className="w-full bg-blue-50 hover:bg-blue-100 text-[#007AFF] font-black py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 group border border-blue-100 hover:border-blue-200"
+            className="w-full bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-[#007AFF] dark:text-blue-400 font-black py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 group border border-blue-100 dark:border-blue-800 hover:border-blue-200 dark:hover:border-blue-700"
           >
             <span>Detaylı Analizi Gör</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

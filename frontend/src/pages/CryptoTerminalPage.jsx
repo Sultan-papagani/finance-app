@@ -243,7 +243,7 @@ const CryptoTerminalPage = () => {
             </h1>
           </div>
           <div className="md:hidden">
-            <button onClick={() => setCurrency(c => c === 'USD' ? 'TRY' : 'USD')} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-black text-xs transition-all text-[#04009A]">
+            <button onClick={() => setCurrency(c => c === 'USD' ? 'TRY' : 'USD')} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-black text-xs transition-all text-blue-700">
               {currency === 'USD' ? '🇺🇸 USD' : '🇹🇷 TRY'}
             </button>
           </div>
@@ -251,7 +251,7 @@ const CryptoTerminalPage = () => {
 
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="hidden md:block">
-            <button onClick={() => setCurrency(c => c === 'USD' ? 'TRY' : 'USD')} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl font-black text-sm transition-all text-[#04009A] w-24 text-center">
+            <button onClick={() => setCurrency(c => c === 'USD' ? 'TRY' : 'USD')} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl font-black text-sm transition-all text-blue-700 w-24 text-center">
               {currency === 'USD' ? '🇺🇸 USD' : '🇹🇷 TRY'}
             </button>
           </div>
@@ -278,7 +278,7 @@ const CryptoTerminalPage = () => {
                       <div className="flex items-center gap-3">
                         <img src={coin.thumb} alt={coin.name} className="w-8 h-8 rounded-full" />
                         <div>
-                          <div className="text-sm font-black text-[#04009A]">{coin.name}</div>
+                          <div className="text-sm font-black text-blue-700">{coin.name}</div>
                           <div className="text-xs font-bold text-gray-400 uppercase">{coin.symbol}</div>
                         </div>
                       </div>
@@ -315,7 +315,7 @@ const CryptoTerminalPage = () => {
                      <span className="bg-[#007AFF]/10 text-[#007AFF] font-bold uppercase tracking-widest text-[10px] md:text-xs px-2.5 py-1 rounded-lg">Rank #{coinData.market_cap_rank}</span>
                      <span className="text-gray-400 font-bold uppercase text-xs md:text-sm">{coinData.symbol}</span>
                    </div>
-                   <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[#04009A]">{coinData.name}</h2>
+                   <h2 className="text-3xl md:text-4xl font-black tracking-tight text-blue-700">{coinData.name}</h2>
                  </div>
                </div>
 
@@ -355,7 +355,7 @@ const CryptoTerminalPage = () => {
                       {isProChart ? 'Basit Görünüm' : 'Pro Çizim'}
                     </button>
 
-                    <button onClick={toggleFullScreen} className="p-2.5 rounded-xl font-bold text-sm transition-all bg-gray-100 text-[#04009A] hover:bg-[#007AFF] hover:text-white flex-shrink-0" title="Tam Ekran">
+                    <button onClick={toggleFullScreen} className="p-2.5 rounded-xl font-bold text-sm transition-all bg-gray-100 text-blue-700 hover:bg-[#007AFF] hover:text-white flex-shrink-0" title="Tam Ekran">
                       <Maximize size={18} />
                     </button>
 
@@ -408,7 +408,7 @@ const CryptoTerminalPage = () => {
                 <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100 relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg md:text-xl font-black text-gray-900 flex items-center gap-2">
-                      <BookOpen className="text-[#04009A]" size={20} /> Trade Günlüğü
+                      <BookOpen className="text-blue-700" size={20} /> Trade Günlüğü
                     </h3>
                     <button onClick={() => setShowAllNotesModal(true)} className="text-xs font-bold text-[#007AFF] bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1.5">
                       <List size={14} /> Tüm Notlarım
@@ -424,7 +424,7 @@ const CryptoTerminalPage = () => {
                     placeholder={`${coinData.name} için stratejini buraya yaz...`}
                     className="w-full h-32 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#007AFF] focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none mb-4 custom-scrollbar"
                   />
-                  <button onClick={handleSaveNote} disabled={isSavingNote} className="w-full py-3 bg-[#04009A] hover:bg-[#007AFF] text-white rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70">
+                  <button onClick={handleSaveNote} disabled={isSavingNote} className="w-full py-3 bg-blue-700 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70">
                     {isSavingNote ? <RefreshCw className="animate-spin" size={18} /> : <Save size={18} />}
                     {isSavingNote ? 'Kaydediliyor...' : 'Analizi Kaydet'}
                   </button>
@@ -468,11 +468,11 @@ const CryptoTerminalPage = () => {
                 <div className="grid grid-cols-2 gap-y-8 gap-x-6">
                   <div>
                     <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Piyasa Değeri</div>
-                    <div className="text-base md:text-xl font-black text-[#04009A]">{formatCompact(coinData.market_data.market_cap.usd)}</div>
+                    <div className="text-base md:text-xl font-black text-blue-700">{formatCompact(coinData.market_data.market_cap.usd)}</div>
                   </div>
                   <div>
                     <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">24S Hacim</div>
-                    <div className="text-base md:text-xl font-black text-[#04009A]">{formatCompact(coinData.market_data.total_volume.usd)}</div>
+                    <div className="text-base md:text-xl font-black text-blue-700">{formatCompact(coinData.market_data.total_volume.usd)}</div>
                   </div>
                   <div>
                     <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Tarihi Zirve (ATH)</div>
@@ -480,7 +480,7 @@ const CryptoTerminalPage = () => {
                   </div>
                   <div>
                     <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Dolaşan Arz</div>
-                    <div className="text-base md:text-xl font-black text-[#04009A]">{coinData.market_data.circulating_supply.toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
+                    <div className="text-base md:text-xl font-black text-blue-700">{coinData.market_data.circulating_supply.toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
                   </div>
                 </div>
               </div>
@@ -536,7 +536,7 @@ const CryptoTerminalPage = () => {
       {showAllNotesModal && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowAllNotesModal(false)}>
           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-[#04009A] text-white">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-blue-700 dark:bg-blue-900 text-white">
               <h2 className="text-xl font-black flex items-center gap-2"><List size={20} /> Tüm Stratejilerim</h2>
               <button onClick={() => setShowAllNotesModal(false)} className="p-1 hover:bg-white/20 rounded-lg transition-colors"><X size={20} /></button>
             </div>
@@ -555,7 +555,7 @@ const CryptoTerminalPage = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 opacity-50">
-                  <BookOpen size={48} className="mb-4 text-[#04009A]" />
+                  <BookOpen size={48} className="mb-4 text-blue-700" />
                   <p className="font-bold text-gray-600">Henüz kaydedilmiş bir stratejin yok.</p>
                 </div>
               )}

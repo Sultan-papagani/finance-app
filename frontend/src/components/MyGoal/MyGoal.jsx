@@ -192,21 +192,21 @@ const MyGoal = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <Loader2 className="animate-spin text-[#007AFF] mb-4" size={40} />
-        <p className="text-gray-500 font-medium">Hedeflerin yükleniyor...</p>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">Hedeflerin yükleniyor...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto w-full relative">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto w-full relative bg-white dark:bg-gray-900">
       {/* Üst Kısım: Başlık ve Ekleme Butonları */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Target className="text-[#007AFF]" size={32} />
             Hedeflerim
           </h1>
-          <p className="text-gray-500 mt-1 text-sm md:text-base">
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm md:text-base">
             Hayallerin için birikim yap, hedefini gözünün önünde tut.
           </p>
         </div>
@@ -214,7 +214,7 @@ const MyGoal = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsJoinModalOpen(true)}
-            className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 md:px-5 md:py-3 rounded-xl flex items-center gap-2 font-semibold transition-all shadow-sm"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-2 md:px-5 md:py-3 rounded-xl flex items-center gap-2 font-semibold transition-all shadow-sm"
           >
             <Key size={18} className="text-[#007AFF]" />
             <span className="hidden sm:inline">Koda Katıl</span>
@@ -242,7 +242,7 @@ const MyGoal = () => {
             <div
               key={goal.id}
               onClick={() => navigate(`/my-goal/${goal.id}`)}
-              className={`bg-white rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgba(0,122,255,0.15)] transition-all duration-300 cursor-pointer group flex flex-col border overflow-hidden relative ${goal.isShared ? 'border-blue-200 bg-blue-50/10' : 'border-gray-100'}`}
+              className={`bg-white dark:bg-gray-800 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_40px_rgba(0,122,255,0.15)] transition-all duration-300 cursor-pointer group flex flex-col border overflow-hidden relative ${goal.isShared ? 'border-blue-200 dark:border-blue-900 bg-blue-50/10 dark:bg-blue-900/20' : 'border-gray-100 dark:border-gray-700'}`}
             >
               {goal.isShared && (
                 <div className="absolute top-4 left-4 z-10 bg-blue-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-md">
@@ -250,7 +250,7 @@ const MyGoal = () => {
                 </div>
               )}
 
-              <div className="w-full h-48 sm:h-52 relative overflow-hidden bg-gray-100">
+              <div className="w-full h-48 sm:h-52 relative overflow-hidden bg-gray-100 dark:bg-gray-700">
                 <img
                   src={goal.image}
                   alt={goal.title}
@@ -263,19 +263,19 @@ const MyGoal = () => {
 
               <div className="p-6 flex-1 flex flex-col">
                 <div className="text-center mb-6">
-                  <h3 className="font-bold text-xl text-gray-900 mb-1 line-clamp-1">
+                  <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-1 line-clamp-1">
                     {goal.title}
                   </h3>
                   <div className="text-[#007AFF] font-bold text-lg">
                     {goal.currentAmount.toLocaleString("tr-TR")} ₺
-                    <span className="text-gray-400 text-sm font-medium ml-1">
+                    <span className="text-gray-400 dark:text-gray-500 text-sm font-medium ml-1">
                       / {goal.targetAmount.toLocaleString("tr-TR")} ₺
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-auto">
-                  <div className="w-full bg-blue-50 rounded-full h-3 overflow-hidden mb-4">
+                  <div className="w-full bg-blue-50 dark:bg-gray-700 rounded-full h-3 overflow-hidden mb-4">
                     <div
                       className="bg-[#007AFF] h-full rounded-full transition-all duration-1000 ease-out relative"
                       style={{ width: `${progressPercentage}%` }}
@@ -283,15 +283,15 @@ const MyGoal = () => {
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500">
-                      <Users size={16} className="text-gray-400" />
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <Users size={16} className="text-gray-400 dark:text-gray-500" />
                       <span>{goal.contributors?.length || 0} Katılımcı</span>
                     </div>
 
                     {!goal.isShared && (
                       <button
                         onClick={(e) => handleGenerateCode(e, goal.id)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 text-[#007AFF] hover:bg-[#007AFF] hover:text-white transition-colors z-20 border border-blue-100 shadow-sm"
+                        className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 dark:bg-gray-700 text-[#007AFF] hover:bg-[#007AFF] hover:text-white transition-colors z-20 border border-blue-100 dark:border-gray-600 shadow-sm"
                         title="Davet Kodu Üret"
                       >
                         <Plus size={16} strokeWidth={3} />
@@ -308,30 +308,30 @@ const MyGoal = () => {
       {/* --- YENİ HEDEF OLUŞTURMA MODALI --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">Yeni Hedef Oluştur</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 p-2 rounded-full">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Yeni Hedef Oluştur</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 p-2 rounded-full">
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleCreateGoal} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedef Adı</label>
-                <input required value={newGoal.title} onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Hedef Adı</label>
+                <input required value={newGoal.title} onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#007AFF] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedeflenen Tutar (₺)</label>
-                <input type="number" required value={newGoal.targetAmount} onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Hedeflenen Tutar (₺)</label>
+                <input type="number" required value={newGoal.targetAmount} onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#007AFF] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Hedef Bitiş Tarihi</label>
-                <input type="date" required value={newGoal.targetDate} onChange={(e) => setNewGoal({ ...newGoal, targetDate: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Hedef Bitiş Tarihi</label>
+                <input type="date" required value={newGoal.targetDate} onChange={(e) => setNewGoal({ ...newGoal, targetDate: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#007AFF] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Görsel Linki (İsteğe Bağlı)</label>
-                <input type="url" value={newGoal.image} onChange={(e) => setNewGoal({ ...newGoal, image: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#007AFF] outline-none" />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Görsel Linki (İsteğe Bağlı)</label>
+                <input type="url" value={newGoal.image} onChange={(e) => setNewGoal({ ...newGoal, image: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#007AFF] outline-none" />
               </div>
 
               <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded-xl font-medium flex items-start gap-2">
@@ -350,13 +350,13 @@ const MyGoal = () => {
       {/* --- KODA KATIL MODALI --- */}
       {isJoinModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-6 text-center animate-in fade-in zoom-in-95">
-            <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#007AFF]">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden p-6 text-center animate-in fade-in zoom-in-95">
+            <div className="bg-blue-50 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#007AFF]">
               <Key size={28} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Ortak Hedefe Katıl</h2>
-            <p className="text-sm text-gray-500 mb-6">Arkadaşından aldığın 6 haneli davet kodunu aşağıya gir.</p>
-            
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ortak Hedefe Katıl</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Arkadaşından aldığın 6 haneli davet kodunu aşağıya gir.</p>
+
             <form onSubmit={handleJoinGoal}>
               <input
                 type="text"
@@ -364,10 +364,10 @@ const MyGoal = () => {
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 placeholder="Örn: X9K2P1"
-                className="w-full text-center text-2xl tracking-[0.3em] font-bold px-4 py-4 rounded-xl border-2 border-gray-200 focus:border-[#007AFF] outline-none mb-6 uppercase"
+                className="w-full text-center text-2xl tracking-[0.3em] font-bold px-4 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#007AFF] outline-none mb-6 uppercase"
               />
               <div className="flex gap-3">
-                <button type="button" onClick={() => setIsJoinModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200">İptal</button>
+                <button type="button" onClick={() => setIsJoinModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">İptal</button>
                 <button type="submit" disabled={isSaving || joinCode.length < 4} className="flex-1 py-3 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 disabled:opacity-50">Katıl</button>
               </div>
             </form>
@@ -378,15 +378,15 @@ const MyGoal = () => {
       {/* --- KOD PAYLAŞMA (ÜRETİLDİ) MODALI --- */}
       {isShareModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center animate-in fade-in zoom-in-95">
-            <button onClick={() => setIsShareModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center animate-in fade-in zoom-in-95">
+            <button onClick={() => setIsShareModalOpen(false)} className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
               <X size={20} />
             </button>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Davet Kodu Üretildi!</h2>
-            <p className="text-sm text-gray-500 mb-6">Bu kodu arkadaşınla paylaşarak hedefi ortak takip edebilirsiniz. Kod 1 saat geçerlidir.</p>
-            
-            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-4 mb-6 relative">
-              <div className="text-4xl font-black tracking-widest text-gray-800">{shareCode}</div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Davet Kodu Üretildi!</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Bu kodu arkadaşınla paylaşarak hedefi ortak takip edebilirsiniz. Kod 1 saat geçerlidir.</p>
+
+            <div className="bg-gray-50 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-4 mb-6 relative">
+              <div className="text-4xl font-black tracking-widest text-gray-800 dark:text-white">{shareCode}</div>
             </div>
 
             <button onClick={copyToClipboard} className="w-full py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">

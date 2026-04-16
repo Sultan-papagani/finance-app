@@ -187,9 +187,35 @@ const handleSave = async (e) => {
   setTitle(""); setAmount(""); setDate(""); setNote(""); setIconSearch(""); setIsRecurring(false);
 };
 
-  const handleComplete = async (e, id) => {
+const handleComplete = async (e, id) => {
     e.stopPropagation();
-    const updatedPayments = payments.map(p => p.id === id ? { ...p, isCompleted: !p.isCompleted } : p);
+    
+    const updatedPayments = payments.map(p => {
+      if (p.id === id) {
+        // Eğer ödeme henüz tamamlanmamışsa (şu an öde tuşuna basılıyorsa)
+        if (!p.isCompleted) {
+          if (p.isRecurring) {
+            // Düzenli ödemeyse tarihi 1 ay ileri at (Örn: 11 Nisan -> 11 Mayıs)
+            const nextDate = new Date(p.date);
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            
+            return { 
+              ...p, 
+              date: nextDate.toISOString().split('T')[0],
+              isCompleted: false // Yeni ay için bekleme moduna (ödenmedi) geçiyor
+            };
+          } else {
+            // Tek seferlik ödemeyse direkt "Ödendi" (true) olarak işaretle
+            return { ...p, isCompleted: true };
+          }
+        } else {
+          // Eğer zaten ödenmiş bir şeyi yanlışlıkla geri alıyorsa
+          return { ...p, isCompleted: false };
+        }
+      }
+      return p;
+    });
+
     setPayments(updatedPayments);
     savePayments(updatedPayments).catch(err => console.error("Güncelleme hatası:", err));
   };
@@ -209,10 +235,10 @@ const handleSave = async (e) => {
   const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-24 md:pb-12 transition-all duration-300">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 pb-24 md:pb-12 transition-all duration-300">
       
       {/* ÜST BAŞLIK */}
-      <div className="bg-[#04009A] pt-12 pb-6 px-6 rounded-b-[40px] md:rounded-none md:pt-6 md:pb-6 relative shadow-lg z-10 flex items-center justify-center">
+      <div className="bg-blue-700 dark:bg-gray-900 pt-12 pb-6 px-6 rounded-b-[40px] md:rounded-none md:pt-6 md:pb-6 relative shadow-lg z-10 flex items-center justify-center">
         <button onClick={() => navigate("/")} className="absolute left-6 md:left-10 text-white bg-white/10 p-2.5 rounded-full hover:bg-white/20 transition-colors flex items-center gap-2">
           <LucideIcons.ArrowLeft size={20} />
           <span className="text-sm font-medium hidden md:block pr-2">Ana Sayfa</span>
@@ -224,46 +250,46 @@ const handleSave = async (e) => {
         
         {/* SOL KOLON: EKLEME FORMU */}
         <div className="lg:col-span-5">
-          <div className="bg-white rounded-[30px] p-6 md:p-8 shadow-xl border border-gray-100 sticky top-6">
-            <div className="flex bg-gray-100 p-1 rounded-2xl mb-8 shadow-inner">
-              <button type="button" onClick={() => setTransactionType("expense")} className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${transactionType === "expense" ? "bg-white text-red-500 shadow-md" : "text-gray-400 hover:text-gray-600"}`}>
+          <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-[30px] p-6 md:p-8 shadow-xl border border-gray-100 sticky top-6">
+            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-2xl mb-8 shadow-inner">
+              <button type="button" onClick={() => setTransactionType("expense")} className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${transactionType === "expense" ? "bg-white dark:bg-gray-600 text-red-500 shadow-md" : "text-gray-400 dark:text-gray-500 hover:text-gray-600"}`}>
                 <LucideIcons.TrendingDown size={18} /> Ödeme Ekle
               </button>
-              <button type="button" onClick={() => setTransactionType("income")} className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${transactionType === "income" ? "bg-white text-green-500 shadow-md" : "text-gray-400 hover:text-gray-600"}`}>
+              <button type="button" onClick={() => setTransactionType("income")} className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${transactionType === "income" ? "bg-white dark:bg-gray-600 text-green-500 shadow-md" : "text-gray-400 dark:text-gray-500 hover:text-gray-600"}`}>
                 <LucideIcons.TrendingUp size={18} /> Gelen Ödeme Ekle
               </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-5">
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                <input type="text" placeholder={transactionType === "expense" ? "Örn: Kira, Fatura..." : "Örn: Maaş, Prim..."} value={title} onChange={(e) => setTitle(e.target.value)} className="w-full text-gray-800 font-bold text-lg bg-transparent border-none outline-none focus:ring-0 placeholder:font-normal placeholder:text-gray-400" />
+              <div className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100">
+                <input type="text" placeholder={transactionType === "expense" ? "Örn: Kira, Fatura..." : "Örn: Maaş, Prim..."} value={title} onChange={(e) => setTitle(e.target.value)} className="w-full text-gray-800 dark:text-white font-bold text-lg bg-transparent border-none outline-none focus:ring-0 placeholder:font-normal placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <div className="flex gap-4">
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex-1 flex items-center">
+                <div className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100 flex-1 flex items-center">
                   <span className={`text-xl font-bold mr-1 ${transactionType === "income" ? "text-green-500" : "text-red-500"}`}>₺</span>
-                  <input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full text-gray-800 font-bold text-xl bg-transparent border-none outline-none focus:ring-0 placeholder:text-gray-400" />
+                  <input type="number" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full text-gray-800 dark:text-white font-bold text-xl bg-transparent border-none outline-none focus:ring-0 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 </div>
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex-1">
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full text-gray-800 font-bold text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-500" />
+                <div className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100 flex-1">
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full text-gray-800 dark:text-white font-bold text-sm bg-transparent border-none outline-none focus:ring-0 text-gray-500" />
                 </div>
               </div>
 
-              <div onClick={() => setIsRecurring(!isRecurring)} className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+              <div onClick={() => setIsRecurring(!isRecurring)} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-xl transition-colors ${isRecurring ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}><LucideIcons.RefreshCw size={20} className={isRecurring ? "animate-spin-slow" : ""} /></div>
-                  <span className="font-bold text-gray-800 text-sm">Düzenli Ödeme</span>
+                  <span className="font-bold text-gray-800 dark:text-gray-300 text-sm">Düzenli Ödeme</span>
                 </div>
                 <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${isRecurring ? 'bg-green-500' : 'bg-gray-300'}`}><div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${isRecurring ? 'translate-x-6' : 'translate-x-0'}`}></div></div>
               </div>
 
               {/* YENİ EKLENEN KART SEÇİCİ ALANI */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-3">
+              <div className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100 flex items-center gap-3">
                 <LucideIcons.Wallet size={20} className="text-gray-400" />
-                <select 
-                  value={selectedCardId} 
+                <select
+                  value={selectedCardId}
                   onChange={(e) => setSelectedCardId(e.target.value)}
-                  className="w-full bg-transparent border-none outline-none font-bold text-gray-700 cursor-pointer"
+                  className="w-full bg-transparent border-none outline-none font-bold text-gray-700 dark:text-gray-200 cursor-pointer"
                 >
                   {userCards.map(card => (
                     <option key={card.id} value={card.id}>{card.name} ({card.balance.toLocaleString('tr-TR')} ₺)</option>
@@ -272,25 +298,25 @@ const handleSave = async (e) => {
               </div>
 
               {/*  NOT KISMI BURADA  */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                <textarea 
-                  placeholder="İsteğe bağlı detay veya not ekle..." 
-                  value={note} 
-                  onChange={(e) => setNote(e.target.value)} 
-                  className="w-full text-gray-800 font-medium text-sm bg-transparent border-none outline-none focus:ring-0 resize-none h-16 placeholder:text-gray-400"
+              <div className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-2xl border border-gray-100">
+                <textarea
+                  placeholder="İsteğe bağlı detay veya not ekle..."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="w-full text-gray-800 dark:text-white font-medium text-sm bg-transparent border-none outline-none focus:ring-0 resize-none h-16 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 ></textarea>
               </div>
 
               {/* İKON VE RENK STÜDYOSU */}
-              <div className="p-4 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50">
+              <div className="p-4 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-3xl bg-gray-50/50 dark:bg-gray-800/50">
                 <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
                   {colorPalette.map((color) => (<button key={color.bg} type="button" onClick={() => setSelectedColor(color.text)} className={`w-8 h-8 rounded-full shrink-0 transition-all ${color.bg} ${selectedColor === color.text ? "ring-4 ring-offset-2 ring-gray-300 scale-110 shadow-md" : "opacity-70 hover:opacity-100"}`}></button>))}
                 </div>
-                <div className="flex items-center bg-white p-3 rounded-xl border border-gray-200 mb-3"><LucideIcons.Search size={18} className="text-gray-400 mr-2" /><input type="text" placeholder="İkon ara..." value={iconSearch} onChange={(e) => setIconSearch(e.target.value)} className="w-full text-sm outline-none bg-transparent" /></div>
+                <div className="flex items-center bg-white dark:bg-gray-700 dark:border-gray-600 p-3 rounded-xl border border-gray-200 mb-3"><LucideIcons.Search size={18} className="text-gray-400 mr-2" /><input type="text" placeholder="İkon ara..." value={iconSearch} onChange={(e) => setIconSearch(e.target.value)} className="w-full text-sm outline-none bg-transparent dark:text-white" /></div>
                 <div className="grid grid-cols-6 gap-2 max-h-32 overflow-y-auto pr-1">
                   {displayedIcons.map((iconName) => {
                     const IconComponent = LucideIcons[iconName];
-                    return (<button key={iconName} type="button" onClick={() => setSelectedIcon(iconName)} className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedIcon === iconName ? "bg-white shadow-md scale-110 z-10" : "hover:bg-gray-200/50"}`}><IconComponent size={24} className={selectedIcon === iconName ? selectedColor : "text-gray-400"} /></button>);
+                    return (<button key={iconName} type="button" onClick={() => setSelectedIcon(iconName)} className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedIcon === iconName ? "bg-white dark:bg-gray-700 shadow-md scale-110 z-10" : "hover:bg-gray-200/50 dark:hover:bg-gray-600/50"}`}><IconComponent size={24} className={selectedIcon === iconName ? selectedColor : "text-gray-400"} /></button>);
                   })}
                 </div>
               </div>
@@ -307,10 +333,10 @@ const handleSave = async (e) => {
         <div className="lg:col-span-7 mt-8 lg:mt-0 flex flex-col gap-6">
           
           {/* AY SEÇİCİ */}
-          <div className="flex items-center justify-between bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
-            <button onClick={handlePrevMonth} className="p-3 bg-gray-50 rounded-2xl hover:bg-[#007AFF] hover:text-white transition-all text-gray-500"><LucideIcons.ChevronLeft size={24} /></button>
-            <h2 className="text-2xl font-black text-gray-800 tracking-tight">{months[currentMonth]} {currentYear}</h2>
-            <button onClick={handleNextMonth} className="p-3 bg-gray-50 rounded-2xl hover:bg-[#007AFF] hover:text-white transition-all text-gray-500"><LucideIcons.ChevronRight size={24} /></button>
+          <div className="flex items-center justify-between bg-white dark:bg-gray-800 dark:border-gray-700 rounded-3xl p-4 shadow-sm border border-gray-100">
+            <button onClick={handlePrevMonth} className="p-3 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 rounded-2xl hover:bg-[#007AFF] hover:text-white transition-all text-gray-500"><LucideIcons.ChevronLeft size={24} /></button>
+            <h2 className="text-2xl font-black text-gray-800 dark:text-white tracking-tight">{months[currentMonth]} {currentYear}</h2>
+            <button onClick={handleNextMonth} className="p-3 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 rounded-2xl hover:bg-[#007AFF] hover:text-white transition-all text-gray-500"><LucideIcons.ChevronRight size={24} /></button>
           </div>
 
           {/* NET DURUM KARTI */}
@@ -328,10 +354,10 @@ const handleSave = async (e) => {
 
           {/* GRAFİK ANALİZİ */}
           {(totalExpense > 0 || totalIncome > 0) && (
-            <div className="bg-white rounded-[30px] p-6 shadow-xl border border-gray-100">
-              <div className="flex bg-gray-50 p-1 rounded-xl mb-6 border border-gray-100">
-                <button onClick={() => setAnalyticsTab("expense")} className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${analyticsTab === "expense" ? "bg-white text-red-500 shadow-sm" : "text-gray-400"}`}>Gider Analizi</button>
-                <button onClick={() => setAnalyticsTab("income")} className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${analyticsTab === "income" ? "bg-white text-green-500 shadow-sm" : "text-gray-400"}`}>Gelir Analizi</button>
+            <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-[30px] p-6 shadow-xl border border-gray-100">
+              <div className="flex bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-1 rounded-xl mb-6 border border-gray-100">
+                <button onClick={() => setAnalyticsTab("expense")} className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${analyticsTab === "expense" ? "bg-white dark:bg-gray-600 text-red-500 shadow-sm" : "text-gray-400 dark:text-gray-500"}`}>Gider Analizi</button>
+                <button onClick={() => setAnalyticsTab("income")} className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${analyticsTab === "income" ? "bg-white dark:bg-gray-600 text-green-500 shadow-sm" : "text-gray-400 dark:text-gray-500"}`}>Gelir Analizi</button>
               </div>
               <div className="space-y-4">
                 {activeAnalytics.slice(0, 4).map((item, index) => {
@@ -343,7 +369,7 @@ const handleSave = async (e) => {
                         <div className="flex items-center gap-2"><IconComp size={16} className={item.color} /> {item.name}</div>
                         <span>{item.amount.toLocaleString('tr-TR')} ₺ <span className="text-gray-400 text-xs font-medium ml-1">%{percent}</span></span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden"><div className={`h-full transition-all duration-1000 ${item.color.replace('text-', 'bg-')}`} style={{ width: `${percent}%` }}></div></div>
+                      <div className="w-full bg-gray-100 dark:bg-gray-600 rounded-full h-2 overflow-hidden"><div className={`h-full transition-all duration-1000 ${item.color.replace('text-', 'bg-')}`} style={{ width: `${percent}%` }}></div></div>
                     </div>
                   )
                 })}
@@ -352,21 +378,21 @@ const handleSave = async (e) => {
           )}
 
           {/* HAREKETLER LİSTESİ */}
-          <div className="bg-white rounded-[30px] p-6 shadow-xl border border-gray-100 flex-1">
-            <h2 className="text-xl font-bold text-[#04009A] mb-6 flex items-center gap-2"><LucideIcons.ListTodo size={24} /> Hareketler</h2>
+          <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-[30px] p-6 shadow-xl border border-gray-100 flex-1">
+            <h2 className="text-xl font-bold text-blue-700 dark:text-blue-400 mb-6 flex items-center gap-2"><LucideIcons.ListTodo size={24} /> Hareketler</h2>
             <div className="flex flex-col gap-3">
               {filteredPayments.map((payment) => (
-                <div key={payment.id} onClick={() => toggleExpand(payment.id)} className={`flex flex-col p-4 rounded-2xl bg-gray-50 border transition-all cursor-pointer group ${expandedId === payment.id ? "border-[#007AFF] shadow-md bg-white" : "border-transparent hover:border-gray-200"}`}>
+                <div key={payment.id} onClick={() => toggleExpand(payment.id)} className={`flex flex-col p-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border transition-all cursor-pointer group ${expandedId === payment.id ? "border-[#007AFF] shadow-md bg-white dark:bg-gray-700" : "border-transparent hover:border-gray-200"}`}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-sm border shrink-0 ${expandedId === payment.id ? "border-[#007AFF]" : "border-gray-100"}`}>{getDynamicIcon(payment, 24)}</div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className={`font-bold text-lg ${payment.isCompleted ? "line-through text-gray-400" : "text-gray-800"}`}>{payment.title}</h3>
+                          <h3 className={`font-bold text-lg ${payment.isCompleted ? "line-through text-gray-400" : "text-gray-800 dark:text-white"}`}>{payment.title}</h3>
                           {!payment.isCompleted && isUrgent(payment.date) && (<span className="animate-pulse bg-red-100 p-1 rounded-full"><LucideIcons.Flame size={14} className="text-red-500 fill-red-500" /></span>)}
                           {payment.isRecurring && <LucideIcons.RefreshCw size={12} className="text-blue-500" />}
                         </div>
-                        <p className="text-[11px] font-medium text-gray-400 mt-1">{formatDate(payment.date)}</p>
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mt-1">{formatDate(payment.date)}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between sm:justify-end gap-3">
@@ -380,8 +406,8 @@ const handleSave = async (e) => {
                     </div>
                   </div>
                   {expandedId === payment.id && (
-                    <div className="mt-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-2">
-                      <p className="text-sm font-medium text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-inner">{payment.note || "Not eklenmemiş."}</p>
+                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-500 animate-in fade-in slide-in-from-top-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-600 p-3 rounded-xl border border-gray-100 dark:border-gray-500 shadow-inner">{payment.note || "Not eklenmemiş."}</p>
                     </div>
                   )}
                 </div>
@@ -390,10 +416,10 @@ const handleSave = async (e) => {
           </div>
 
           {/* AYLIK GÖRÜNÜM TAKVİMİ */}
-          <div className="bg-white rounded-[30px] p-6 shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-[30px] p-6 shadow-xl border border-gray-100 overflow-hidden">
             <div className="flex items-center gap-2 mb-6">
-              <LucideIcons.CalendarRange size={20} className="text-[#04009A]" />
-              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Aylık Ödeme Takvimi</h3>
+              <LucideIcons.CalendarRange size={20} className="text-blue-700" />
+              <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Aylık Ödeme Takvimi</h3>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide select-none" ref={calendarRef}>
               {calendarDays.map((day) => {
@@ -403,9 +429,9 @@ const handleSave = async (e) => {
                 const isToday = new Date().toISOString().split('T')[0] === dateStr;
                 const dayName = weekdays[dayDate.getDay()];
                 return (
-                  <div key={day} className={`flex-shrink-0 w-16 h-28 rounded-3xl border-2 flex flex-col items-center justify-between py-3 transition-all duration-300 ${isToday ? 'bg-[#007AFF] border-[#007AFF] shadow-lg scale-105' : 'bg-gray-50 border-gray-100 hover:border-blue-200'}`}>
-                    <span className={`text-[10px] font-black uppercase ${isToday ? 'text-white/70' : 'text-gray-300'}`}>{dayName}</span>
-                    <span className={`text-xl font-black ${isToday ? 'text-white' : 'text-gray-700'}`}>{day}</span>
+                  <div key={day} className={`flex-shrink-0 w-16 h-28 rounded-3xl border-2 flex flex-col items-center justify-between py-3 transition-all duration-300 ${isToday ? 'bg-[#007AFF] border-[#007AFF] shadow-lg scale-105' : 'bg-gray-50 dark:bg-gray-700 border-gray-100 dark:border-gray-600 hover:border-blue-200'}`}>
+                    <span className={`text-[10px] font-black uppercase ${isToday ? 'text-white/70' : 'text-gray-300 dark:text-gray-400'}`}>{dayName}</span>
+                    <span className={`text-xl font-black ${isToday ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`}>{day}</span>
                     <div className="flex flex-col gap-1 items-center justify-center min-h-[30px]">
                       {dayPayments.length > 0 ? (
                         <div className="flex flex-col -space-y-1">
@@ -418,7 +444,7 @@ const handleSave = async (e) => {
                             );
                           })}
                         </div>
-                      ) : (<div className={`w-1 h-1 rounded-full ${isToday ? 'bg-white/30' : 'bg-gray-200'}`}></div>)}
+                      ) : (<div className={`w-1 h-1 rounded-full ${isToday ? 'bg-white/30' : 'bg-gray-200 dark:bg-gray-500'}`}></div>)}
                     </div>
                   </div>
                 );

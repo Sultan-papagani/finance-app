@@ -157,38 +157,38 @@ const GoldMarketsPage = () => {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 font-sans">
+    <div className="flex flex-col w-full min-h-screen bg-gray-50 dark:bg-gray-950 font-sans">
       
       {/* ÜST BAR */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-3 md:px-8 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6 shadow-sm">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 px-4 py-3 md:px-8 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6 shadow-sm dark:shadow-lg">
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <button onClick={() => navigate('/finance')} className="p-2 md:p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-gray-600 transition-colors">
+          <button onClick={() => navigate('/finance')} className="p-2 md:p-2.5 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-600 dark:text-gray-400 transition-colors">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl md:text-2xl font-black text-gray-900 flex items-center gap-2">
+          <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
             <Coins className="text-yellow-500" size={24} /> Altın Terminali
           </h1>
         </div>
 
         <div className="relative w-full md:w-72" ref={dropdownRef}>
-          <button 
+          <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="w-full flex items-center justify-between bg-gray-100 hover:bg-gray-200 border border-transparent rounded-2xl px-4 py-3 text-sm md:text-base font-bold text-[#04009A] transition-all"
+            className="w-full flex items-center justify-between bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-transparent rounded-2xl px-4 py-3 text-sm md:text-base font-bold text-blue-700 dark:text-blue-400 transition-all"
           >
             <span>{activeGold ? activeGold.name : 'Altın Seçiliyor...'}</span>
-            <ChevronDown size={18} className={`transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />
+            <ChevronDown size={18} className={`transition-transform duration-300`} />
           </button>
 
           {showDropdown && (
-            <div className="absolute top-[110%] left-0 w-full bg-white border border-gray-100 rounded-2xl shadow-xl z-[60] overflow-hidden">
+            <div className="absolute top-[110%] left-0 w-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl dark:shadow-2xl z-[60] overflow-hidden">
               {goldList.map((gold) => (
-                <div 
-                  key={gold.id} 
-                  onClick={() => { setSearchParams({ id: gold.id }); setShowDropdown(false); }} 
-                  className={`px-4 py-3 cursor-pointer flex items-center justify-between border-b border-gray-50 last:border-0 transition-colors ${activeGold?.id === gold.id ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
+                <div
+                  key={gold.id}
+                  onClick={() => { setSearchParams({ id: gold.id }); setShowDropdown(false); }}
+                  className={`px-4 py-3 cursor-pointer flex items-center justify-between border-b border-gray-50 dark:border-gray-800 last:border-0 transition-colors ${activeGold?.id === gold.id ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 >
-                  <div className={`text-sm font-black ${activeGold?.id === gold.id ? 'text-[#04009A]' : 'text-gray-700'}`}>{gold.name}</div>
-                  <ChevronRight size={14} className="text-gray-300" />
+                  <div className={`text-sm font-black ${activeGold?.id === gold.id ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-white'}`}>{gold.name}</div>
+                  <ChevronRight size={14} className="text-gray-300 dark:text-gray-600" />
                 </div>
               ))}
             </div>
@@ -200,8 +200,8 @@ const GoldMarketsPage = () => {
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-4 md:gap-6 relative">
         
         {loading && !activeGold && (
-          <div className="absolute inset-0 bg-gray-50/80 z-40 flex flex-col items-center justify-center min-h-[50vh]">
-            <RefreshCw className="animate-spin text-yellow-500 mb-4" size={32} />
+          <div className="absolute inset-0 bg-gray-50/80 dark:bg-gray-900/80 z-40 flex flex-col items-center justify-center min-h-[50vh]">
+            <RefreshCw className="animate-spin text-yellow-500 dark:text-yellow-400 mb-4" size={32} />
           </div>
         )}
 
@@ -209,7 +209,7 @@ const GoldMarketsPage = () => {
           <div className={`space-y-4 md:space-y-6 transition-opacity duration-500 ${loading ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
             
             {/* HERO KARTI */}
-            <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-8 shadow-sm dark:shadow-lg border border-gray-100 dark:border-gray-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
               <div className="absolute -right-10 -top-10 opacity-[0.03] pointer-events-none">
                 <Coins size={250} />
               </div>
@@ -224,24 +224,24 @@ const GoldMarketsPage = () => {
                       <Sparkles size={12} /> Kapalıçarşı
                     </span>
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-black tracking-tight text-[#04009A]">{activeGold.name}</h2>
+                  <h2 className="text-3xl md:text-4xl font-black tracking-tight text-blue-700 dark:text-blue-400">{activeGold.name}</h2>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 md:p-6 rounded-3xl border border-gray-100 w-full lg:w-auto relative z-10">
-                <div className="border-r border-gray-200 pr-4">
-                  <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Kuyumcu Alış (Bozdurma)</div>
-                  <div className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter">
+              <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 p-4 md:p-6 rounded-3xl border border-gray-100 dark:border-gray-700 w-full lg:w-auto relative z-10">
+                <div className="border-r border-gray-200 dark:border-gray-700 pr-4">
+                  <div className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Kuyumcu Alış (Bozdurma)</div>
+                  <div className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
                     ₺{activeGold.buy.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div className="pl-2">
-                  <div className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Kuyumcu Satış (Alma)</div>
-                  <div className="text-2xl md:text-3xl font-black text-[#10B981] tracking-tighter">
+                  <div className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Kuyumcu Satış (Alma)</div>
+                  <div className="text-2xl md:text-3xl font-black text-[#10B981] dark:text-green-400 tracking-tighter">
                     ₺{activeGold.sell.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
-                <div className={`col-span-2 flex items-center justify-center gap-1.5 font-bold mt-2 text-sm px-3 py-2 rounded-xl ${activeGold.change >= 0 ? 'bg-green-100/50 text-green-600' : 'bg-red-100/50 text-red-600'}`}>
+                <div className={`col-span-2 flex items-center justify-center gap-1.5 font-bold mt-2 text-sm px-3 py-2 rounded-xl ${activeGold.change >= 0 ? 'bg-green-100/50 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100/50 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
                   {activeGold.change >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                   24S Değişim: {activeGold.change > 0 ? '+' : ''}{activeGold.change}%
                 </div>
@@ -251,29 +251,29 @@ const GoldMarketsPage = () => {
             {/* ÜST KAT: GRAFİK VE KİŞİSEL ARAÇLAR */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               
-              <div ref={chartBoxRef} className={`lg:col-span-2 bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100 flex flex-col ${isFullScreen ? 'p-6 h-screen' : 'h-[400px] md:h-[480px]'}`}>
-                
+              <div ref={chartBoxRef} className={`lg:col-span-2 bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-8 shadow-sm dark:shadow-lg border border-gray-100 dark:border-gray-800 flex flex-col ${isFullScreen ? 'p-6 h-screen' : 'h-[400px] md:h-[480px]'}`}>
+
                 <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${isFullScreen ? 'mb-4' : 'mb-6'}`}>
-                  <h3 className="text-lg md:text-xl font-black text-gray-900 flex items-center gap-2">
-                    <BarChart2 className="text-[#EAB308]" size={24} /> 
+                  <h3 className="text-lg md:text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <BarChart2 className="text-[#EAB308]" size={24} />
                     {isProChart ? 'Pro Çizim Tahtası' : `${activeGold.name} Trendi`}
                   </h3>
                   
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button 
+                    <button
                       onClick={() => setIsProChart(!isProChart)}
-                      className={`px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2 flex-1 sm:flex-none justify-center ${isProChart ? 'bg-[#EAB308] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                      className={`px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2 flex-1 sm:flex-none justify-center ${isProChart ? 'bg-[#EAB308] text-white shadow-md dark:shadow-lg' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                     >
                       {isProChart ? <LineIcon size={16} /> : <PenTool size={16} />}
                       {isProChart ? 'Basit Görünüm' : 'Pro Çizim'}
                     </button>
 
-                    <button onClick={toggleFullScreen} className="p-2.5 rounded-xl font-bold text-sm transition-all bg-gray-100 text-[#04009A] hover:bg-[#EAB308] hover:text-white flex-shrink-0" title="Tam Ekran">
+                    <button onClick={toggleFullScreen} className="p-2.5 rounded-xl font-bold text-sm transition-all bg-gray-100 dark:bg-gray-800 text-blue-700 dark:text-blue-400 hover:bg-[#EAB308] dark:hover:bg-yellow-500 hover:text-white dark:hover:text-gray-900 flex-shrink-0" title="Tam Ekran">
                       <Maximize size={18} />
                     </button>
 
                     {!isProChart && (
-                      <div className="flex items-center bg-gray-100 p-1.5 rounded-xl justify-between ml-2">
+                      <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl justify-between ml-2">
                         {[
                           { id: '30', label: '1A' },
                           { id: '90', label: '3A' },
@@ -283,7 +283,7 @@ const GoldMarketsPage = () => {
                           <button 
                             key={range.id} 
                             onClick={() => setTimeRange(range.id)} 
-                            className={`px-3 py-1.5 rounded-lg font-bold text-xs md:text-sm transition-all text-center ${timeRange === range.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
+                            className={`px-3 py-1.5 rounded-lg font-bold text-xs md:text-sm transition-all text-center ${timeRange === range.id ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                           >
                             {range.label}
                           </button>
@@ -293,11 +293,11 @@ const GoldMarketsPage = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 w-full relative rounded-2xl overflow-hidden bg-white">
+                <div className="flex-1 w-full relative rounded-2xl overflow-hidden bg-white dark:bg-gray-800">
                   {chartLoading && !isProChart && (
-                     <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center">
+                     <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 z-20 flex flex-col items-center justify-center">
                        <RefreshCw className="animate-spin text-[#EAB308] mb-2" size={28} />
-                       <span className="text-xs font-bold text-gray-400">Trend Yükleniyor...</span>
+                       <span className="text-xs font-bold text-gray-400 dark:text-gray-500">Trend Yükleniyor...</span>
                      </div>
                   )}
 
@@ -347,13 +347,13 @@ const GoldMarketsPage = () => {
 
               {/* SAĞ: TRADE GÜNLÜĞÜ VE HESAPLAYICI */}
               <div className="space-y-4 md:space-y-6">
-                
-                <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100 relative">
+
+                <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-8 shadow-sm dark:shadow-lg border border-gray-100 dark:border-gray-800 relative">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg md:text-xl font-black text-gray-900 flex items-center gap-2">
+                    <h3 className="text-lg md:text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <BookOpen className="text-yellow-500" size={20} /> Altın Notlarım
                     </h3>
-                    <button onClick={() => setShowAllNotesModal(true)} className="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors flex items-center gap-1.5">
+                    <button onClick={() => setShowAllNotesModal(true)} className="text-xs font-bold text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors flex items-center gap-1.5">
                       <List size={14} /> Tüm Notlar
                     </button>
                   </div>
@@ -365,36 +365,36 @@ const GoldMarketsPage = () => {
                   <textarea
                     value={currentNote} onChange={(e) => setCurrentNote(e.target.value)}
                     placeholder={`${activeGold.name} alış hedeflerin veya piyasa yorumların...`}
-                    className="w-full h-28 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium text-gray-800 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all resize-none mb-4 custom-scrollbar"
+                    className="w-full h-28 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm font-medium text-gray-800 dark:text-white focus:bg-white dark:focus:bg-gray-700 focus:border-yellow-400 dark:focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all resize-none mb-4 custom-scrollbar"
                   />
-                  <button onClick={handleSaveNote} disabled={isSavingNote} className="w-full py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70">
+                  <button onClick={handleSaveNote} disabled={isSavingNote} className="w-full py-3 bg-gray-900 dark:bg-gray-800 hover:bg-black dark:hover:bg-gray-700 text-white rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 shadow-md dark:shadow-lg hover:shadow-lg disabled:opacity-70">
                     {isSavingNote ? <RefreshCw className="animate-spin" size={18} /> : <Save size={18} />}
                     {isSavingNote ? 'Kaydediliyor...' : 'Notu Kaydet'}
                   </button>
                 </div>
 
-                <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100">
-                  <h3 className="text-lg md:text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-8 shadow-sm dark:shadow-lg border border-gray-100 dark:border-gray-800">
+                  <h3 className="text-lg md:text-xl font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <Wallet className="text-yellow-500" size={20} /> Varlık Hesaplayıcı
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">
+                      <label className="text-[10px] md:text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
                         Elimdeki {activeGold.name} Adedi/Gramı
                       </label>
-                      <input 
-                        type="number" value={holdings} onChange={(e) => setHoldings(e.target.value)} placeholder="Örn: 5" 
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base md:text-lg font-black text-gray-900 focus:bg-white focus:border-yellow-400 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all placeholder-gray-300" 
+                      <input
+                        type="number" value={holdings} onChange={(e) => setHoldings(e.target.value)} placeholder="Örn: 5"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-base md:text-lg font-black text-gray-900 dark:text-white focus:bg-white dark:focus:bg-gray-700 focus:border-yellow-400 dark:focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all placeholder-gray-300 dark:placeholder-gray-500"
                       />
                     </div>
-                    <div className="bg-green-50/50 p-4 rounded-xl border border-green-100 flex flex-col gap-1">
+                    <div className="bg-green-50/50 dark:bg-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-800 flex flex-col gap-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs md:text-sm font-bold text-green-700 uppercase tracking-widest">Bozdurma Değeri</span>
-                        <span className="text-lg md:text-xl font-black text-green-600">
+                        <span className="text-xs md:text-sm font-bold text-green-700 dark:text-green-400 uppercase tracking-widest">Bozdurma Değeri</span>
+                        <span className="text-lg md:text-xl font-black text-green-600 dark:text-green-400">
                           {holdings && parseFloat(holdings) > 0 ? `₺${(parseFloat(holdings) * activeGold.buy).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₺0,00'}
                         </span>
                       </div>
-                      <div className="text-[10px] font-bold text-gray-400 text-right">Kuyumcu Alış (₺{activeGold.buy.toLocaleString('tr-TR', {maximumFractionDigits:0})}) üzerinden hesaplanır.</div>
+                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 text-right">Kuyumcu Alış (₺{activeGold.buy.toLocaleString('tr-TR', {maximumFractionDigits:0})}) üzerinden hesaplanır.</div>
                     </div>
                   </div>
                 </div>
@@ -403,11 +403,11 @@ const GoldMarketsPage = () => {
             </div>
 
 
-            <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-100 mt-4 md:mt-6">
-              <h3 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
-                <Info className="text-[#04009A]" size={20} /> Sistem Notu
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-5 md:p-8 shadow-sm dark:shadow-lg border border-gray-100 dark:border-gray-800 mt-4 md:mt-6">
+              <h3 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Info className="text-blue-700 dark:text-blue-400" size={20} /> Sistem Notu
               </h3>
-              <div className="text-gray-600 text-sm font-medium leading-relaxed bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+              <div className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed bg-blue-50/50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-800">
                 Görmüş olduğunuz alış ve satış fiyatları, küresel <strong>ONS Altın ($)</strong> ve anlık <strong>Dolar/TL</strong> kurları üzerinden milimetrik olarak has altın (24 Ayar) baz alınarak hesaplanmıştır. Kapalıçarşıdaki fiziki kuyumcu standartlarına uygun olarak ortalama <strong>%1.5 Alış/Satış makası</strong> uygulanmaktadır. Grafikler uluslararası Gram Altın (XAUTRYG) paritesini göstermektedir.
               </div>
             </div>
@@ -418,30 +418,30 @@ const GoldMarketsPage = () => {
 
 
       {showAllNotesModal && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowAllNotesModal(false)}>
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-[#04009A] text-white">
+        <div className="fixed inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowAllNotesModal(false)}>
+          <div className="bg-white dark:bg-gray-900 rounded-3xl w-full max-w-lg shadow-2xl dark:shadow-2xl overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-blue-700 dark:bg-blue-900 text-white">
               <h2 className="text-xl font-black flex items-center gap-2"><List size={20} /> Tüm Altın Notlarım</h2>
-              <button onClick={() => setShowAllNotesModal(false)} className="p-1 hover:bg-white/20 rounded-lg transition-colors"><X size={20} /></button>
+              <button onClick={() => setShowAllNotesModal(false)} className="p-1 hover:bg-white/20 dark:hover:bg-white/10 rounded-lg transition-colors"><X size={20} /></button>
             </div>
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-gray-50">
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-gray-50 dark:bg-gray-800">
               {Object.keys(userNotes).filter(k => userNotes[k].trim() !== '' && ['gram','ceyrek','yarim','tam','cumhuriyet','ata5','bilezik22'].includes(k)).length > 0 ? (
                 <div className="space-y-4">
                   {Object.entries(userNotes).map(([key, note]) => {
                     if (!note.trim() || !['gram','ceyrek','yarim','tam','cumhuriyet','ata5','bilezik22'].includes(key)) return null;
                     const goldName = goldList.find(g => g.id === key)?.name || key;
                     return (
-                      <div key={key} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="text-xs font-black text-yellow-600 uppercase tracking-widest mb-2 bg-yellow-50 border border-yellow-100 inline-block px-2 py-1 rounded-md">{goldName}</div>
-                        <p className="text-gray-700 text-sm font-medium whitespace-pre-wrap">{note}</p>
+                      <div key={key} className="bg-white dark:bg-gray-700 p-4 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm dark:shadow-lg">
+                        <div className="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest mb-2 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-100 dark:border-yellow-700 inline-block px-2 py-1 rounded-md">{goldName}</div>
+                        <p className="text-gray-700 dark:text-gray-200 text-sm font-medium whitespace-pre-wrap">{note}</p>
                       </div>
                     );
                   })}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 opacity-50">
-                  <BookOpen size={48} className="mb-4 text-gray-300" />
-                  <p className="font-bold text-gray-500">Henüz kaydedilmiş bir altın stratejin yok.</p>
+                  <BookOpen size={48} className="mb-4 text-gray-300 dark:text-gray-600" />
+                  <p className="font-bold text-gray-500 dark:text-gray-400">Henüz kaydedilmiş bir altın stratejin yok.</p>
                 </div>
               )}
             </div>

@@ -26,7 +26,7 @@ const BottomNav = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] z-50">
+    <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] z-50 transition-colors">
       <ul className="flex justify-around items-center h-16 px-2">
         
         {/* Ana Sayfa */}

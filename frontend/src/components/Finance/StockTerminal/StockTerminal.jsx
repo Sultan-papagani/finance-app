@@ -6,7 +6,7 @@ const StockTerminalComponent = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-gradient-to-r from-[#04009A] to-[#007AFF] rounded-[2.5rem] p-8 md:p-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 group">
+    <div className="bg-gradient-to-r from-[#04009A] dark:from-blue-900 to-[#007AFF] dark:to-blue-700 rounded-[2.5rem] p-8 md:p-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 group">
       
       {/* Arka plan süslemeleri  */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
@@ -27,9 +27,9 @@ const StockTerminalComponent = () => {
           Wall Street'in kalbine bağlanın. Binlerce hisse senedini gerçek zamanlı fiyatlar, hacim analizleri ve yapay zeka destekli piyasa momentumu ile anında keşfedin.
         </p>
         
-        <button 
+        <button
           onClick={() => navigate('/stock-terminal')}
-          className="bg-white text-[#04009A] hover:bg-blue-50 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_25px_rgba(0,0,0,0.2)] flex items-center gap-3 transform hover:-translate-y-1"
+          className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-[0_10px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_25px_rgba(0,0,0,0.2)] flex items-center gap-3 transform hover:-translate-y-1"
         >
           Terminali Başlat
           <ChevronRight size={20} className="transition-transform duration-300 group-hover:translate-x-1.5" />
