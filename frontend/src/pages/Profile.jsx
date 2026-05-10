@@ -272,8 +272,8 @@ const Profile = () => {
             </button>
 
             <button
-              onClick={() => {
-                if (window.confirm("Hesabinizdan guvenli cikis yapmak istediginize emin misiniz?")) {
+              onClick={async () => {
+                if (await window.confirm("Hesabinizdan guvenli cikis yapmak istediginize emin misiniz?")) {
                   localStorage.removeItem("token");
                   navigate("/");
                 }

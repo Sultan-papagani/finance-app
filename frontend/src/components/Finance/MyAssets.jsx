@@ -70,7 +70,7 @@ function MyAssets() {
     e.preventDefault();
     e.stopPropagation(); // 🔥 ÇOK ÖNEMLİ: Silme butonuna basınca detay sayfasına gitmeyi engeller!
 
-    if (!window.confirm("Bu varlığı silmek istediğinize emin misiniz?")) return;
+    if (!(await window.confirm("Bu varlığı silmek istediğinize emin misiniz?"))) return;
     
     try {
       const updatedAssets = assets.filter(a => a.id !== assetId);

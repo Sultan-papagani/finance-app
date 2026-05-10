@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import AppLayout from "./components/AppLayout/AppLayout";
+import CustomAlert from "./components/CustomAlert/CustomAlert";
 
 // Sayfalari ice aktariyoruz
 import Home from "./pages/Home";
@@ -36,6 +37,7 @@ function App() {
 
   return (
     <ThemeProvider>
+      <CustomAlert />
       <Router>
         <Routes>
           {/* --- ANA YONLENDIRME --- */}

@@ -222,7 +222,7 @@ const handleComplete = async (e, id) => {
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    if (window.confirm("Kaydı silmek istediğine emin misin?")) {
+    if (await window.confirm("Kaydı silmek istediğine emin misin?")) {
       const updatedPayments = payments.filter(p => p.id !== id);
       setPayments(updatedPayments);
       savePayments(updatedPayments).catch(err => console.error("Silme hatası:", err));

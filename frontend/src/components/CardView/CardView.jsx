@@ -133,7 +133,7 @@ function CardView() {
       alert("Sistemde her zaman en az 1 kartınız bulunmalıdır.");
       return;
     }
-    const isConfirmed = window.confirm("Bu kartı ve içindeki tüm işlem geçmişini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!");
+    const isConfirmed = await window.confirm("Bu kartı ve içindeki tüm işlem geçmişini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!");
     if (isConfirmed) {
       try {
         const updatedCards = cards.filter(c => c.id !== cardId);
