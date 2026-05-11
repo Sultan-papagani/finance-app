@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           ${isOpen ? "opacity-100 w-auto" : "opacity-0 w-0"}`}
         >
           <h1 className="text-lg font-semibold tracking-wider text-gray-50">
-            Finance<span className="text-blue-400 font-bold">App</span>
+            While<span className="text-blue-400 font-bold">Wallet</span>
           </h1>
         </div>
       </div>

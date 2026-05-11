@@ -80,7 +80,7 @@ function Index() {
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <Wallet className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">FinTakip</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">WhileWallet</span>
           </div>
 
           {/* Desktop nav links */}

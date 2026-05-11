@@ -114,7 +114,7 @@ const HomeHeader = () => {
           {/*  LOGO GRUBU */}
           <div className="flex items-center gap-2 shrink-0 group">
             <h1 className="text-sm font-black uppercase tracking-widest text-blue-700 dark:text-blue-400">
-              FINANCE APP
+              WHİLE WALLET
             </h1>
             <Wallet size={18} className="text-blue-700 dark:text-blue-400" strokeWidth={2.5} />
           </div>
