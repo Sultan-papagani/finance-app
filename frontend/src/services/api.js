@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://api.whilewallet.com';
 
 // Token'ı her seferinde taze olarak localStorage'dan çeken yardımcı fonksiyon
 const getHeaders = () => {

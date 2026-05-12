@@ -6,4 +6,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),
             tailwindcss()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.whilewallet.com',
+        changeOrigin: true,
+      },
+    },
+  },
 })
