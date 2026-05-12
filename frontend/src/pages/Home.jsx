@@ -15,12 +15,12 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 pb-24 transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-gray-900 pb-24 transition-colors duration-300 overflow-x-hidden">
 
       <HomeHeader />
 
-      <div className="flex justify-center mt-8">
-        <div className="max-w-6xl w-full px-6 space-y-6">
+      <div className="flex justify-center mt-4 sm:mt-8">
+        <div className="max-w-6xl w-full px-3 sm:px-6 space-y-6">
 
           {/*
           <div className="bg-white p-6 md:p-8 rounded-[30px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 relative overflow-hidden">

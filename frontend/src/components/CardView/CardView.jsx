@@ -167,30 +167,31 @@ function CardView() {
   const activeHistory = activeCard?.history ? activeCard.history.map(normalizeHistoryItem) : [];
 
   return (
-    <div className="w-full mb-12 relative overflow-hidden py-4">
-      
+    <div className="w-full mb-8 sm:mb-12 relative overflow-hidden py-4">
+
       {/* ÜST BAŞLIK VE EKLE BUTONU */}
-      <div className="flex items-center justify-between mb-8 px-4">
-        <h2 className="text-2xl font-black text-blue-700 dark:text-blue-400 flex items-center gap-2">
-          <LucideIcons.Wallet size={28} /> Cüzdanım
+      <div className="flex items-center justify-between mb-6 sm:mb-8 px-2 sm:px-4 gap-2">
+        <h2 className="text-xl sm:text-2xl font-black text-blue-700 dark:text-blue-400 flex items-center gap-2 min-w-0">
+          <LucideIcons.Wallet size={26} className="flex-shrink-0" />
+          <span className="truncate">Cüzdanım</span>
         </h2>
         {cards.length < 3 ? (
-          <button onClick={() => setIsModalOpen(true)} className="bg-[#007AFF] text-white p-2 rounded-xl hover:shadow-lg transition-all">
+          <button onClick={() => setIsModalOpen(true)} className="flex-shrink-0 bg-[#007AFF] text-white p-2 rounded-xl hover:shadow-lg transition-all">
             <LucideIcons.Plus size={20} strokeWidth={3} />
           </button>
         ) : (
-          <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 px-3 py-2 rounded-xl border border-gray-200 shadow-inner">
+          <span className="flex-shrink-0 text-[10px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 px-3 py-2 rounded-xl border border-gray-200 shadow-inner">
             Maksimum (3/3)
           </span>
         )}
       </div>
 
       {/* 3D KART CAROUSEL'İ */}
-      <div className="relative w-full flex items-center justify-center h-[240px] px-4 mb-4">
+      <div className="relative w-full flex items-center justify-center h-[220px] sm:h-[240px] px-2 sm:px-4 mb-4">
         {cards.length > 1 && (
           <>
-            <button onClick={handlePrev} className="absolute left-2 z-40 p-2 bg-white dark:bg-gray-800 dark:text-gray-400 shadow-md rounded-full text-gray-400 hover:text-[#007AFF] transition-all"><LucideIcons.ChevronLeft size={24} /></button>
-            <button onClick={handleNext} className="absolute right-2 z-40 p-2 bg-white dark:bg-gray-800 dark:text-gray-400 shadow-md rounded-full text-gray-400 hover:text-[#007AFF] transition-all"><LucideIcons.ChevronRight size={24} /></button>
+            <button onClick={handlePrev} className="absolute left-1 sm:left-2 z-40 p-1.5 sm:p-2 bg-white dark:bg-gray-800 dark:text-gray-400 shadow-md rounded-full text-gray-400 hover:text-[#007AFF] transition-all"><LucideIcons.ChevronLeft size={22} /></button>
+            <button onClick={handleNext} className="absolute right-1 sm:right-2 z-40 p-1.5 sm:p-2 bg-white dark:bg-gray-800 dark:text-gray-400 shadow-md rounded-full text-gray-400 hover:text-[#007AFF] transition-all"><LucideIcons.ChevronRight size={22} /></button>
           </>
         )}
 
@@ -201,48 +202,48 @@ function CardView() {
                 key={card.id}
                 id={`digital-card-${card.id}`}
                 onClick={() => handleCardClick(index)}
-                className={`absolute top-0 transition-all duration-500 ease-out flex flex-col justify-between p-6 rounded-[32px] w-[280px] md:w-[340px] h-[210px] border-2 text-white overflow-hidden ${card.color || "bg-blue-600"} ${getCardStyle(index)}`}
+                className={`absolute top-0 transition-all duration-500 ease-out flex flex-col justify-between p-5 sm:p-6 rounded-[28px] sm:rounded-[32px] w-[260px] sm:w-[280px] md:w-[340px] h-[200px] sm:h-[210px] border-2 text-white overflow-hidden ${card.color || "bg-blue-600"} ${getCardStyle(index)}`}
               >
                 <div className="absolute -top-12 -right-12 opacity-10 pointer-events-none">
                   <LucideIcons.Wifi size={180} strokeWidth={1} />
                 </div>
 
-                <div className="flex justify-between items-start relative z-10">
-                  <span className="font-bold tracking-widest text-sm uppercase opacity-80">{card.name}</span>
-                  <LucideIcons.Nfc size={32} className="opacity-90" />
+                <div className="flex justify-between items-start relative z-10 gap-2">
+                  <span className="font-bold tracking-widest text-xs sm:text-sm uppercase opacity-80 truncate">{card.name}</span>
+                  <LucideIcons.Nfc size={28} className="opacity-90 flex-shrink-0" />
                 </div>
 
-                <div className="relative z-10 flex items-end justify-between mt-auto">
-                  <div>
+                <div className="relative z-10 flex items-end justify-between mt-auto gap-2">
+                  <div className="min-w-0">
                     <p className="text-[10px] uppercase font-black tracking-widest opacity-60 mb-1">Toplam Bakiye</p>
-                    <h3 className="text-3xl font-black tracking-tighter">
-                      {card.balance.toLocaleString("tr-TR")} <span className="text-xl">₺</span>
+                    <h3 className="text-2xl sm:text-3xl font-black tracking-tighter truncate">
+                      {card.balance.toLocaleString("tr-TR")} <span className="text-lg sm:text-xl">₺</span>
                     </h3>
                   </div>
 
                   {/* KART BUTONLARI (Sadece merkezdeyken tıklanabilir) */}
-                  <div className="flex items-center gap-2" style={{ pointerEvents: index === currentIndex ? 'auto' : 'none' }} data-html2canvas-ignore="true">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0" style={{ pointerEvents: index === currentIndex ? 'auto' : 'none' }} data-html2canvas-ignore="true">
                     <button
                       onClick={(e) => { e.stopPropagation(); navigate(`/add-transaction?cardId=${card.id}`); }}
-                      className="p-2.5 rounded-xl bg-white/20 hover:bg-white/40 backdrop-blur-md transition-all"
+                      className="p-2 sm:p-2.5 rounded-xl bg-white/20 hover:bg-white/40 backdrop-blur-md transition-all"
                       title="İşlem Ekle"
                     >
-                      <LucideIcons.Plus size={20} className="text-white" />
+                      <LucideIcons.Plus size={18} className="text-white" />
                     </button>
                     <button
                       onClick={(e) => handleShareCard(e, card.id, card.name)}
-                      className="p-2.5 rounded-xl bg-white/20 hover:bg-white/40 backdrop-blur-md transition-all"
+                      className="p-2 sm:p-2.5 rounded-xl bg-white/20 hover:bg-white/40 backdrop-blur-md transition-all"
                       title="Kartı Paylaş"
                     >
-                      {isSharing ? <LucideIcons.Loader2 size={20} className="animate-spin" /> : <LucideIcons.Share2 size={20} />}
+                      {isSharing ? <LucideIcons.Loader2 size={18} className="animate-spin" /> : <LucideIcons.Share2 size={18} />}
                     </button>
                     {cards.length > 1 && (
                       <button
                         onClick={(e) => handleDeleteCard(e, card.id)}
-                        className="p-2.5 rounded-xl bg-red-500/80 hover:bg-red-600 backdrop-blur-md transition-all shadow-md"
+                        className="p-2 sm:p-2.5 rounded-xl bg-red-500/80 hover:bg-red-600 backdrop-blur-md transition-all shadow-md"
                         title="Kartı Sil"
                       >
-                        <LucideIcons.Trash2 size={20} className="text-white" />
+                        <LucideIcons.Trash2 size={18} className="text-white" />
                       </button>
                     )}
                   </div>
@@ -255,17 +256,17 @@ function CardView() {
 
       {/* 🔥 YENİ: DİNAMİK HESAP GEÇMİŞİ LİSTESİ 🔥 */}
       {activeCard && (
-        <div className="max-w-4xl mx-auto px-4 mt-6 animate-in fade-in duration-500">
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="text-lg font-black text-gray-800 dark:text-white flex items-center gap-2">
-              <LucideIcons.History className="text-[#007AFF]" size={20} />
-              {activeCard.name} Geçmişi
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 mt-6 animate-in fade-in duration-500">
+          <div className="flex items-center justify-between mb-4 px-1 sm:px-2">
+            <h3 className="text-base sm:text-lg font-black text-gray-800 dark:text-white flex items-center gap-2 min-w-0">
+              <LucideIcons.History className="text-[#007AFF] flex-shrink-0" size={20} />
+              <span className="truncate">{activeCard.name} Geçmişi</span>
             </h3>
           </div>
 
           <div className="flex flex-col gap-3">
             {activeHistory.length === 0 ? (
-              <div className="bg-white dark:bg-gray-800 dark:border-gray-700 p-8 rounded-[24px] border border-gray-100 text-center shadow-sm">
+              <div className="bg-white dark:bg-gray-800 dark:border-gray-700 p-6 sm:p-8 rounded-[24px] border border-gray-100 text-center shadow-sm">
                 <LucideIcons.SearchX size={40} className="mx-auto text-gray-300 mb-3" />
                 <p className="text-gray-500 dark:text-gray-500 font-bold text-sm">Henüz bu kartta bir işlem yapılmamış.</p>
               </div>
@@ -275,17 +276,17 @@ function CardView() {
                 const isIncome = item.type === "income";
 
                 return (
-                  <div key={item.id} className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500/30 rounded-2xl shadow-sm border border-gray-100 hover:border-[#007AFF]/30 transition-all group">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-full flex items-center justify-center transition-colors ${isIncome ? "bg-green-50 text-green-500 group-hover:bg-green-100" : "bg-red-50 text-red-500 group-hover:bg-red-100"}`}>
-                        <IconComp size={20} />
+                  <div key={item.id} className="flex justify-between items-center gap-2 p-3 sm:p-4 bg-white dark:bg-gray-800 dark:border-gray-700 dark:hover:border-blue-500/30 rounded-2xl shadow-sm border border-gray-100 hover:border-[#007AFF]/30 transition-all group">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      <div className={`flex-shrink-0 p-2.5 sm:p-3 rounded-full flex items-center justify-center transition-colors ${isIncome ? "bg-green-50 text-green-500 group-hover:bg-green-100" : "bg-red-50 text-red-500 group-hover:bg-red-100"}`}>
+                        <IconComp size={18} />
                       </div>
-                      <div>
-                        <p className="font-bold text-gray-800 dark:text-white text-sm md:text-base leading-tight">{item.label}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-gray-800 dark:text-white text-sm md:text-base leading-tight truncate">{item.label}</p>
                         <p className="text-[11px] text-gray-400 font-medium mt-0.5">{item.date}</p>
                       </div>
                     </div>
-                    <span className={`font-black text-base md:text-lg whitespace-nowrap ${isIncome ? "text-green-500" : "text-gray-900 dark:text-gray-100"}`}>
+                    <span className={`font-black text-sm sm:text-base md:text-lg whitespace-nowrap flex-shrink-0 ${isIncome ? "text-green-500" : "text-gray-900 dark:text-gray-100"}`}>
                       {isIncome ? "+" : "-"}{item.amount.toLocaleString("tr-TR")} ₺
                     </span>
                   </div>

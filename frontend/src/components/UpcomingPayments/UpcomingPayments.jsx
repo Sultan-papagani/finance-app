@@ -39,7 +39,7 @@ const UpcomingPayments = () => {
   const netBalance = totalIncome - totalExpense;
 
   return (
-    <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-3xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] mb-6 border border-gray-100 relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 dark:border-gray-700 rounded-3xl p-4 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] mb-6 border border-gray-100 relative overflow-hidden">
 
       <LucideIcons.ArrowRightLeft size={120} className="absolute -top-6 -right-6 text-gray-50 dark:text-gray-700 opacity-50 pointer-events-none" />
 
@@ -81,26 +81,26 @@ const UpcomingPayments = () => {
           <p className="text-gray-400 dark:text-gray-500 text-center py-4 text-sm">Bekleyen işlem bulunmuyor.</p>
         ) : (
           payments.slice(0, 4).map((payment) => (
-            <Link to="/add-payment" key={payment.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-100 group">
+            <Link to="/add-payment" key={payment.id} className="flex items-center justify-between gap-2 p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-100 group">
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-700 dark:border-gray-600 border border-gray-100 shadow-sm group-hover:bg-white transition-colors">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                <div className="flex-shrink-0 flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gray-50 dark:bg-gray-700 dark:border-gray-600 border border-gray-100 shadow-sm group-hover:bg-white transition-colors">
                   {getDynamicIcon(payment)}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-bold text-gray-800 dark:text-white text-base">{payment.title}</h3>
-                    {payment.isRecurring && <LucideIcons.RefreshCw size={12} className="text-blue-500" title="Düzenli" />}
+                    <h3 className="font-bold text-gray-800 dark:text-white text-sm sm:text-base truncate">{payment.title}</h3>
+                    {payment.isRecurring && <LucideIcons.RefreshCw size={12} className="flex-shrink-0 text-blue-500" title="Düzenli" />}
                   </div>
                   <p className="text-xs font-medium text-gray-400 mt-0.5">{formatDate(payment.date)}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className={`font-bold text-lg ${payment.transactionType === 'income' ? 'text-green-500' : 'text-red-500'}`}>
+              <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+                <span className={`font-bold text-sm sm:text-lg whitespace-nowrap ${payment.transactionType === 'income' ? 'text-green-500' : 'text-red-500'}`}>
                   {payment.transactionType === 'income' ? '+' : '-'}{Number(payment.amount).toLocaleString('tr-TR')} ₺
                 </span>
-                <LucideIcons.ChevronRight size={18} className="text-gray-300 group-hover:text-[#007AFF] group-hover:translate-x-1 transition-all" />
+                <LucideIcons.ChevronRight size={18} className="hidden sm:block text-gray-300 group-hover:text-[#007AFF] group-hover:translate-x-1 transition-all" />
               </div>
 
             </Link>
