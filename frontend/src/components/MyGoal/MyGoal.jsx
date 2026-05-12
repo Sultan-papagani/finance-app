@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { fetchGoals, saveGoals } from "../../services/goalService";
 import { apiGet } from "../../services/api";
+import { API_BASE_URL } from "../../config/api";
 
 const MyGoal = () => {
   const [goals, setGoals] = useState([]);
@@ -49,7 +50,7 @@ const MyGoal = () => {
         const token = localStorage.getItem('token') || localStorage.getItem('jwt');
         const headers = token ? { 'Authorization': token, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
         
-        const res = await fetch('http://localhost:3000/api/friends/shared-goals', { headers });
+        const res = await fetch(`${API_BASE_URL}/api/friends/shared-goals`, { headers });
         if(res.ok) {
           const json = await res.json();
           // Ortak hedefleri ayırt edebilmek için isShared bayrağı ekliyoruz
@@ -130,7 +131,7 @@ const MyGoal = () => {
     setIsSaving(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('jwt');
-      const res = await fetch('http://localhost:3000/api/friends/join', {
+      const res = await fetch(`${API_BASE_URL}/api/friends/join`, {
         method: 'POST',
         headers: {
           'Authorization': token,
@@ -160,7 +161,7 @@ const MyGoal = () => {
     e.stopPropagation(); // Kartın içine tıklanmasını engelle
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('jwt');
-      const res = await fetch('http://localhost:3000/api/friends/generate-code', {
+      const res = await fetch(`${API_BASE_URL}/api/friends/generate-code`, {
         method: 'POST',
         headers: {
           'Authorization': token,

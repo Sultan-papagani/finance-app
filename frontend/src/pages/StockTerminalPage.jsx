@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Activity, TrendingUp, TrendingDown, BarChart2, PieChart as PieIcon, AlertCircle, RefreshCw, ArrowLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
+import { API_BASE_URL } from '../config/api';
 
 //  DÜNYANIN EN BÜYÜK 10 BORSASI 
 const MARKETS = [
@@ -46,7 +47,7 @@ const StockTerminalPage = () => {
     setSearchParams({ symbol: symbolToFetch.toUpperCase() });
 
     try {
-      const res = await fetch(`http://localhost:3000/api/stock/${symbolToFetch}`);
+      const res = await fetch(`${API_BASE_URL}/api/stock/${symbolToFetch}`);
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) throw new Error("Sunucu çöktü, lütfen node server.js'i yeniden başlatın.");
       
@@ -63,7 +64,7 @@ const StockTerminalPage = () => {
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/search/${searchTerm}`);
+        const res = await fetch(`${API_BASE_URL}/api/search/${searchTerm}`);
         if (res.headers.get("content-type")?.includes("application/json")) {
           const data = await res.json();
           let filteredData = Array.isArray(data) ? data : [];

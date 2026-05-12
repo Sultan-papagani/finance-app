@@ -1,4 +1,6 @@
-const BASE_URL = 'https://api.whilewallet.com';
+import { API_BASE_URL } from '../config/api';
+
+const BASE_URL = API_BASE_URL;
 
 // Token'ı her seferinde taze olarak localStorage'dan çeken yardımcı fonksiyon
 const getHeaders = () => {

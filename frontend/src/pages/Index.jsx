@@ -290,7 +290,7 @@ function Index() {
       <section id="neden" className="py-24 px-6 bg-blue-600">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 space-y-3">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white">Neden FinTakip?</h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white">Neden WhileWallet?</h2>
             <p className="text-blue-100 font-medium text-lg max-w-xl mx-auto">
               Sade, güvenli ve tamamen sizin için tasarlandı.
             </p>
@@ -344,7 +344,7 @@ function Index() {
                 <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                   <Wallet className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-bold text-lg">FinTakip</span>
+                <span className="text-white font-bold text-lg">WhileWallet</span>
               </div>
               <p className="text-sm leading-relaxed font-medium">
                 Paranızı akıllıca yönetmek için sade ve güvenilir bir araç.
@@ -385,7 +385,7 @@ function Index() {
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 text-sm font-medium">
-            <p>© 2026 FinTakip. Tüm hakları saklıdır.</p>
+            <p>© 2026 WhileWallet. Tüm hakları saklıdır.</p>
             <p>Türkiye 🇹🇷 için yapıldı</p>
           </div>
         </div>

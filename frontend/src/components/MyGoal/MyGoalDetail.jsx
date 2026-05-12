@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { fetchGoals, saveGoals } from "../../services/goalService";
 import { apiGet, apiPost } from "../../services/api";
+import { API_BASE_URL } from "../../config/api";
 
 // Avatar color pool for contributors
 const AVATAR_COLORS = [
@@ -71,7 +72,7 @@ const MyGoalDetail = () => {
           const headers = token
             ? { Authorization: token, "Content-Type": "application/json" }
             : { "Content-Type": "application/json" };
-          const res = await fetch("http://localhost:3000/api/friends/shared-goals", { headers });
+          const res = await fetch(`${API_BASE_URL}/api/friends/shared-goals`, { headers });
           if (res.ok) {
             const json = await res.json();
             sharedGoals = (json.sharedGoals || []).map((g) => ({ ...g, isShared: true }));
@@ -127,7 +128,7 @@ const MyGoalDetail = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:3000/api/friends/shared-goals/${goal.id}/transaction`,
+          `${API_BASE_URL}/api/friends/shared-goals/${goal.id}/transaction`,
           {
             method: "POST",
             headers: { Authorization: token, "Content-Type": "application/json" },
@@ -229,7 +230,7 @@ const MyGoalDetail = () => {
     if (goal.isShared) return alert("Başkasının ortak hedefine kod üretemezsin!");
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3000/api/friends/generate-code", {
+      const res = await fetch(`${API_BASE_URL}/api/friends/generate-code`, {
         method: "POST",
         headers: { Authorization: token, "Content-Type": "application/json" },
         body: JSON.stringify({ goalId: goal.id }),

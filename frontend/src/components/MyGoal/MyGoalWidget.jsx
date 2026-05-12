@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Target, ChevronRight, Loader2, Users } from "lucide-react";
 import { fetchGoals } from "../../services/goalService";
 import { apiGet } from "../../services/api";
+import { API_BASE_URL } from "../../config/api";
 
 const MyGoalWidget = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const MyGoalWidget = () => {
           const headers = token
             ? { Authorization: token, "Content-Type": "application/json" }
             : { "Content-Type": "application/json" };
-          const res = await fetch("http://localhost:3000/api/friends/shared-goals", { headers });
+          const res = await fetch(`${API_BASE_URL}/api/friends/shared-goals`, { headers });
           if (res.ok) {
             const json = await res.json();
             sharedGoals = (json.sharedGoals || []).map((g) => ({ ...g, isShared: true }));

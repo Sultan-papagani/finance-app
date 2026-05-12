@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 function Login() {
   const [isRegister, setIsRegister] = useState(false);
@@ -42,7 +43,7 @@ function Login() {
         ? { username, email, password }
         : { email, password };
 
-      const response = await fetch(`http://localhost:3000${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ function Login() {
       if (response.ok) {
         if (isRegister) {
           // Kayıt başarılı oldu, arka planda otomatik giriş yapalım
-          const loginResponse = await fetch("http://localhost:3000/login", {
+          const loginResponse = await fetch(`${API_BASE_URL}/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
