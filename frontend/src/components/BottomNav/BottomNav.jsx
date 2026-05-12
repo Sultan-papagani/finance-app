@@ -31,8 +31,8 @@ const BottomNav = () => {
         
         {/* Ana Sayfa */}
         <li className="flex-1 flex justify-center">
-          <Link to="/" className={getNavStyle('/')}>
-            <Home size={26} strokeWidth={2.5} fill={isActive('/') ? "white" : "none"} />
+          <Link to="/home" className={getNavStyle('/home')}>
+            <Home size={26} strokeWidth={2.5} fill={isActive('/home') ? "white" : "none"} />
           </Link>
         </li>
 

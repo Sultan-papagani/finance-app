@@ -69,11 +69,11 @@ function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-[500]">
+    <div className="min-h-screen overflow-x-hidden bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-[500]">
 
       {/* ── NAV ── */}
-      <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-100 dark:border-gray-800">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
           <div className="flex items-center gap-2 select-none">
@@ -108,79 +108,86 @@ function Index() {
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
+            type="button"
+            aria-label={menuOpen ? "Menüyü kapat" : "Menüyü aç"}
+            aria-expanded={menuOpen}
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700 transition-colors"
+            onClick={() => setMenuOpen((v) => !v)}
           >
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
         {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 space-y-3">
-            <a href="#ozellikler" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 py-2" onClick={() => setMenuOpen(false)}>Özellikler</a>
-            <a href="#neden" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 py-2" onClick={() => setMenuOpen(false)}>Neden Biz?</a>
-            <a href="#footer" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 py-2" onClick={() => setMenuOpen(false)}>Hakkında</a>
+        <div
+          className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${
+            menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-6 py-4 space-y-2">
+            <a href="#ozellikler" className="block text-base font-semibold text-gray-700 dark:text-gray-200 py-2.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setMenuOpen(false)}>Özellikler</a>
+            <a href="#neden" className="block text-base font-semibold text-gray-700 dark:text-gray-200 py-2.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setMenuOpen(false)}>Neden Biz?</a>
+            <a href="#footer" className="block text-base font-semibold text-gray-700 dark:text-gray-200 py-2.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setMenuOpen(false)}>Hakkında</a>
             <div className="flex gap-3 pt-2">
-              <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+              <Link to="/login" onClick={() => setMenuOpen(false)} className="flex-1 text-center py-2.5 text-sm font-semibold text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-500 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
                 Giriş Yap
               </Link>
-              <Link to="/login" className="flex-1 text-center py-2.5 text-sm font-semibold text-white bg-blue-600 dark:bg-blue-700 rounded-full hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors">
+              <Link to="/login" onClick={() => setMenuOpen(false)} className="flex-1 text-center py-2.5 text-sm font-semibold text-white bg-blue-600 dark:bg-blue-700 rounded-full hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors">
                 Kayıt Ol
               </Link>
             </div>
           </div>
-        )}
+        </div>
       </header>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden pt-20 pb-28 px-6">
+      <section className="relative overflow-hidden pt-12 sm:pt-20 pb-20 sm:pb-28 px-4 sm:px-6">
         {/* Decorative blob */}
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-blue-100 rounded-full blur-3xl opacity-50 pointer-events-none" />
-        <div className="absolute -bottom-16 -left-24 w-[350px] h-[350px] bg-blue-50 rounded-full blur-2xl opacity-60 pointer-events-none" />
+        <div className="absolute -top-20 sm:-top-32 -right-20 sm:-right-32 w-[280px] sm:w-[500px] h-[280px] sm:h-[500px] bg-blue-100 rounded-full blur-3xl opacity-50 pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 sm:-left-24 w-[200px] sm:w-[350px] h-[200px] sm:h-[350px] bg-blue-50 rounded-full blur-2xl opacity-60 pointer-events-none" />
 
-        <div className="relative max-w-4xl mx-auto text-center space-y-7">
-          <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-semibold px-4 py-1.5 rounded-full border border-blue-100 dark:border-blue-800">
+        <div className="relative max-w-4xl mx-auto text-center space-y-6 sm:space-y-7">
+          <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 rounded-full border border-blue-100 dark:border-blue-800">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             Paranızın kontrolü artık sizde
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-gray-900 dark:text-white px-2">
             Finanslarınızı{" "}
             <span className="text-blue-600 dark:text-blue-400">akıllıca</span>{" "}
             yönetin
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed px-2">
             Kripto, döviz, altın, harcama ve tasarruf hedeflerinizi tek bir uygulamada takip edin.
             Banka bağlantısı yok — sadece siz ve paranız.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-3 px-4 sm:px-0">
             <Link
               to="/login"
-              className="flex items-center gap-2 px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all hover:-translate-y-0.5 text-base"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all hover:-translate-y-0.5 text-base"
             >
               Hemen Başla <ArrowRight className="w-4 h-4" />
             </Link>
             <a
               href="#ozellikler"
-              className="flex items-center gap-2 px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-base"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-base"
             >
               Özellikleri Gör <ChevronRight className="w-4 h-4" />
             </a>
           </div>
 
           {/* Mini stats */}
-          <div className="flex flex-wrap justify-center gap-8 pt-8 text-center">
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 pt-6 sm:pt-8 text-center">
             {[
               { value: "6+", label: "Özellik" },
               { value: "Ücretsiz", label: "Kullanım" },
               { value: "Türkçe", label: "Tam destek" },
             ].map((s) => (
               <div key={s.label}>
-                <div className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">{s.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 font-semibold mt-0.5">{s.label}</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-blue-600 dark:text-blue-400">{s.value}</div>
+                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-semibold mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
@@ -188,12 +195,12 @@ function Index() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="ozellikler" className="py-24 px-6 bg-gray-50 dark:bg-gray-800">
+      <section id="ozellikler" className="py-16 sm:py-24 px-4 sm:px-6 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 space-y-3">
-            <p className="text-blue-600 dark:text-blue-400 font-semibold text-sm uppercase tracking-widest">Özellikler</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">Her şey tek yerde</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-xl mx-auto">
+          <div className="text-center mb-10 sm:mb-16 space-y-3">
+            <p className="text-blue-600 dark:text-blue-400 font-semibold text-xs sm:text-sm uppercase tracking-widest">Özellikler</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white">Her şey tek yerde</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg font-medium max-w-xl mx-auto px-2">
               Paranızı yönetmek için ihtiyacınız olan her araç, sade ve kullanışlı bir arayüzde.
             </p>
           </div>
@@ -216,25 +223,25 @@ function Index() {
       </section>
 
       {/* ── GOAL HIGHLIGHT ── */}
-      <section className="py-24 px-6 bg-white dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <p className="text-blue-600 dark:text-blue-400 font-semibold text-sm uppercase tracking-widest">Öne Çıkan Özellik</p>
-            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
-              Hayalleriniz için <br />birlikte birikim yapın
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-white dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 sm:gap-12 items-center">
+          <div className="space-y-5 sm:space-y-6 text-center md:text-left">
+            <p className="text-blue-600 dark:text-blue-400 font-semibold text-xs sm:text-sm uppercase tracking-widest">Öne Çıkan Özellik</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-tight">
+              Hayalleriniz için <br className="hidden sm:inline" />birlikte birikim yapın
             </h2>
             <p className="text-gray-600 dark:text-gray-400 font-medium text-lg leading-relaxed">
               Yeni telefon, tatil, araba — istediğiniz hedefe özel birikim hesabı oluşturun.
               Bir fotoğraf ekleyin, hedef tutarı belirleyin ve dilediğiniz kişiyi davet ederek
               birlikte tasarruf yapın.
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-left max-w-md mx-auto md:mx-0">
               {[
                 "Hedeflerinize özel görsel ekleyin",
                 "Arkadaş ve aile ile ortak hedef oluşturun",
                 "İlerlemenizi anlık takip edin",
               ].map((item) => (
-                <li key={item} className="flex items-center gap-3 text-gray-700 dark:text-gray-300 font-semibold">
+                <li key={item} className="flex items-center gap-3 text-gray-700 dark:text-gray-300 font-semibold text-sm sm:text-base">
                   <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                     <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                   </span>
@@ -287,19 +294,19 @@ function Index() {
       </section>
 
       {/* ── WHY US ── */}
-      <section id="neden" className="py-24 px-6 bg-blue-600">
+      <section id="neden" className="py-16 sm:py-24 px-4 sm:px-6 bg-blue-600">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14 space-y-3">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white">Neden WhileWallet?</h2>
-            <p className="text-blue-100 font-medium text-lg max-w-xl mx-auto">
+          <div className="text-center mb-10 sm:mb-14 space-y-3">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Neden WhileWallet?</h2>
+            <p className="text-blue-100 font-medium text-base sm:text-lg max-w-xl mx-auto px-2">
               Sade, güvenli ve tamamen sizin için tasarlandı.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             {WHY_US.map(({ title, desc }) => (
-              <div key={title} className="bg-white/10 backdrop-blur rounded-2xl p-7 border border-white/20 text-white hover:bg-white/20 transition-colors">
-                <h3 className="text-xl font-bold mb-3">{title}</h3>
-                <p className="text-blue-100 font-medium leading-relaxed">{desc}</p>
+              <div key={title} className="bg-white/10 backdrop-blur rounded-2xl p-6 sm:p-7 border border-white/20 text-white hover:bg-white/20 transition-colors">
+                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">{title}</h3>
+                <p className="text-blue-100 font-medium leading-relaxed text-sm sm:text-base">{desc}</p>
               </div>
             ))}
           </div>
@@ -307,25 +314,25 @@ function Index() {
       </section>
 
       {/* ── BOTTOM CTA ── */}
-      <section className="py-24 px-6 bg-white dark:bg-gray-900 text-center">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-white dark:bg-gray-900 text-center">
+        <div className="max-w-2xl mx-auto space-y-5 sm:space-y-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
             Finansal özgürlüğünüz <br />
             <span className="text-blue-600 dark:text-blue-400">bir adım uzakta</span>
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 font-medium text-lg">
+          <p className="text-gray-500 dark:text-gray-400 font-medium text-base sm:text-lg">
             Hemen ücretsiz hesap oluşturun ve paranızı kontrol altına alın.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-2">
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5 text-base"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5 text-base"
             >
               Ücretsiz Kayıt Ol <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-base"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-full border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-base"
             >
               Giriş Yap
             </Link>
@@ -334,9 +341,9 @@ function Index() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer id="footer" className="bg-gray-900 text-gray-400 pt-16 pb-8 px-6">
+      <footer id="footer" className="bg-gray-900 text-gray-400 pt-12 sm:pt-16 pb-8 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-gray-800">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 pb-10 sm:pb-12 border-b border-gray-800">
 
             {/* Brand */}
             <div className="col-span-2 md:col-span-1 space-y-4">

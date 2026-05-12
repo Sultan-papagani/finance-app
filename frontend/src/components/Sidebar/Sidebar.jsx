@@ -50,11 +50,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <nav className="px-3">
         <ul className="space-y-2">
           <NavItem
-            to="/"
+            to="/home"
             icon={<Home size={22} />}
             label="Ana Sayfa"
             isOpen={isOpen}
-            isActive={isActive("/")}
+            isActive={isActive("/home")}
           />
           <NavItem
             to="/search"
