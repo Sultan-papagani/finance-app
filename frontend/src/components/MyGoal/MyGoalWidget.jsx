@@ -5,6 +5,10 @@ import { fetchGoals } from "../../services/goalService";
 import { apiGet } from "../../services/api";
 import { API_BASE_URL } from "../../config/api";
 
+// Resmi olmayan veya linki kirik olan hedefler icin yedek gorsel
+const FALLBACK_GOAL_IMAGE =
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1000";
+
 const MyGoalWidget = () => {
   const navigate = useNavigate();
   const [goals, setGoals]   = useState([]);
@@ -100,8 +104,12 @@ const MyGoalWidget = () => {
 
                 <div className="w-full h-48 sm:h-72 md:h-96 shrink-0 relative overflow-hidden bg-gray-50 dark:bg-gray-700">
                   <img
-                    src={goal.image}
+                    src={goal.image || FALLBACK_GOAL_IMAGE}
                     alt={goal.title}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = FALLBACK_GOAL_IMAGE;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 transition-opacity duration-300" />

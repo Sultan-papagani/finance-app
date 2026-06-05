@@ -32,19 +32,23 @@ import GoldMarketsPage from './pages/GoldMarketsPage';
 import CardDetail from "./pages/CardDetail";
 import AssetDetail from "./pages/AssetDetail";
 
-function App() {
+// "/" rotasi her render'da token'i TAZE okur.
+// Boylece giris yaptiktan sonra navigate("/") cagrildiginda
+// eski (bos) token degeri yuzunden tanitim sayfasina dusmek yerine
+// dogru sekilde kart sayfasina (/home) yonlendirir.
+function RootRedirect() {
   const hasToken = localStorage.getItem("token");
+  return hasToken ? <Navigate to="/home" replace /> : <Index />;
+}
 
+function App() {
   return (
     <ThemeProvider>
       <CustomAlert />
       <Router>
         <Routes>
           {/* --- ANA YONLENDIRME --- */}
-          <Route
-            path="/"
-            element={hasToken ? <Navigate to="/home" replace /> : <Index />}
-          />
+          <Route path="/" element={<RootRedirect />} />
 
           {/* Sadece Giris Sayfasi */}
           <Route path="/login" element={<Login />} />
